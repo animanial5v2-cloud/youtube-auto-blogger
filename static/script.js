@@ -756,6 +756,51 @@ document.addEventListener('DOMContentLoaded', () => {
         addChatMessage('ai', '예약된 종료가 취소되었습니다.');
     }
 
+    // --- MISSING FUNCTIONS ---
+    function handleChatContainerClick(event) {
+        if (event.target.classList.contains('show-preview-btn')) {
+            const contentId = event.target.dataset.contentId;
+            const content = generatedContentStore[contentId];
+            if (content) {
+                previewTitleInput.value = content.title;
+                previewBodyTextarea.value = content.body;
+                approvePostBtn.dataset.contentId = contentId;
+                previewModal.classList.remove('hidden');
+            }
+        } else if (event.target.classList.contains('post-from-topic-btn')) {
+            const topic = event.target.dataset.topic;
+            chatInput.value = topic;
+            toggleTopicDiscoveryMode();
+            chatInput.focus();
+            addChatMessage('ai', `<strong>'${topic.substring(0, 50)}...'</strong> 주제로 포스팅을 준비합니다. 내용을 확인하고 전송 버튼을 누르세요.`, true);
+        }
+    }
+
+    function toggleTopicDiscoveryMode() {
+        isTopicDiscoveryMode = !isTopicDiscoveryMode;
+        const topicDiscoveryBtn = document.getElementById('topicDiscoveryBtn');
+        if (topicDiscoveryBtn) {
+            if (isTopicDiscoveryMode) {
+                topicDiscoveryBtn.textContent = '일반 모드로 전환';
+                topicDiscoveryBtn.classList.add('active');
+                addChatMessage('ai', '주제 발견 모드가 활성화되었습니다. YouTube 링크나 주제를 입력하면 관련 블로그 포스팅 주제를 제안해드립니다.');
+            } else {
+                topicDiscoveryBtn.textContent = '주제 발견 모드';
+                topicDiscoveryBtn.classList.remove('active');
+                addChatMessage('ai', '일반 모드로 돌아왔습니다.');
+            }
+        }
+    }
+
+    // Add event listener for chat container clicks
+    if (chatContainer) {
+        chatContainer.addEventListener('click', handleChatContainerClick);
+    }
+
+    // Make functions globally available
+    window.handleChatContainerClick = handleChatContainerClick;
+    window.toggleTopicDiscoveryMode = toggleTopicDiscoveryMode;
+
     // --- INITIALIZATION ---
     setInitialTheme();
     initializeCollapsibles();
