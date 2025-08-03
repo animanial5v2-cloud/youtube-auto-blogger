@@ -30,9 +30,11 @@ class BlogPost(db.Model):
     source_url = db.Column(db.String(1000), nullable=True)
     source_file_name = db.Column(db.String(255), nullable=True)
     
-    # Blog posting details
-    blogger_post_id = db.Column(db.String(100), nullable=True)
-    blogger_url = db.Column(db.String(1000), nullable=True)
+    # Publishing platform information
+    platform = db.Column(db.String(50), default='blogger')
+    platform_post_id = db.Column(db.String(255), nullable=True)
+    blogger_post_id = db.Column(db.String(100), nullable=True)  # Keep for backward compatibility
+    blogger_url = db.Column(db.String(1000), nullable=True)  # Keep for backward compatibility
     is_draft = db.Column(db.Boolean, default=False)
     
     # Metadata

@@ -7,6 +7,9 @@ from models import User, BlogPost, PostQueue
 from services.youtube_service import YouTubeService
 from services.gemini_service import GeminiService
 from services.blogger_service import BloggerService
+from services.wordpress_service import WordPressService
+from services.tistory_service import TistoryService
+from services.naver_service import NaverService
 from datetime import datetime
 import uuid
 
@@ -14,6 +17,9 @@ import uuid
 youtube_service = YouTubeService()
 gemini_service = GeminiService()
 blogger_service = BloggerService()
+wordpress_service = WordPressService()
+tistory_service = TistoryService()
+naver_service = NaverService()
 
 def get_or_create_user(session_id=None):
     """Get or create user based on session"""
@@ -224,48 +230,96 @@ def generate_blog_post():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/publish', methods=['POST'])
-def publish_to_blogger():
-    """Publish generated post to Blogger"""
+def publish_to_platform():
+    """Publish generated post to selected platform"""
     try:
         user = get_or_create_user()
         data = request.get_json()
         
         post_id = data.get('post_id')
-        access_token = data.get('access_token')
-        blog_id = data.get('blog_id')
+        platform = data.get('platform', 'blogger')
         is_draft = data.get('is_draft', False)
         
-        if not all([post_id, access_token, blog_id]):
-            return jsonify({'error': 'Missing required parameters'}), 400
+        if not post_id:
+            return jsonify({'error': 'Post ID is required'}), 400
         
         # Get post from database
         blog_post = BlogPost.query.filter_by(id=post_id, user_id=user.id).first()
         if not blog_post:
             return jsonify({'error': 'Post not found'}), 404
         
-        # Publish to Blogger
-        result = blogger_service.publish_post(
-            access_token, blog_id, blog_post.title, blog_post.content, is_draft
-        )
+        result = None
+        
+        # Publish to selected platform
+        if platform == 'blogger':
+            access_token = data.get('access_token')
+            blog_id = data.get('blog_id')
+            
+            if not all([access_token, blog_id]):
+                return jsonify({'error': 'Missing Blogger credentials'}), 400
+                
+            result = blogger_service.publish_post(
+                access_token, blog_id, blog_post.title, blog_post.content, is_draft
+            )
+            
+        elif platform == 'wordpress':
+            site_url = data.get('site_url')
+            access_token = data.get('access_token')
+            
+            if not all([site_url, access_token]):
+                return jsonify({'error': 'Missing WordPress credentials'}), 400
+                
+            result = wordpress_service.publish_post(
+                site_url, access_token, blog_post.title, blog_post.content, is_draft
+            )
+            
+        elif platform == 'tistory':
+            blog_name = data.get('blog_name')
+            access_token = data.get('access_token')
+            
+            if not all([blog_name, access_token]):
+                return jsonify({'error': 'Missing Tistory credentials'}), 400
+                
+            result = tistory_service.publish_post(
+                blog_name, access_token, blog_post.title, blog_post.content, is_draft
+            )
+            
+        elif platform == 'naver':
+            blog_id = data.get('blog_id')
+            client_id = data.get('client_id')
+            client_secret = data.get('client_secret')
+            
+            if not all([blog_id, client_id, client_secret]):
+                return jsonify({'error': 'Missing Naver Blog credentials'}), 400
+                
+            result = naver_service.publish_post(
+                blog_id, client_id, client_secret, blog_post.title, blog_post.content, is_draft
+            )
+            
+        else:
+            return jsonify({'error': f'Unsupported platform: {platform}'}), 400
         
         if result:
-            # Update post with Blogger details
-            blog_post.blogger_post_id = result.get('id')
-            blog_post.blogger_url = result.get('url')
+            # Update post with platform details
+            blog_post.platform = platform
+            blog_post.platform_post_id = result.get('id')
+            blog_post.blogger_url = result.get('url')  # Keep for backward compatibility
             blog_post.is_draft = is_draft
             blog_post.posted_at = datetime.utcnow()
             db.session.commit()
             
             return jsonify({
                 'status': 'success',
-                'blogger_url': result.get('url'),
-                'blogger_post_id': result.get('id')
+                'platform': platform,
+                'post_url': result.get('url'),
+                'post_id': result.get('id'),
+                'blogger_url': result.get('url')  # Keep for backward compatibility
             })
         else:
-            return jsonify({'error': 'Failed to publish to Blogger'}), 500
+            return jsonify({'error': f'Failed to publish to {platform}'}), 500
             
     except Exception as e:
-        logging.error(f"Error publishing to Blogger: {str(e)}")
+        logging.error(f"Error publishing to {platform if 'platform' in locals() else 'unknown platform'}: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/queue', methods=['GET', 'POST'])

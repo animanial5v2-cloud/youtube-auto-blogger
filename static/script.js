@@ -49,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const removeVideoBtn = document.getElementById('removeVideoBtn');
     const previewBeforePostCheckbox = document.getElementById('previewBeforePost');
     const postAsDraftCheckbox = document.getElementById('postAsDraft');
+    
+    // Platform selection elements
+    const platformSelect = document.getElementById('platformSelect');
 
     // Automation & PC Control
     const loopIntervalSelect = document.getElementById('loopInterval');
@@ -122,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     removeImageBtn?.addEventListener('click', handleRemoveImage);
     userVideoUpload?.addEventListener('change', handleVideoUpload);
     removeVideoBtn?.addEventListener('click', handleRemoveVideo);
+    platformSelect?.addEventListener('change', handlePlatformChange);
 
     // Automation & PC Control
     addToQueueFromChatBtn?.addEventListener('click', handleAddToQueueFromChat);
@@ -449,26 +453,73 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function publishPost(postId) {
-        if (!accessToken || !blogIdInput?.value) {
-            addChatMessage('ai', '블로거 로그인과 블로그 ID가 필요합니다.');
-            return;
+        const selectedPlatform = document.getElementById('platformSelect')?.value || 'blogger';
+        
+        // Validate platform-specific requirements
+        let publishData = {
+            post_id: postId,
+            platform: selectedPlatform,
+            is_draft: postAsDraftCheckbox?.checked || false
+        };
+        
+        if (selectedPlatform === 'blogger') {
+            if (!accessToken || !document.getElementById('bloggerBlogId')?.value) {
+                addChatMessage('ai', 'Google 로그인과 Blogger 블로그 ID가 필요합니다.');
+                return;
+            }
+            publishData.access_token = accessToken;
+            publishData.blog_id = document.getElementById('bloggerBlogId').value;
+            
+        } else if (selectedPlatform === 'wordpress') {
+            const siteUrl = document.getElementById('wordpressSite')?.value;
+            const token = document.getElementById('wordpressToken')?.value;
+            if (!siteUrl || !token) {
+                addChatMessage('ai', 'WordPress 사이트 주소와 API 토큰이 필요합니다.');
+                return;
+            }
+            publishData.site_url = siteUrl;
+            publishData.access_token = token;
+            
+        } else if (selectedPlatform === 'tistory') {
+            const blogName = document.getElementById('tistoryBlogName')?.value;
+            const token = document.getElementById('tistoryAccessToken')?.value;
+            if (!blogName || !token) {
+                addChatMessage('ai', 'Tistory 블로그명과 Access Token이 필요합니다.');
+                return;
+            }
+            publishData.blog_name = blogName;
+            publishData.access_token = token;
+            
+        } else if (selectedPlatform === 'naver') {
+            const blogId = document.getElementById('naverBlogId')?.value;
+            const clientId = document.getElementById('naverClientId')?.value;
+            const clientSecret = document.getElementById('naverClientSecret')?.value;
+            if (!blogId || !clientId || !clientSecret) {
+                addChatMessage('ai', '네이버 블로그 ID, Client ID, Client Secret이 필요합니다.');
+                return;
+            }
+            publishData.blog_id = blogId;
+            publishData.client_id = clientId;
+            publishData.client_secret = clientSecret;
         }
         
         try {
             const response = await fetch('/api/publish', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    post_id: postId,
-                    access_token: accessToken,
-                    blog_id: blogIdInput.value,
-                    is_draft: postAsDraftCheckbox?.checked || false
-                })
+                body: JSON.stringify(publishData)
             });
             
             if (response.ok) {
                 const result = await response.json();
-                addChatMessage('ai', `게시물이 성공적으로 업로드되었습니다! <a href="${result.blogger_url}" target="_blank">확인하기</a>`);
+                const platformName = {
+                    'blogger': 'Blogger',
+                    'wordpress': 'WordPress',
+                    'tistory': 'Tistory',
+                    'naver': '네이버 블로그'
+                }[selectedPlatform] || selectedPlatform;
+                
+                addChatMessage('ai', `${platformName}에 게시물이 성공적으로 업로드되었습니다! <a href="${result.post_url}" target="_blank">확인하기</a>`);
             } else {
                 const error = await response.json();
                 addChatMessage('ai', `업로드 실패: ${error.error}`);
@@ -513,6 +564,23 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (videoUploadConfig) {
             videoUploadConfig.style.display = selected === 'videoFile' ? 'block' : 'none';
+        }
+    }
+
+    function handlePlatformChange() {
+        const selected = document.getElementById('platformSelect')?.value;
+        const configs = ['bloggerConfig', 'wordpressConfig', 'tistoryConfig', 'naverConfig'];
+        
+        // Hide all platform configs
+        configs.forEach(configId => {
+            const config = document.getElementById(configId);
+            if (config) config.classList.add('hidden');
+        });
+        
+        // Show selected platform config
+        const selectedConfig = document.getElementById(`${selected}Config`);
+        if (selectedConfig) {
+            selectedConfig.classList.remove('hidden');
         }
     }
 
@@ -801,6 +869,21 @@ document.addEventListener('DOMContentLoaded', () => {
     window.handleChatContainerClick = handleChatContainerClick;
     window.toggleTopicDiscoveryMode = toggleTopicDiscoveryMode;
 
+    // --- PLATFORM HANDLERS ---
+    function handlePlatformChange() {
+        const selectedPlatform = document.getElementById('platformSelect')?.value || 'blogger';
+        
+        // Hide all platform configs
+        const allConfigs = document.querySelectorAll('.platform-config');
+        allConfigs.forEach(config => config.classList.add('hidden'));
+        
+        // Show selected platform config
+        const selectedConfig = document.getElementById(`${selectedPlatform}Config`);
+        if (selectedConfig) {
+            selectedConfig.classList.remove('hidden');
+        }
+    }
+
     // --- INITIALIZATION ---
     setInitialTheme();
     initializeCollapsibles();
@@ -809,4 +892,11 @@ document.addEventListener('DOMContentLoaded', () => {
     loadHistory();
     loadQueue();
     checkModelCompatibility();
+    
+    // Add platform change listener
+    const platformSelect = document.getElementById('platformSelect');
+    if (platformSelect) {
+        platformSelect.addEventListener('change', handlePlatformChange);
+        handlePlatformChange(); // Initialize display
+    }
 });

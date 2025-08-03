@@ -281,10 +281,71 @@
                     </summary>
                     <div class="collapsible-content-wrapper">
                         <div class="form-group-description">
-                            ⚙️ <strong>발행 설정:</strong> 블로그 글 발행 방식을 설정하세요.<br>
+                            🌐 <strong>플랫폼 & 발행 설정:</strong> 블로그 플랫폼과 발행 방식을 설정하세요.<br>
+                            • <strong>플랫폼:</strong> Blogger, WordPress, Tistory, Naver 블로그 지원<br>
                             • <strong>미리보기:</strong> 생성된 글을 검토 후 수동으로 발행<br>
                             • <strong>임시 저장:</strong> 블로그에 초안으로만 저장 (즉시 발행 안함)
                         </div>
+                    
+                    <div class="form-group">
+                        <label for="platformSelect">발행 플랫폼</label>
+                        <select id="platformSelect">
+                            <option value="blogger" selected>Google Blogger</option>
+                            <option value="wordpress">WordPress.com</option>
+                            <option value="tistory">Tistory</option>
+                            <option value="naver">네이버 블로그</option>
+                        </select>
+                    </div>
+
+                    <!-- Platform-specific configurations -->
+                    <div id="bloggerConfig" class="platform-config">
+                        <div class="form-group">
+                            <label for="bloggerBlogId">Blogger 블로그 ID</label>
+                            <input type="text" id="bloggerBlogId" placeholder="숫자로 된 블로그 ID">
+                            <small class="help-text">Blogger 관리 → 설정 → 기본에서 확인</small>
+                        </div>
+                    </div>
+
+                    <div id="wordpressConfig" class="platform-config hidden">
+                        <div class="form-group">
+                            <label for="wordpressSite">WordPress 사이트</label>
+                            <input type="text" id="wordpressSite" placeholder="yoursite.wordpress.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="wordpressToken">WordPress API 토큰</label>
+                            <input type="password" id="wordpressToken" placeholder="WordPress.com API 토큰">
+                            <small class="help-text"><a href="https://developer.wordpress.com/apps/" target="_blank">WordPress.com에서 토큰 발급</a></small>
+                        </div>
+                    </div>
+
+                    <div id="tistoryConfig" class="platform-config hidden">
+                        <div class="form-group">
+                            <label for="tistoryBlogName">Tistory 블로그명</label>
+                            <input type="text" id="tistoryBlogName" placeholder="yourblog.tistory.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="tistoryAccessToken">Tistory Access Token</label>
+                            <input type="password" id="tistoryAccessToken" placeholder="Tistory API Access Token">
+                            <small class="help-text"><a href="https://www.tistory.com/guide/api/blog" target="_blank">Tistory API 관리에서 토큰 발급</a></small>
+                        </div>
+                    </div>
+
+                    <div id="naverConfig" class="platform-config hidden">
+                        <div class="form-group">
+                            <label for="naverBlogId">네이버 블로그 ID</label>
+                            <input type="text" id="naverBlogId" placeholder="네이버 블로그 ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="naverClientId">네이버 Client ID</label>
+                            <input type="text" id="naverClientId" placeholder="네이버 개발자센터 Client ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="naverClientSecret">네이버 Client Secret</label>
+                            <input type="password" id="naverClientSecret" placeholder="네이버 개발자센터 Client Secret">
+                            <small class="help-text"><a href="https://developers.naver.com/apps/" target="_blank">네이버 개발자센터에서 앱 등록</a></small>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label>
                             <input type="checkbox" id="previewBeforePost">
