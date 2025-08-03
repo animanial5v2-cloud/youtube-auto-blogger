@@ -155,28 +155,37 @@
                 <button id="themeToggleBtn" class="button-icon" title="테마 전환">☀️</button>
             </div>
             <div class="settings-panel">
-                <div class="settings-group">
-                    <h3>API 설정</h3>
-                    <div class="form-group">
-                        <label for="apiKey">Gemini API 키</label>
-                        <input type="password" id="apiKey" placeholder="Gemini API 키">
+                <details id="apiSettingsSection" class="collapsible-section" open>
+                    <summary class="sidebar-section-header">
+                        <h3 class="sidebar-section-title">API 설정</h3>
+                        <span class="collapse-icon"></span>
+                    </summary>
+                    <div class="collapsible-content-wrapper">
+                        <div class="form-group">
+                            <label for="apiKey">Gemini API 키</label>
+                            <input type="password" id="apiKey" placeholder="Gemini API 키">
+                        </div>
+                        <div class="form-group">
+                            <label for="clientId">Google Client ID</label>
+                            <input type="text" id="clientId" placeholder="Google OAuth Client ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="blogId">블로그 ID</label>
+                            <input type="text" id="blogId" placeholder="Blogger 블로그 ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="blogAddress">블로그 주소</label>
+                            <input type="text" id="blogAddress" placeholder="https://yourblog.blogspot.com">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="clientId">Google Client ID</label>
-                        <input type="text" id="clientId" placeholder="Google OAuth Client ID">
-                    </div>
-                    <div class="form-group">
-                        <label for="blogId">블로그 ID</label>
-                        <input type="text" id="blogId" placeholder="Blogger 블로그 ID">
-                    </div>
-                    <div class="form-group">
-                        <label for="blogAddress">블로그 주소</label>
-                        <input type="text" id="blogAddress" placeholder="https://yourblog.blogspot.com">
-                    </div>
-                </div>
+                </details>
 
-                <div class="settings-group">
-                    <h3>이미지 소스</h3>
+                <details id="imageSettingsSection" class="collapsible-section" open>
+                    <summary class="sidebar-section-header">
+                        <h3 class="sidebar-section-title">이미지 소스</h3>
+                        <span class="collapse-icon"></span>
+                    </summary>
+                    <div class="collapsible-content-wrapper">
                     <div class="form-group image-source-selector">
                         <input type="radio" name="imageSource" value="none" id="imageNone" checked>
                         <label for="imageNone">없음</label>
@@ -211,10 +220,15 @@
                             <button id="removeImageBtn" type="button">&times;</button>
                         </div>
                     </div>
-                </div>
+                    </div>
+                </details>
                 
-                <div class="settings-group">
-                    <h3>콘텐츠 소스</h3>
+                <details id="contentSettingsSection" class="collapsible-section" open>
+                    <summary class="sidebar-section-header">
+                        <h3 class="sidebar-section-title">콘텐츠 소스</h3>
+                        <span class="collapse-icon"></span>
+                    </summary>
+                    <div class="collapsible-content-wrapper">
                     <div class="form-group image-source-selector">
                         <input type="radio" name="youtubeSourceType" value="transcript" id="youtubeTranscript" checked>
                         <label for="youtubeTranscript">자막 (URL)</label>
@@ -234,10 +248,15 @@
                             <button id="removeVideoBtn" type="button">파일 제거</button>
                         </div>
                     </div>
-                </div>
+                    </div>
+                </details>
 
-                <div class="settings-group">
-                    <h3>포스팅 옵션</h3>
+                <details id="postingOptionsSection" class="collapsible-section" open>
+                    <summary class="sidebar-section-header">
+                        <h3 class="sidebar-section-title">포스팅 옵션</h3>
+                        <span class="collapse-icon"></span>
+                    </summary>
+                    <div class="collapsible-content-wrapper">
                     <div class="form-group">
                         <label>
                             <input type="checkbox" id="previewBeforePost">
@@ -250,10 +269,15 @@
                             임시 저장으로 포스팅
                         </label>
                     </div>
-                </div>
+                    </div>
+                </details>
 
-                <div class="settings-group">
-                    <h3>자동화 & PC 제어</h3>
+                <details id="automationSection" class="collapsible-section">
+                    <summary class="sidebar-section-header">
+                        <h3 class="sidebar-section-title">자동화 & PC 제어</h3>
+                        <span class="collapse-icon"></span>
+                    </summary>
+                    <div class="collapsible-content-wrapper">
                     <div class="form-group">
                         <label for="loopInterval">자동 포스팅 간격</label>
                         <select id="loopInterval">
@@ -274,14 +298,20 @@
                         <button id="shutdownPcBtn" class="button button-secondary">PC 자동 종료</button>
                         <button id="cancelShutdownBtn" class="button button-secondary">종료 취소</button>
                     </div>
-                </div>
+                    </div>
+                </details>
 
-                <div class="settings-group">
-                    <h3>포스팅 대기열</h3>
+                <details id="queueSection" class="collapsible-section">
+                    <summary class="sidebar-section-header">
+                        <h3 class="sidebar-section-title">포스팅 대기열</h3>
+                        <span class="collapse-icon"></span>
+                    </summary>
+                    <div class="collapsible-content-wrapper">
                     <div id="postQueueContainer">
                         <p>대기열이 비어있습니다.</p>
                     </div>
-                </div>
+                    </div>
+                </details>
             </div>
         </aside>
     </div>
