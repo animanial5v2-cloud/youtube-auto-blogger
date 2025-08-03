@@ -8,6 +8,14 @@ AI Blogging Studio is a comprehensive web application that automates blog conten
 
 Preferred communication style: Simple, everyday language.
 
+## Commercial Goals
+
+The user plans to sell this AI Auto-Blogging Studio on Kmong (Korean freelance platform). Key requirements:
+- Deployment-ready Flask application with PostgreSQL database
+- Professional presentation for potential buyers
+- Clear documentation for setup and usage
+- Scalable architecture for multiple users
+
 ## System Architecture
 
 ### Backend Architecture
