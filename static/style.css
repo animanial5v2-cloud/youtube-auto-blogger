@@ -204,12 +204,35 @@ h3 {
 }
 
 .form-group-description {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
-    margin-top: calc(var(--spacing-unit));
+    margin-bottom: calc(var(--spacing-unit) * 1.5);
+    padding: calc(var(--spacing-unit) * 1.5);
+    background-color: rgba(88, 166, 255, 0.05);
+    border-left: 3px solid var(--primary-color);
+    border-radius: 0 6px 6px 0;
+    line-height: 1.4;
 }
+
+[data-theme="light"] .form-group-description {
+    background-color: rgba(9, 105, 218, 0.05);
+}
+
 .form-group-description a {
     color: var(--primary-color);
+    text-decoration: none;
+}
+
+.form-group-description a:hover {
+    text-decoration: underline;
+}
+
+.help-text {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: calc(var(--spacing-unit) * 0.5);
+    font-style: italic;
 }
 
 input[type="text"], input[type="password"], select, textarea {
