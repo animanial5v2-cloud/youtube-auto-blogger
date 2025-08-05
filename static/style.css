@@ -792,10 +792,9 @@ input:focus, select:focus, textarea:focus {
         align-items: center;
         padding: calc(var(--spacing-unit) * 1.5);
         background: var(--surface-color);
-        border-bottom: 1px solid var(--border-color);
-        position: sticky;
-        top: 0;
-        z-index: 100;
+        border-bottom: 2px solid var(--border-color);
+        flex-shrink: 0;
+        min-height: 60px;
     }
     
     .mobile-title {
@@ -810,9 +809,8 @@ input:focus, select:focus, textarea:focus {
     }
     
     .app-container {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto 1fr auto;
-        grid-template-areas: "mobile-header" "main" "sidebar-right";
+        display: flex;
+        flex-direction: column;
         height: 100vh;
         overflow: hidden;
     }
@@ -822,36 +820,42 @@ input:focus, select:focus, textarea:focus {
     }
     
     .main-content {
-        grid-area: main;
-        padding: calc(var(--spacing-unit) * 1.5);
+        flex: 1;
+        padding: calc(var(--spacing-unit) * 1);
         overflow-y: auto;
         background-color: var(--bg-color);
+        min-height: 0; /* flexbox 스크롤 수정 */
     }
     
     .sidebar-right {
-        grid-area: sidebar-right;
-        padding: calc(var(--spacing-unit) * 1.5);
-        max-height: 50vh;
+        flex-shrink: 0;
+        padding: calc(var(--spacing-unit) * 1);
+        max-height: 45vh;
         overflow-y: auto;
         border-top: 2px solid var(--border-color);
         border-left: none;
+        background: var(--surface-color);
     }
     
     /* 채팅 폼 모바일 최적화 */
     .chat-form {
         flex-direction: column;
-        gap: calc(var(--spacing-unit) * 1.5);
-        position: sticky;
-        bottom: 0;
+        gap: calc(var(--spacing-unit) * 1);
         background: var(--surface-color);
         padding: calc(var(--spacing-unit) * 1.5);
         border-top: 1px solid var(--border-color);
-        margin: 0 calc(var(--spacing-unit) * -1.5);
+        margin: 0;
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
     }
     
     .chat-input {
-        min-height: 80px;
+        min-height: 100px;
         font-size: 16px; /* iOS zoom 방지 */
+        border-radius: 8px;
+        padding: calc(var(--spacing-unit) * 1.2);
+        resize: none;
     }
     
     .form-actions {
@@ -861,8 +865,11 @@ input:focus, select:focus, textarea:focus {
     
     .send-btn, .topic-discovery-btn {
         width: 100%;
-        padding: calc(var(--spacing-unit) * 1.5);
-        font-size: 1rem;
+        padding: calc(var(--spacing-unit) * 1.8);
+        font-size: 1.1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        min-height: 50px;
     }
     
     /* 설정 그룹 모바일 최적화 */
@@ -905,20 +912,53 @@ input:focus, select:focus, textarea:focus {
 
 /* 작은 모바일 기기 (iPhone SE 등) */
 @media (max-width: 480px) {
+    .mobile-header {
+        padding: calc(var(--spacing-unit) * 1);
+        min-height: 50px;
+    }
+    
+    .mobile-title {
+        font-size: 1.1rem;
+    }
+    
     .sidebar-right {
-        max-height: 60vh;
+        max-height: 40vh;
+        padding: calc(var(--spacing-unit) * 0.8);
     }
     
     .chat-form {
-        padding: var(--spacing-unit);
-        margin: 0 calc(var(--spacing-unit) * -1);
+        padding: calc(var(--spacing-unit) * 1);
     }
     
     .main-content {
-        padding: var(--spacing-unit);
+        padding: calc(var(--spacing-unit) * 0.8);
+    }
+    
+    .chat-input {
+        min-height: 80px;
+        padding: calc(var(--spacing-unit) * 1);
+    }
+    
+    .send-btn, .topic-discovery-btn {
+        padding: calc(var(--spacing-unit) * 1.5);
+        min-height: 45px;
+        font-size: 1rem;
+    }
+}
+
+/* 매우 작은 화면 (Galaxy Fold 등) */
+@media (max-width: 320px) {
+    .mobile-header {
+        flex-direction: column;
+        gap: calc(var(--spacing-unit) * 0.5);
+        padding: calc(var(--spacing-unit) * 0.8);
+    }
+    
+    .mobile-language-selector {
+        width: 100%;
     }
     
     .sidebar-right {
-        padding: var(--spacing-unit);
+        max-height: 35vh;
     }
 }
