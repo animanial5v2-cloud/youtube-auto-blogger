@@ -990,6 +990,9 @@ function initializeMobileInterface() {
     
     // 모바일 API 설정 동기화
     syncMobileApiSettings();
+    
+    // 초기 로그인 상태 체크
+    setTimeout(checkLoginStatus, 500);
 }
 
 // 콘텐츠 입력 화면 업데이트
@@ -1216,8 +1219,32 @@ function handleMobileLogin() {
         loginBtn.click();
     }
     
-    // 상태 업데이트
-    updateMobileAuthStatus();
+    // 상태 업데이트 (약간의 지연 후)
+    setTimeout(() => {
+        updateMobileAuthStatus();
+        checkLoginStatus();
+    }, 1000);
+}
+
+// 로그인 상태 체크 및 다음 버튼 활성화
+function checkLoginStatus() {
+    const authStatus = document.getElementById('authStatus');
+    const mobileLoginNextBtn = document.getElementById('mobileLoginNextBtn');
+    
+    if (authStatus && mobileLoginNextBtn) {
+        // 로그인 성공 여부 확인 (성공 클래스나 텍스트로 판단)
+        const isLoggedIn = authStatus.classList.contains('success') || 
+                          authStatus.innerHTML.includes('성공') ||
+                          authStatus.innerHTML.includes('로그인됨');
+        
+        if (isLoggedIn) {
+            mobileLoginNextBtn.disabled = false;
+            mobileLoginNextBtn.textContent = '포스팅 시작';
+        } else {
+            mobileLoginNextBtn.disabled = true;
+            mobileLoginNextBtn.textContent = '로그인 필요';
+        }
+    }
 }
 
 // 모바일 인증 상태 업데이트
@@ -1229,6 +1256,9 @@ function updateMobileAuthStatus() {
         mobileAuthStatus.innerHTML = authStatus.innerHTML;
         mobileAuthStatus.className = authStatus.className.replace('status-box', 'auth-status-mobile');
     }
+    
+    // 로그인 상태 체크
+    checkLoginStatus();
 }
 
 // 전역 함수로 만들기
