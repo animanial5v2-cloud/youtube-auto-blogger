@@ -8,4 +8,4 @@ youtube-transcript-api==0.6.1
 email-validator==2.1.0
 python-multipart==0.0.6
 pyinstaller==6.15.0
-pillow==10.2.0
+pillow
