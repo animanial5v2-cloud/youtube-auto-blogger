@@ -1,13 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 언어 초기화 (languages.js 의존) - 약간의 지연을 두어 languages.js 로드 완료 보장
-    setTimeout(() => {
+    // 언어 초기화 (languages.js 의존) - 더 긴 지연으로 확실한 로드 보장
+    const initLanguages = () => {
         if (typeof initializeLanguage === 'function') {
             console.log('언어 초기화 시작');
             initializeLanguage();
         } else {
             console.error('initializeLanguage 함수를 찾을 수 없습니다');
+            // 재시도
+            setTimeout(initLanguages, 200);
         }
-    }, 100);
+    };
+    
+    // 다양한 시점에서 시도
+    setTimeout(initLanguages, 100);
+    setTimeout(initLanguages, 500);
+    setTimeout(initLanguages, 1000);
     
     // 사이드바 토글 기능 초기화
     initializeSidebarToggle();
