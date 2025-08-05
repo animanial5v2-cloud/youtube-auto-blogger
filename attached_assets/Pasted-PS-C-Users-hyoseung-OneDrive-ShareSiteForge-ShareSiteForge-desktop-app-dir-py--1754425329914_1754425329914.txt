@@ -1,0 +1,74 @@
+PS C:\Users\hyoseung\OneDrive\바탕 화면\ShareSiteForge\ShareSiteForge\desktop-app> dir *.py
+
+
+    디렉터리: C:\Users\hyoseung\OneDrive\바탕 화면\ShareSiteForge\ShareSiteForge\desktop-app
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----   2025-08-06-수   오전 5:02           1399 build.py
+-a----   2025-08-06-수   오전 5:02          10583 package-desktop.py
+
+
+PS C:\Users\hyoseung\OneDrive\바탕 화면\ShareSiteForge\ShareSiteForge\desktop-app> pyinstaller --onefile --noconsole --name="AI_Blogging_Studio" package-desktop.py
+315 INFO: PyInstaller: 6.15.0, contrib hooks: 2025.8
+316 INFO: Python: 3.13.5
+376 INFO: Platform: Windows-11-10.0.26100-SP0
+376 INFO: Python environment: C:\Users\hyoseung\AppData\Local\Programs\Python\Python313
+377 INFO: wrote C:\Users\hyoseung\OneDrive\바탕 화면\ShareSiteForge\ShareSiteForge\desktop-app\AI_Blogging_Studio.spec
+388 INFO: Module search paths (PYTHONPATH):
+['C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pyinstaller.exe',
+ 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip',
+ 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\DLLs',
+ 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib',
+ 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313',
+ 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages',
+ 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor',
+ 'C:\\Users\\hyoseung\\OneDrive\\바탕 '
+ '화면\\ShareSiteForge\\ShareSiteForge\\desktop-app']
+1037 INFO: checking Analysis
+1038 INFO: Building Analysis because Analysis-00.toc is non existent
+1038 INFO: Running Analysis Analysis-00.toc
+1038 INFO: Target bytecode optimization level: 0
+1038 INFO: Initializing module dependency graph...
+1038 INFO: Initializing module graph hook caches...
+1073 INFO: Analyzing modules for base_library.zip ...
+3339 INFO: Processing standard module hook 'hook-encodings.py' from 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks'
+4587 INFO: Processing standard module hook 'hook-heapq.py' from 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks'
+6913 INFO: Processing standard module hook 'hook-pickle.py' from 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks'
+11222 INFO: Caching module dependency graph...
+11296 INFO: Looking for Python shared library...
+11334 INFO: Using Python shared library: C:\Users\hyoseung\AppData\Local\Programs\Python\Python313\python313.dll
+11334 INFO: Analyzing C:\Users\hyoseung\OneDrive\바탕 화면\ShareSiteForge\ShareSiteForge\desktop-app\package-desktop.py
+11346 INFO: Processing module hooks (post-graph stage)...
+11354 INFO: Performing binary vs. data reclassification (1 entries)
+11356 INFO: Looking for ctypes DLLs
+11365 INFO: Analyzing run-time hooks ...
+11366 INFO: Including run-time hook 'pyi_rth_inspect.py' from 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+11378 INFO: Creating base_library.zip...
+11466 INFO: Looking for dynamic libraries
+11596 INFO: Extra DLL search directories (AddDllDirectory): []
+11596 INFO: Extra DLL search directories (PATH): []
+12117 INFO: Warnings written to C:\Users\hyoseung\OneDrive\바탕 화면\ShareSiteForge\ShareSiteForge\desktop-app\build\AI_Blogging_Studio\warn-AI_Blogging_Studio.txt
+12138 INFO: Graph cross-reference written to C:\Users\hyoseung\OneDrive\바탕 화면\ShareSiteForge\ShareSiteForge\desktop-app\build\AI_Blogging_Studio\xref-AI_Blogging_Studio.html
+12160 INFO: checking PYZ
+12160 INFO: Building PYZ because PYZ-00.toc is non existent
+12160 INFO: Building PYZ (ZlibArchive) C:\Users\hyoseung\OneDrive\바탕 화면\ShareSiteForge\ShareSiteForge\desktop-app\build\AI_Blogging_Studio\PYZ-00.pyz
+12428 INFO: Building PYZ (ZlibArchive) C:\Users\hyoseung\OneDrive\바탕 화면\ShareSiteForge\ShareSiteForge\desktop-app\build\AI_Blogging_Studio\PYZ-00.pyz completed successfully.
+12466 INFO: checking PKG
+12466 INFO: Building PKG because PKG-00.toc is non existent
+12466 INFO: Building PKG (CArchive) AI_Blogging_Studio.pkg
+14409 INFO: Building PKG (CArchive) AI_Blogging_Studio.pkg completed successfully.
+14412 INFO: Bootloader C:\Users\hyoseung\AppData\Local\Programs\Python\Python313\Lib\site-packages\PyInstaller\bootloader\Windows-64bit-intel\runw.exe
+14412 INFO: checking EXE
+14412 INFO: Building EXE because EXE-00.toc is non existent
+14412 INFO: Building EXE from EXE-00.toc
+14412 INFO: Copying bootloader EXE to C:\Users\hyoseung\OneDrive\바탕 화면\ShareSiteForge\ShareSiteForge\desktop-app\dist\AI_Blogging_Studio.exe
+14508 INFO: Copying icon to EXE
+14563 INFO: Copying 0 resources to EXE
+14563 INFO: Embedding manifest in EXE
+15170 INFO: Appending PKG archive to EXE
+15283 INFO: Fixing EXE headers
+16074 INFO: Building EXE from EXE-00.toc completed successfully.
+16077 INFO: Build complete! The results are available in: C:\Users\hyoseung\OneDrive\바탕 화면\ShareSiteForge\ShareSiteForge\desktop-app\dist
+PS C:\Users\hyoseung\OneDrive\바탕 화면\ShareSiteForge\ShareSiteForge\desktop-app>
