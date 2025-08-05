@@ -784,28 +784,55 @@ input:focus, select:focus, textarea:focus {
     resize: vertical;
 }
 
+/* === LARGE PHONE OPTIMIZATION (Galaxy S25 Ultra etc.) === */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .app-container {
+        grid-template-columns: 300px 1fr 320px;
+        grid-template-areas: "sidebar-left main sidebar-right";
+    }
+    
+    .sidebar-left, .sidebar-right {
+        font-size: 0.9rem;
+    }
+    
+    .form-group input, .form-group select, .form-group textarea {
+        font-size: 15px;
+        padding: calc(var(--spacing-unit) * 0.8);
+    }
+    
+    .button, .button-primary, .button-secondary {
+        min-height: 42px;
+    }
+}
+
 /* === MOBILE RESPONSIVENESS === */
 @media (max-width: 768px) {
     .mobile-header {
         display: flex !important;
         justify-content: space-between;
         align-items: center;
-        padding: calc(var(--spacing-unit) * 1.5);
+        padding: calc(var(--spacing-unit) * 2);
         background: var(--surface-color);
         border-bottom: 2px solid var(--border-color);
         flex-shrink: 0;
-        min-height: 60px;
+        min-height: 70px;
     }
     
     .mobile-title {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
         font-weight: 600;
         color: var(--text-color);
         margin: 0;
     }
     
     .mobile-language-selector {
-        min-width: 100px;
+        min-width: 120px;
+    }
+    
+    .mobile-language-selector select {
+        font-size: 16px;
+        padding: calc(var(--spacing-unit) * 1.2);
+        border-radius: 8px;
     }
     
     .app-container {
@@ -821,7 +848,7 @@ input:focus, select:focus, textarea:focus {
     
     .main-content {
         flex: 1;
-        padding: calc(var(--spacing-unit) * 1);
+        padding: calc(var(--spacing-unit) * 1.5);
         overflow-y: auto;
         background-color: var(--bg-color);
         min-height: 0; /* flexbox 스크롤 수정 */
@@ -829,8 +856,8 @@ input:focus, select:focus, textarea:focus {
     
     .sidebar-right {
         flex-shrink: 0;
-        padding: calc(var(--spacing-unit) * 1);
-        max-height: 45vh;
+        padding: calc(var(--spacing-unit) * 1.2);
+        max-height: 50vh;
         overflow-y: auto;
         border-top: 2px solid var(--border-color);
         border-left: none;
@@ -851,11 +878,12 @@ input:focus, select:focus, textarea:focus {
     }
     
     .chat-input {
-        min-height: 100px;
-        font-size: 16px; /* iOS zoom 방지 */
-        border-radius: 8px;
-        padding: calc(var(--spacing-unit) * 1.2);
+        min-height: 120px;
+        font-size: 17px; /* 대형 화면 가독성 */
+        border-radius: 12px;
+        padding: calc(var(--spacing-unit) * 1.5);
         resize: none;
+        line-height: 1.5;
     }
     
     .form-actions {
@@ -865,34 +893,51 @@ input:focus, select:focus, textarea:focus {
     
     .send-btn, .topic-discovery-btn {
         width: 100%;
-        padding: calc(var(--spacing-unit) * 1.8);
-        font-size: 1.1rem;
-        border-radius: 8px;
+        padding: calc(var(--spacing-unit) * 2);
+        font-size: 1.2rem;
+        border-radius: 12px;
         font-weight: 600;
-        min-height: 50px;
+        min-height: 56px;
+        letter-spacing: 0.5px;
     }
     
     /* 설정 그룹 모바일 최적화 */
     .settings-group {
-        margin-bottom: calc(var(--spacing-unit) * 2);
+        margin-bottom: calc(var(--spacing-unit) * 2.5);
+    }
+    
+    .settings-group h3 {
+        font-size: 1.1rem;
+        margin-bottom: calc(var(--spacing-unit) * 1.2);
     }
     
     .form-group {
-        margin-bottom: calc(var(--spacing-unit) * 1.5);
+        margin-bottom: calc(var(--spacing-unit) * 1.8);
+    }
+    
+    .form-group label {
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: calc(var(--spacing-unit) * 0.8);
+        display: block;
     }
     
     .form-group input,
     .form-group select,
     .form-group textarea {
-        font-size: 16px; /* iOS zoom 방지 */
-        padding: calc(var(--spacing-unit) * 1);
+        font-size: 17px; /* 대형 화면 가독성 */
+        padding: calc(var(--spacing-unit) * 1.2);
+        border-radius: 8px;
+        min-height: 48px;
     }
     
     /* 버튼 터치 친화적으로 */
     .button, .button-primary, .button-secondary {
-        min-height: 44px; /* iOS 터치 가이드라인 */
-        font-size: 1rem;
-        padding: calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 1.5);
+        min-height: 52px; /* 대형 화면 터치 최적화 */
+        font-size: 1.1rem;
+        padding: calc(var(--spacing-unit) * 1.2) calc(var(--spacing-unit) * 2);
+        border-radius: 10px;
+        font-weight: 500;
     }
     
     /* 언어 선택 드롭다운 */
