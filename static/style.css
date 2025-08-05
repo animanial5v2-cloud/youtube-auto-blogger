@@ -897,38 +897,38 @@ input:focus, select:focus, textarea:focus {
 @media (max-width: 768px) {
     .mobile-header {
         display: flex !important;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
         padding: calc(var(--spacing-unit) * 2);
-        background: var(--surface-color);
-        border-bottom: 2px solid var(--border-color);
+        background: var(--primary-color);
+        color: white;
         flex-shrink: 0;
         min-height: 70px;
+        position: relative;
     }
     
     .mobile-title {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         font-weight: 600;
-        color: var(--text-color);
         margin: 0;
+        text-align: center;
     }
     
-    .mobile-controls {
-        display: flex;
-        gap: calc(var(--spacing-unit) * 1);
-        align-items: center;
+    /* 언어 선택 - 우상단 고정 */
+    .mobile-language-floating {
+        position: absolute;
+        top: 50%;
+        right: calc(var(--spacing-unit) * 2);
+        transform: translateY(-50%);
     }
     
-    .mobile-controls .language-select {
-        min-width: 100px;
-        font-size: 15px;
-        padding: calc(var(--spacing-unit) * 0.8);
+    .mobile-language-floating select {
+        background: rgba(255,255,255,0.9);
+        border: 1px solid rgba(255,255,255,0.3);
         border-radius: 6px;
-    }
-    
-    .mobile-controls .sidebar-toggle-btn {
-        font-size: 0.9rem;
-        padding: calc(var(--spacing-unit) * 0.8) calc(var(--spacing-unit) * 1);
+        padding: calc(var(--spacing-unit) * 0.6) calc(var(--spacing-unit) * 0.8);
+        font-size: 14px;
+        backdrop-filter: blur(10px);
     }
     
     .app-container {
@@ -951,23 +951,103 @@ input:focus, select:focus, textarea:focus {
     }
     
     .sidebar-right {
-        flex-shrink: 0;
+        display: none;
+    }
+    
+    /* 모바일 전용 심플 인터페이스 */
+    .mobile-simple-interface {
+        display: block !important;
+        padding: calc(var(--spacing-unit) * 2);
+        max-width: 100%;
+    }
+    
+    .mobile-step {
+        background: white;
+        border-radius: 12px;
+        padding: calc(var(--spacing-unit) * 2);
+        margin-bottom: calc(var(--spacing-unit) * 2);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border: 1px solid var(--border-color);
+    }
+    
+    .mobile-step h3 {
+        font-size: 1.1rem;
+        margin: 0 0 calc(var(--spacing-unit) * 1.5) 0;
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    
+    .mobile-step .form-group {
+        margin-bottom: calc(var(--spacing-unit) * 1.5);
+    }
+    
+    .mobile-step .form-group:last-child {
+        margin-bottom: 0;
+    }
+    
+    .mobile-step label {
+        display: block;
+        font-size: 0.95rem;
+        font-weight: 500;
+        margin-bottom: calc(var(--spacing-unit) * 0.8);
+        color: var(--text-color);
+    }
+    
+    .mobile-step input,
+    .mobile-step select,
+    .mobile-step textarea {
+        width: 100%;
+        font-size: 16px !important; /* 줌 방지 */
         padding: calc(var(--spacing-unit) * 1.2);
-        max-height: 60vh;
-        overflow-y: auto;
-        border-top: 2px solid var(--border-color);
-        border-left: none;
-        background: var(--surface-color);
-        transition: max-height 0.3s ease, padding 0.3s ease;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        background: white;
+        box-sizing: border-box;
+        min-height: 48px;
     }
     
-    .sidebar-right.collapsed {
-        max-height: 0;
-        padding: 0 calc(var(--spacing-unit) * 1.2);
-        overflow: hidden;
+    .mobile-step input:focus,
+    .mobile-step select:focus,
+    .mobile-step textarea:focus {
+        border-color: var(--primary-color);
+        outline: none;
     }
     
-    /* 채팅 폼 모바일 최적화 */
+    .mobile-step textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .mobile-big-button {
+        width: 100%;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: calc(var(--spacing-unit) * 1.5);
+        font-size: 1.1rem;
+        font-weight: 600;
+        min-height: 56px;
+        cursor: pointer;
+        margin-top: calc(var(--spacing-unit) * 2);
+    }
+    
+    .mobile-big-button:hover {
+        background: var(--primary-hover);
+    }
+    
+    .mobile-big-button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+    
+    /* 기존 채팅 인터페이스 숨기기 */
+    #chatContainer,
+    .chat-input-area {
+        display: none !important;
+    }
+    
+    /* 채팅 폼 모바일 최적화 (혹시 표시될 때를 위해) */
     .chat-form {
         flex-direction: column;
         gap: calc(var(--spacing-unit) * 1);
