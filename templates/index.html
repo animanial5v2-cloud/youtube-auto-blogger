@@ -12,10 +12,24 @@
 </head>
 <body>
     <div class="app-container">
+        <!-- Tablet Header -->
+        <div class="tablet-header" style="display: none;">
+            <h1 class="tablet-title">AI Blogging Studio</h1>
+            <div class="tablet-controls">
+                <button id="sidebarToggleBtn" class="sidebar-toggle-btn">설정 접기/펼치기</button>
+                <select id="tabletLangSelect" class="language-select">
+                    <option value="ko">한국어</option>
+                    <option value="vi">Tiếng Việt</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </div>
+        
         <!-- Mobile Header -->
         <div class="mobile-header" style="display: none;">
             <h1 class="mobile-title">AI Blogging Studio</h1>
-            <div class="mobile-language-selector">
+            <div class="mobile-controls">
+                <button id="mobileSidebarToggle" class="sidebar-toggle-btn">설정</button>
                 <select id="mobileLangSelect" class="language-select">
                     <option value="ko">한국어</option>
                     <option value="vi">Tiếng Việt</option>

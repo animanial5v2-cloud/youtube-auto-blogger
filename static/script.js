@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 100);
     
+    // 사이드바 토글 기능 초기화
+    initializeSidebarToggle();
+    
     // --- GLOBAL STATE & CONFIG ---
     const GOOGLE_API_SCOPES = 'https://www.googleapis.com/auth/blogger https://www.googleapis.com/auth/cloud-platform';
     let tokenClient;
@@ -20,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isTopicDiscoveryMode = false;
     let postQueue = [];
     let currentQueueIndex = 0;
+    let sidebarCollapsed = false;
     
     // A temporary store for generated content before it's approved
     const generatedContentStore = {};
@@ -924,3 +928,33 @@ document.addEventListener('DOMContentLoaded', () => {
         handlePlatformChange(); // Initialize display
     }
 });
+
+// 사이드바 토글 기능 초기화
+function initializeSidebarToggle() {
+    const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+    const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+    const sidebarRight = document.querySelector('.sidebar-right');
+    
+    function toggleSidebar() {
+        if (sidebarRight) {
+            sidebarRight.classList.toggle('collapsed');
+            const isCollapsed = sidebarRight.classList.contains('collapsed');
+            
+            // 버튼 텍스트 업데이트
+            if (sidebarToggleBtn) {
+                sidebarToggleBtn.textContent = isCollapsed ? '설정 보기' : '설정 숨기기';
+            }
+            if (mobileSidebarToggle) {
+                mobileSidebarToggle.textContent = isCollapsed ? '설정 보기' : '설정 숨기기';
+            }
+        }
+    }
+    
+    // 이벤트 리스너 추가
+    if (sidebarToggleBtn) {
+        sidebarToggleBtn.addEventListener('click', toggleSidebar);
+    }
+    if (mobileSidebarToggle) {
+        mobileSidebarToggle.addEventListener('click', toggleSidebar);
+    }
+}

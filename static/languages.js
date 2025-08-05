@@ -1,5 +1,5 @@
 // 다국어 지원
-const translations = {
+const languages = {
     ko: {
         // Header
         title: "AI Blogging Studio",
@@ -229,10 +229,22 @@ function initializeLanguage() {
         
         mobileLangSelect.addEventListener('change', (e) => {
             changeLanguage(e.target.value);
-            // 데스크톱 셀렉트도 동기화
-            if (languageSelect) {
-                languageSelect.value = e.target.value;
-            }
+            // 다른 셀렉트들도 동기화
+            if (languageSelect) languageSelect.value = e.target.value;
+            if (tabletLangSelect) tabletLangSelect.value = e.target.value;
+        });
+    }
+    
+    // 태블릿 언어 선택
+    const tabletLangSelect = document.getElementById('tabletLangSelect');
+    if (tabletLangSelect) {
+        tabletLangSelect.value = savedLanguage;
+        
+        tabletLangSelect.addEventListener('change', (e) => {
+            changeLanguage(e.target.value);
+            // 다른 셀렉트들도 동기화
+            if (languageSelect) languageSelect.value = e.target.value;
+            if (mobileLangSelect) mobileLangSelect.value = e.target.value;
         });
     }
 }
