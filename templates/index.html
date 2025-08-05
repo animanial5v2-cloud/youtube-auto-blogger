@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='languages.js') }}"></script>
 </head>
 <body>
     <div class="app-container">
@@ -15,11 +16,18 @@
         <aside class="sidebar-left">
             <div class="sidebar-header">
                 <h1>AI Blogging Studio</h1>
+                <div class="language-selector">
+                    <select id="languageSelect" class="language-select">
+                        <option value="ko">한국어</option>
+                        <option value="vi">Tiếng Việt</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
             </div>
             <div class="sidebar-section">
                 <details id="historySection" class="collapsible-section" open>
                     <summary class="sidebar-section-header">
-                        <h2 class="sidebar-section-title">포스팅 기록</h2>
+                        <h2 class="sidebar-section-title" data-i18n="postingHistory">포스팅 기록</h2>
                         <div class="header-actions">
                             <button id="clearHistoryBtn" class="button-icon" title="기록 전체 삭제">🗑️</button>
                             <span class="collapse-icon"></span>
@@ -27,15 +35,15 @@
                     </summary>
                     <div class="collapsible-content-wrapper">
                         <ul id="historyList" class="history-list">
-                            <li class="history-placeholder">기록이 없습니다.</li>
+                            <li class="history-placeholder" data-i18n="noHistoryRecords">기록이 없습니다.</li>
                         </ul>
                     </div>
                 </details>
 
                 <div class="settings-group">
-                    <h3>콘텐츠 생성 (Gemini)</h3>
+                    <h3 data-i18n="contentGeneration">콘텐츠 생성 (Gemini)</h3>
                     <div class="form-group">
-                        <label for="geminiModel">Gemini 모델</label>
+                        <label for="geminiModel" data-i18n="geminiModel">Gemini 모델</label>
                         <select id="geminiModel">
                             <optgroup label="Gemini 2.5 Series (멀티모달 텍스트 출력)">
                                 <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
@@ -71,17 +79,17 @@
                         <p id="modelCompatibilityWarning" class="info-text hidden" style="color: var(--warning-color); margin-top: 8px;"></p>
                     </div>
                     <div class="form-group">
-                        <label for="writingTone">글쓰기 톤 & 스타일</label>
+                        <label for="writingTone" data-i18n="writingTone">글쓰기 톤 & 스타일</label>
                         <select id="writingTone">
-                            <option value="전문적인 (Professional)">전문적인</option>
-                            <option value="친근한 (Friendly)" selected>친근한</option>
-                            <option value="유머러스한 (Humorous)">유머러스한</option>
-                            <option value="설득적인 (Persuasive)">설득적인</option>
+                            <option value="전문적인 (Professional)" data-i18n-option="professional">전문적인</option>
+                            <option value="친근한 (Friendly)" data-i18n-option="friendly" selected>친근한</option>
+                            <option value="유머러스한 (Humorous)" data-i18n-option="humorous">유머러스한</option>
+                            <option value="격식있는 (Formal)" data-i18n-option="formal">격식있는</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="targetAudience">타겟 독자</label>
-                        <input type="text" id="targetAudience" placeholder="예: IT 비전공자">
+                        <label for="targetAudience" data-i18n="targetAudience">타겟 독자</label>
+                        <input type="text" id="targetAudience" data-i18n="targetAudience" placeholder="예: IT 비전공자">
                     </div>
                 </div>
 
