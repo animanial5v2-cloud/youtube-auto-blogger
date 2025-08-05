@@ -165,7 +165,7 @@ class AIBloggingStudioFinal:
         """메인 애플리케이션 실행"""
         try:
             # 웹 버전 URL (실제 배포된 Replit 앱)
-            app_url = "https://sharesiteforge-sharesiteforge.replit.app"
+            app_url = "https://sharesiteforge-sharesiteforge-sharesiteforge.replit.app"
             
             self.status_var.set("🌐 웹 브라우저에서 실행 중...")
             webbrowser.open(app_url)
