@@ -894,7 +894,6 @@ document.addEventListener('DOMContentLoaded', () => {
     checkModelCompatibility();
     
     // Add platform change listener
-    const platformSelect = document.getElementById('platformSelect');
     if (platformSelect) {
         platformSelect.addEventListener('change', handlePlatformChange);
         handlePlatformChange(); // Initialize display
