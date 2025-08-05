@@ -972,73 +972,170 @@ function initializeMobileInterface() {
     
     // 콘텐츠 타입 변경 시 해당 입력 필드 표시
     if (mobileContentType) {
-        mobileContentType.addEventListener('change', (e) => {
-            // 모든 입력 필드 숨기기
-            if (mobileYoutubeInput) mobileYoutubeInput.style.display = 'none';
-            if (mobileTopicInput) mobileTopicInput.style.display = 'none';
-            if (mobileFileInput) mobileFileInput.style.display = 'none';
-            
-            // 선택된 타입에 따라 해당 필드 표시
-            switch (e.target.value) {
-                case 'youtube':
-                    if (mobileYoutubeInput) mobileYoutubeInput.style.display = 'block';
-                    break;
-                case 'topic':
-                    if (mobileTopicInput) mobileTopicInput.style.display = 'block';
-                    break;
-                case 'file':
-                    if (mobileFileInput) mobileFileInput.style.display = 'block';
-                    break;
-            }
-        });
+        mobileContentType.addEventListener('change', updateContentInputScreen);
+        // 초기 화면 설정
+        updateContentInputScreen();
     }
     
     // 생성 버튼 클릭 처리
     if (mobileGenerateBtn) {
-        mobileGenerateBtn.addEventListener('click', () => {
-            const contentType = mobileContentType.value;
-            let inputValue = '';
-            
-            // 선택된 콘텐츠 타입에 따라 입력값 가져오기
-            switch (contentType) {
-                case 'youtube':
-                    inputValue = document.getElementById('mobileYoutubeUrl')?.value || '';
-                    break;
-                case 'topic':
-                    inputValue = document.getElementById('mobileTopicText')?.value || '';
-                    break;
-                case 'file':
-                    const fileInput = document.getElementById('mobileFileUpload');
-                    if (fileInput && fileInput.files.length > 0) {
-                        // 파일 업로드 처리는 나중에 구현
-                        alert('파일 업로드 기능은 준비 중입니다.');
-                        return;
-                    }
-                    break;
-            }
-            
-            if (!inputValue.trim()) {
-                alert('내용을 입력해주세요.');
-                return;
-            }
-            
-            // 설정값 가져오기
-            const writingTone = document.getElementById('mobileWritingTone')?.value || 'friendly';
-            const platform = document.getElementById('mobilePlatform')?.value || 'blogger';
-            
-            // 기존 설정에 모바일 설정 적용
-            if (document.getElementById('writingTone')) {
-                document.getElementById('writingTone').value = writingTone;
-            }
-            if (document.getElementById('platformSelect')) {
-                document.getElementById('platformSelect').value = platform;
-            }
-            
-            // 기존 채팅 인터페이스로 요청 전달
-            if (document.getElementById('chatInput')) {
-                document.getElementById('chatInput').value = inputValue;
-                document.getElementById('chatForm').dispatchEvent(new Event('submit'));
-            }
-        });
+        mobileGenerateBtn.addEventListener('click', handleMobileGenerate);
     }
 }
+
+// 콘텐츠 입력 화면 업데이트
+function updateContentInputScreen() {
+    const contentType = document.getElementById('mobileContentType')?.value;
+    const mobileYoutubeInput = document.getElementById('mobileYoutubeInput');
+    const mobileTopicInput = document.getElementById('mobileTopicInput');
+    const mobileFileInput = document.getElementById('mobileFileInput');
+    
+    // 모든 입력 필드 숨기기
+    if (mobileYoutubeInput) mobileYoutubeInput.style.display = 'none';
+    if (mobileTopicInput) mobileTopicInput.style.display = 'none';
+    if (mobileFileInput) mobileFileInput.style.display = 'none';
+    
+    // 선택된 타입에 따라 해당 필드 표시
+    switch (contentType) {
+        case 'youtube':
+            if (mobileYoutubeInput) mobileYoutubeInput.style.display = 'block';
+            break;
+        case 'topic':
+            if (mobileTopicInput) mobileTopicInput.style.display = 'block';
+            break;
+        case 'file':
+            if (mobileFileInput) mobileFileInput.style.display = 'block';
+            break;
+    }
+}
+
+// 모바일 화면 전환
+function showScreen(screenId) {
+    // 모든 화면 숨기기
+    const screens = document.querySelectorAll('.mobile-screen');
+    screens.forEach(screen => screen.classList.remove('active'));
+    
+    // 선택된 화면 표시
+    const targetScreen = document.getElementById(`screen-${screenId}`);
+    if (targetScreen) {
+        targetScreen.classList.add('active');
+        
+        // 특별한 화면 처리
+        if (screenId === 'content-input') {
+            updateContentInputScreen();
+        } else if (screenId === 'generate') {
+            updateSettingsSummary();
+        }
+    }
+}
+
+// 설정 요약 업데이트
+function updateSettingsSummary() {
+    const summaryDiv = document.getElementById('mobileSettingsSummary');
+    if (!summaryDiv) return;
+    
+    const contentType = document.getElementById('mobileContentType')?.value || '';
+    const writingTone = document.getElementById('mobileWritingTone')?.value || '';
+    const platform = document.getElementById('mobilePlatform')?.value || '';
+    const imageSource = document.getElementById('mobileImageSource')?.value || '';
+    
+    let inputValue = '';
+    switch (contentType) {
+        case 'youtube':
+            inputValue = document.getElementById('mobileYoutubeUrl')?.value || '';
+            break;
+        case 'topic':
+            inputValue = document.getElementById('mobileTopicText')?.value || '';
+            break;
+        case 'file':
+            const fileInput = document.getElementById('mobileFileUpload');
+            inputValue = fileInput?.files.length > 0 ? fileInput.files[0].name : '';
+            break;
+    }
+    
+    const contentTypeNames = {
+        'youtube': 'YouTube 동영상',
+        'topic': '주제 입력',
+        'file': '파일 업로드'
+    };
+    
+    const toneNames = {
+        'friendly': '친근한',
+        'professional': '전문적인',
+        'casual': '캐주얼한',
+        'formal': '격식있는'
+    };
+    
+    const platformNames = {
+        'blogger': 'Google Blogger',
+        'wordpress': 'WordPress'
+    };
+    
+    const imageNames = {
+        'none': '이미지 없음',
+        'ai': 'AI 생성',
+        'pexels': 'Pexels 검색'
+    };
+    
+    summaryDiv.innerHTML = `
+        <p style="color: #cccccc; margin-bottom: 15px;"><strong>콘텐츠:</strong> ${contentTypeNames[contentType] || contentType}</p>
+        <p style="color: #cccccc; margin-bottom: 15px;"><strong>입력:</strong> ${inputValue || '없음'}</p>
+        <p style="color: #cccccc; margin-bottom: 15px;"><strong>스타일:</strong> ${toneNames[writingTone] || writingTone}</p>
+        <p style="color: #cccccc; margin-bottom: 15px;"><strong>플랫폼:</strong> ${platformNames[platform] || platform}</p>
+        <p style="color: #cccccc; margin-bottom: 0;"><strong>이미지:</strong> ${imageNames[imageSource] || imageSource}</p>
+    `;
+}
+
+// 모바일 생성 처리
+function handleMobileGenerate() {
+    const contentType = document.getElementById('mobileContentType')?.value;
+    let inputValue = '';
+    
+    // 선택된 콘텐츠 타입에 따라 입력값 가져오기
+    switch (contentType) {
+        case 'youtube':
+            inputValue = document.getElementById('mobileYoutubeUrl')?.value || '';
+            break;
+        case 'topic':
+            inputValue = document.getElementById('mobileTopicText')?.value || '';
+            break;
+        case 'file':
+            const fileInput = document.getElementById('mobileFileUpload');
+            if (fileInput && fileInput.files.length > 0) {
+                alert('파일 업로드 기능은 준비 중입니다.');
+                return;
+            }
+            break;
+    }
+    
+    if (!inputValue.trim()) {
+        alert('내용을 입력해주세요.');
+        return;
+    }
+    
+    // 설정값 가져오기
+    const writingTone = document.getElementById('mobileWritingTone')?.value || 'friendly';
+    const platform = document.getElementById('mobilePlatform')?.value || 'blogger';
+    const targetAudience = document.getElementById('mobileTargetAudience')?.value || '';
+    const imageSource = document.getElementById('mobileImageSource')?.value || 'none';
+    
+    // 기존 설정에 모바일 설정 적용
+    if (document.getElementById('writingTone')) {
+        document.getElementById('writingTone').value = writingTone;
+    }
+    if (document.getElementById('platformSelect')) {
+        document.getElementById('platformSelect').value = platform;
+    }
+    if (document.getElementById('targetAudience')) {
+        document.getElementById('targetAudience').value = targetAudience;
+    }
+    
+    // 기존 채팅 인터페이스로 요청 전달
+    if (document.getElementById('chatInput')) {
+        document.getElementById('chatInput').value = inputValue;
+        document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+    }
+}
+
+// 전역 함수로 만들기
+window.showScreen = showScreen;
