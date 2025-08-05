@@ -275,14 +275,25 @@ def publish_to_platform():
             
         elif platform == 'tistory':
             blog_name = data.get('blog_name')
-            access_token = data.get('access_token')
             
-            if not all([blog_name, access_token]):
-                return jsonify({'error': 'Missing Tistory credentials'}), 400
+            if not blog_name:
+                return jsonify({'error': 'Tistory 블로그명이 필요합니다'}), 400
                 
             result = tistory_service.publish_post(
-                blog_name, access_token, blog_post.title, blog_post.content, is_draft
+                blog_name, None, blog_post.title, blog_post.content, is_draft
             )
+            
+            # Tistory API is discontinued, return manual guide
+            if result and 'error' in result:
+                return jsonify({
+                    'status': 'manual_required',
+                    'platform': 'tistory',
+                    'message': result['error'],
+                    'manual_guide': result['manual_guide'],
+                    'blog_url': f"https://{blog_name}.tistory.com/manage/newpost/",
+                    'title': result['title'],
+                    'content': result['content']
+                }), 202  # 202 Accepted but requires manual action
             
         elif platform == 'naver':
             blog_id = data.get('blog_id')

@@ -510,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(publishData)
             });
             
-            if (response.ok) {
+            if (response.ok || response.status === 202) {
                 const result = await response.json();
                 const platformName = {
                     'blogger': 'Blogger',
@@ -519,7 +519,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     'naver': '네이버 블로그'
                 }[selectedPlatform] || selectedPlatform;
                 
-                addChatMessage('ai', `${platformName}에 게시물이 성공적으로 업로드되었습니다! <a href="${result.post_url}" target="_blank">확인하기</a>`);
+                if (result.status === 'manual_required') {
+                    // Tistory manual publishing guide
+                    addChatMessage('ai', `
+                        <div class="manual-guide">
+                            <strong>⚠️ ${result.message}</strong><br><br>
+                            <strong>수동 발행 가이드:</strong><br>
+                            ${result.manual_guide.replace(/\n/g, '<br>')}<br><br>
+                            <a href="${result.blog_url}" target="_blank" class="manual-link">Tistory 새 글 작성 페이지로 이동</a><br><br>
+                            <strong>제목:</strong> ${result.title}<br>
+                            <strong>내용:</strong> (아래 내용을 복사하세요)<br>
+                            <textarea readonly style="width:100%; height:100px; margin:10px 0;">${result.content}</textarea>
+                        </div>
+                    `);
+                } else {
+                    addChatMessage('ai', `${platformName}에 게시물이 성공적으로 업로드되었습니다! <a href="${result.post_url}" target="_blank">확인하기</a>`);
+                }
             } else {
                 const error = await response.json();
                 addChatMessage('ai', `업로드 실패: ${error.error}`);

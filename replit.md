@@ -12,9 +12,11 @@ Preferred communication style: Simple, everyday language.
 
 The user plans to sell this AI Auto-Blogging Studio on Kmong (Korean freelance platform). Key requirements:
 - Deployment-ready Flask application with PostgreSQL database
+- Multi-platform publishing support (Blogger, WordPress, Tistory manual, Naver Blog)
 - Professional presentation for potential buyers
 - Clear documentation for setup and usage
 - Scalable architecture for multiple users
+- Transparent handling of API limitations (e.g., Tistory API discontinuation)
 
 ## System Architecture
 
@@ -67,6 +69,9 @@ The system implements Google OAuth 2.0 integration:
 
 ### Publishing Platform
 - **Google Blogger API**: Automated blog post publishing with draft/live status management
+- **WordPress.com API**: REST API integration for WordPress.com sites
+- **Tistory**: Manual publishing workflow (API discontinued since 2021)
+- **Naver Blog API**: Integration with Naver's blog publishing system
 - **OAuth 2.0 Authentication**: Google Identity Services for secure API access
 
 ### Media & Content Services

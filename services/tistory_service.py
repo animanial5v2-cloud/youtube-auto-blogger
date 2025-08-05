@@ -6,48 +6,14 @@ class TistoryService:
         self.base_url = "https://www.tistory.com/apis"
     
     def publish_post(self, blog_name, access_token, title, content, is_draft=False):
-        """Publish post to Tistory"""
-        try:
-            if not all([blog_name, access_token, title, content]):
-                raise ValueError("Missing required parameters for Tistory publishing")
-            
-            url = f"{self.base_url}/post/write"
-            
-            data = {
-                'access_token': access_token,
-                'blogName': blog_name,
-                'title': title,
-                'content': content,
-                'visibility': '0' if is_draft else '3',  # 0=private, 3=public
-                'output': 'json'
-            }
-            
-            response = requests.post(url, data=data, timeout=30)
-            
-            if response.status_code == 200:
-                result = response.json()
-                if result.get('tistory', {}).get('status') == '200':
-                    post_id = result.get('tistory', {}).get('postId')
-                    post_url = f"https://{blog_name}.tistory.com/{post_id}"
-                    
-                    logging.info(f"Successfully published Tistory post: {post_id}")
-                    return {
-                        'id': post_id,
-                        'url': post_url,
-                        'title': title,
-                        'published': True
-                    }
-                else:
-                    error_msg = result.get('tistory', {}).get('error_message', 'Unknown error')
-                    logging.error(f"Tistory API error: {error_msg}")
-                    return None
-            else:
-                logging.error(f"Tistory API error: {response.status_code} - {response.text}")
-                return None
-                
-        except Exception as e:
-            logging.error(f"Failed to publish to Tistory: {str(e)}")
-            return None
+        """Tistory API has been discontinued since 2021"""
+        logging.error("Tistory API has been discontinued since 2021")
+        return {
+            'error': 'Tistory API가 2021년부터 중단되었습니다. 수동 포스팅을 권장합니다.',
+            'manual_guide': f"1. {blog_name}.tistory.com에서 직접 로그인\n2. 새 글 작성에서 제목과 내용 복사/붙여넣기\n3. 수동으로 발행",
+            'title': title,
+            'content': content
+        }
     
     def get_blog_info(self, access_token):
         """Get user's Tistory blog information"""
