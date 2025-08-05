@@ -15,6 +15,7 @@ class AIBloggingStudioFinal:
         self.root.title("AI 블로깅 스튜디오 Pro")
         self.root.geometry("550x420")
         self.root.resizable(False, False)
+        self.root.configure(bg='#1e1e1e')  # 윈도우 전체 배경 다크
         self.center_window()
         self.setup_ui()
     
