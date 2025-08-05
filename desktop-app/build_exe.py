@@ -93,6 +93,7 @@ def convert_icon():
     try:
         from PIL import Image
         import cairosvg
+        import io
         
         svg_path = Path('assets/icon.svg')
         ico_path = Path('assets/icon.ico')

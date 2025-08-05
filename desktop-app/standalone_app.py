@@ -42,7 +42,7 @@ class AIBloggingStudioApp:
         
         # Create main frame
         main_frame = ttk.Frame(self.root, padding="20")
-        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        main_frame.grid(row=0, column=0, sticky="wens")
         
         # Title
         title_label = ttk.Label(main_frame, text="🤖 AI Blogging Studio", 
@@ -56,7 +56,7 @@ class AIBloggingStudioApp:
         
         # Progress bar
         self.progress = ttk.Progressbar(main_frame, mode='indeterminate')
-        self.progress.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 20))
+        self.progress.grid(row=2, column=0, columnspan=2, sticky="we", pady=(0, 20))
         
         # Buttons
         self.start_button = ttk.Button(main_frame, text="서버 시작", 
