@@ -1,99 +1,100 @@
 #!/usr/bin/env python3
 """
-AI 블로깅 스튜디오 Pro - 최종 완성본
-올바른 URL 적용
+AI 블로깅 스튜디오 Pro - 다크 테마 버전
 """
 import tkinter as tk
 from tkinter import messagebox
 import webbrowser
-import threading
-import time
 
-class AIBloggingStudioFinal:
+class AIBloggingStudioDark:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("AI 블로깅 스튜디오 Pro")
-        self.root.geometry("550x420")
+        self.root.geometry("500x380")
         self.root.resizable(False, False)
-        self.root.configure(bg='#1e1e1e')  # 윈도우 전체 배경 다크
+        self.root.configure(bg='#1a1a1a')
         self.center_window()
         self.setup_ui()
     
     def center_window(self):
-        x = (self.root.winfo_screenwidth() // 2) - 275
-        y = (self.root.winfo_screenheight() // 2) - 210
-        self.root.geometry(f"550x420+{x}+{y}")
+        x = (self.root.winfo_screenwidth() // 2) - 250
+        y = (self.root.winfo_screenheight() // 2) - 190
+        self.root.geometry(f"500x380+{x}+{y}")
     
     def setup_ui(self):
-        main_frame = tk.Frame(self.root, bg='#1e1e1e', padx=30, pady=25)
+        # 메인 컨테이너 - 완전한 다크 테마
+        main_frame = tk.Frame(self.root, bg='#1a1a1a', padx=25, pady=20)
         main_frame.pack(fill='both', expand=True)
         
-        # 헤더
-        tk.Label(main_frame, text="AI 블로깅 스튜디오 Pro", 
-                font=('맑은 고딕', 20, 'bold'),
-                bg='#1e1e1e', fg='#ffffff').pack(pady=(0, 8))
+        # 타이틀
+        title_label = tk.Label(main_frame, 
+                              text="AI 블로깅 스튜디오 Pro",
+                              font=('맑은 고딕', 18, 'bold'),
+                              bg='#1a1a1a', fg='#ffffff')
+        title_label.pack(pady=(0, 5))
         
-        tk.Label(main_frame, text="YouTube 영상을 AI 블로그 포스트로 자동 변환", 
-                font=('맑은 고딕', 11),
-                bg='#1e1e1e', fg='#b0b0b0').pack(pady=(0, 20))
+        # 서브타이틀
+        subtitle = tk.Label(main_frame,
+                           text="YouTube 영상을 AI 블로그 포스트로 자동 변환",
+                           font=('맑은 고딕', 10),
+                           bg='#1a1a1a', fg='#9e9e9e')
+        subtitle.pack(pady=(0, 20))
         
-        # 기능 소개
-        feature_frame = tk.Frame(main_frame, bg='#2d2d2d', relief='flat', bd=0)
-        feature_frame.pack(fill='x', pady=(0, 20), ipady=15)
+        # 기능 박스 - 진짜 다크
+        feature_box = tk.Frame(main_frame, bg='#2a2a2a', bd=1, relief='solid')
+        feature_box.pack(fill='x', pady=(0, 20), padx=10)
         
-        tk.Label(feature_frame, text="핵심 기능", 
-                font=('맑은 고딕', 13, 'bold'),
-                bg='#2d2d2d', fg='#ffffff').pack(pady=(0, 10))
+        # 기능 제목
+        tk.Label(feature_box, text="핵심 기능",
+                font=('맑은 고딕', 12, 'bold'),
+                bg='#2a2a2a', fg='#ffffff').pack(pady=(10, 5))
         
-        features = """Google Gemini AI 기반 고품질 콘텐츠 자동 생성
+        # 기능 리스트
+        features_text = """Google Gemini AI 기반 고품질 콘텐츠 자동 생성
 구글 블로거, 워드프레스, 티스토리, 네이버 블로그 동시 발행
 맞춤형 톤앤매너 설정 및 SEO 최적화
 예약 발행 및 자동화 스케줄링 기능
 무제한 포스트 생성 및 히스토리 관리"""
         
-        tk.Label(feature_frame, text=features, 
+        tk.Label(feature_box, text=features_text,
                 font=('맑은 고딕', 9),
-                bg='#2d2d2d', justify='center', fg='#d0d0d0').pack(padx=20)
+                bg='#2a2a2a', fg='#cccccc',
+                justify='center').pack(pady=(0, 10))
         
-        # 상태 표시
+        # 상태
         self.status_var = tk.StringVar(value="시스템 준비 완료")
-        status_label = tk.Label(main_frame, textvariable=self.status_var,
-                               font=('맑은 고딕', 10),
-                               bg='#1e1e1e', fg='#4CAF50')
-        status_label.pack(pady=(0, 25))
+        tk.Label(main_frame, textvariable=self.status_var,
+                font=('맑은 고딕', 9),
+                bg='#1a1a1a', fg='#4caf50').pack(pady=(0, 20))
         
-        # 메인 실행 버튼 (작고 고급스럽게)
-        launch_btn = tk.Button(main_frame, text="시작",
-                              command=self.launch_app,
-                              font=('맑은 고딕', 12, 'bold'),
-                              bg='#007ACC', fg='white',
-                              width=15, height=1,
-                              relief='flat', cursor='hand2',
-                              bd=2, highlightthickness=0)
-        launch_btn.pack(pady=(0, 20))
+        # 시작 버튼 - 작고 심플하게
+        start_btn = tk.Button(main_frame, text="시작",
+                             command=self.launch_app,
+                             font=('맑은 고딕', 11, 'bold'),
+                             bg='#0078d4', fg='white',
+                             width=12, height=1,
+                             relief='flat', cursor='hand2',
+                             bd=0, highlightthickness=0)
+        start_btn.pack(pady=(0, 15))
         
-        # 보조 버튼들 (더 세련되게)
-        button_frame = tk.Frame(main_frame, bg='#1e1e1e')
-        button_frame.pack(pady=(0, 20))
+        # 하단 버튼들
+        btn_frame = tk.Frame(main_frame, bg='#1a1a1a')
+        btn_frame.pack(pady=(0, 15))
         
-        tk.Button(button_frame, text="사용법", command=self.show_guide,
-                 bg='#404040', fg='#ffffff', width=10, height=1,
-                 font=('맑은 고딕', 9), relief='flat', cursor='hand2',
-                 bd=1, highlightthickness=0).pack(side='left', padx=8)
+        # 작은 버튼들
+        for text, cmd in [("사용법", self.show_guide), ("정보", self.show_info), ("종료", self.quit_app)]:
+            tk.Button(btn_frame, text=text, command=cmd,
+                     bg='#3a3a3a', fg='#ffffff',
+                     width=8, height=1,
+                     font=('맑은 고딕', 8),
+                     relief='flat', cursor='hand2',
+                     bd=0, highlightthickness=0).pack(side='left', padx=5)
         
-        tk.Button(button_frame, text="정보", command=self.show_info,
-                 bg='#404040', fg='#ffffff', width=10, height=1,
-                 font=('맑은 고딕', 9), relief='flat', cursor='hand2',
-                 bd=1, highlightthickness=0).pack(side='left', padx=8)
-        
-        tk.Button(button_frame, text="종료", command=self.quit_app,
-                 bg='#404040', fg='#ffffff', width=10, height=1,
-                 font=('맑은 고딕', 9), relief='flat', cursor='hand2',
-                 bd=1, highlightthickness=0).pack(side='left', padx=8)
-        
-        # 하단 정보
-        tk.Label(main_frame, text="구매해주셔서 감사합니다 • 문의사항은 크몽 메시지로 연락주세요",
-                font=('맑은 고딕', 8), bg='#1e1e1e', fg='#808080').pack(side='bottom')
+        # 하단 텍스트
+        tk.Label(main_frame, 
+                text="구매해주셔서 감사합니다 • 크몽 메시지로 문의하세요",
+                font=('맑은 고딕', 7),
+                bg='#1a1a1a', fg='#666666').pack(side='bottom')
     
     def launch_app(self):
         """메인 앱 실행"""
@@ -196,7 +197,7 @@ class AIBloggingStudioFinal:
 
 if __name__ == "__main__":
     try:
-        app = AIBloggingStudioFinal()
+        app = AIBloggingStudioDark()
         app.run()
     except Exception as e:
         root = tk.Tk()
