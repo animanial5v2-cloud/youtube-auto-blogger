@@ -1,0 +1,50 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb"/>
+      <stop offset="100%" style="stop-color:#f5576c"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#gradient1)" stroke="#fff" stroke-width="8"/>
+  
+  <!-- Robot Head -->
+  <rect x="180" y="140" width="152" height="120" rx="25" fill="#ffffff" opacity="0.95"/>
+  
+  <!-- Eyes -->
+  <circle cx="210" cy="170" r="15" fill="url(#gradient2)"/>
+  <circle cx="302" cy="170" r="15" fill="url(#gradient2)"/>
+  
+  <!-- Antenna -->
+  <rect x="250" y="110" width="12" height="30" fill="#ffffff" opacity="0.9"/>
+  <circle cx="256" cy="105" r="8" fill="url(#gradient2)"/>
+  
+  <!-- Mouth -->
+  <rect x="220" y="200" width="72" height="8" rx="4" fill="url(#gradient2)"/>
+  
+  <!-- Body -->
+  <rect x="160" y="260" width="192" height="160" rx="30" fill="#ffffff" opacity="0.95"/>
+  
+  <!-- Chest Panel -->
+  <rect x="200" y="300" width="112" height="80" rx="15" fill="url(#gradient1)" opacity="0.3"/>
+  
+  <!-- Blog Icon -->
+  <rect x="220" y="320" width="72" height="8" rx="4" fill="url(#gradient2)"/>
+  <rect x="220" y="340" width="72" height="8" rx="4" fill="url(#gradient2)"/>
+  <rect x="220" y="360" width="40" height="8" rx="4" fill="url(#gradient2)"/>
+  
+  <!-- Arms -->
+  <rect x="120" y="280" width="40" height="20" rx="10" fill="#ffffff" opacity="0.9"/>
+  <rect x="352" y="280" width="40" height="20" rx="10" fill="#ffffff" opacity="0.9"/>
+  
+  <!-- AI Sparkles -->
+  <path d="M100 150 L110 160 L100 170 L90 160 Z" fill="#f093fb" opacity="0.8"/>
+  <path d="M400 180 L410 190 L400 200 L390 190 Z" fill="#f5576c" opacity="0.8"/>
+  <path d="M120 350 L130 360 L120 370 L110 360 Z" fill="#667eea" opacity="0.8"/>
+  <path d="M380 320 L390 330 L380 340 L370 330 Z" fill="#764ba2" opacity="0.8"/>
+</svg>
