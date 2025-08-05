@@ -103,7 +103,7 @@ class AIBloggingStudioDark:
     def launch_app(self):
         """웹 앱 실행"""
         try:
-            url = "https://a29c9aae-a815-4ca1-ab77-1a3014b50f24-00-egu3q7nb1g24.picard.replit.dev"
+            url = "https://share-site-forge-animanial5v2.replit.app"
             webbrowser.open(url)
             messagebox.showinfo("실행 완료", "웹 브라우저에서 AI 블로깅 스튜디오가 열렸습니다!")
         except Exception as e:

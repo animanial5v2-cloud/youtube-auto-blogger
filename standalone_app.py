@@ -102,7 +102,7 @@ class AIBloggingStudioDark:
             self.status_var.set("🌐 웹 브라우저에서 실행 중...")
             
             # 정확한 Replit 앱 URL
-            app_url = "https://a29c9aae-a815-4ca1-ab77-1a3014b50f24-00-egu3q7nb1g24.picard.replit.dev"
+            app_url = "https://share-site-forge-animanial5v2.replit.app"
             webbrowser.open(app_url)
             
             messagebox.showinfo("실행 완료!", 
