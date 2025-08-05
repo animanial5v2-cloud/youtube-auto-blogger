@@ -153,29 +153,29 @@
                 <div id="screen-api-settings" class="mobile-screen active">
                     <h2 class="screen-title">API 설정</h2>
                     <div class="screen-content">
-                        <h3>필수 API 키</h3>
+                        <h3 data-i18n="apiKey">필수 API 키</h3>
                         <div class="form-group">
-                            <label>Gemini API 키</label>
+                            <label data-i18n="geminiApiKey">Gemini API 키</label>
                             <input type="password" id="mobileApiKey" placeholder="AI 콘텐츠 생성용">
                         </div>
                         
                         <div class="form-group">
-                            <label>Google Client ID</label>
+                            <label data-i18n="googleClientId">Google Client ID</label>
                             <input type="text" id="mobileClientId" placeholder="Blogger 접근용">
                         </div>
                         
                         <div class="form-group">
-                            <label>블로그 ID</label>
+                            <label data-i18n="blogId">블로그 ID</label>
                             <input type="text" id="mobileBlogId" placeholder="Blogger 블로그 ID (숫자)">
                         </div>
                         
                         <div class="form-group">
-                            <label>블로그 주소</label>
+                            <label data-i18n="blogAddress">블로그 주소</label>
                             <input type="text" id="mobileBlogAddress" placeholder="https://yourblog.blogspot.com">
                         </div>
                     </div>
                     <div class="mobile-nav-buttons">
-                        <button class="mobile-nav-btn primary" onclick="showScreen('login')">다음</button>
+                        <button class="mobile-nav-btn primary" onclick="showScreen('login')" data-i18n="next">다음</button>
                     </div>
                 </div>
 
@@ -183,7 +183,7 @@
                 <div id="screen-login" class="mobile-screen">
                     <h2 class="screen-title">Google 로그인</h2>
                     <div class="screen-content">
-                        <h3>Blogger 연동</h3>
+                        <h3 data-i18n="authentication">Blogger 연동</h3>
                         <div class="form-group">
                             <p style="color: #cccccc; margin-bottom: 20px;">
                                 블로그 자동 발행을 위해 Google 계정 연동이 필요합니다.
@@ -193,14 +193,14 @@
                                 로그인이 필요합니다
                             </div>
                             
-                            <button id="mobileLoginBtn" class="mobile-auth-btn">
+                            <button id="mobileLoginBtn" class="mobile-auth-btn" data-i18n="login">
                                 Google 로그인
                             </button>
                         </div>
                     </div>
                     <div class="mobile-nav-buttons">
                         <button class="mobile-nav-btn" onclick="showScreen('api-settings')">이전</button>
-                        <button class="mobile-nav-btn primary" id="mobileLoginNextBtn" onclick="showScreen('content-source')" disabled>다음</button>
+                        <button class="mobile-nav-btn primary" id="mobileLoginNextBtn" onclick="showScreen('content-source')" disabled data-i18n="next">다음</button>
                     </div>
                 </div>
 

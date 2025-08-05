@@ -981,11 +981,11 @@ input:focus, select:focus, textarea:focus {
     }
     
     .screen-content {
-        background: #1a1a1a;
+        background: #0a0a0a;
         border-radius: 12px;
         padding: calc(var(--spacing-unit) * 2);
         margin-bottom: calc(var(--spacing-unit) * 2);
-        border: 1px solid #333333;
+        border: 1px solid #222222;
     }
     
     .screen-content h3 {
@@ -1042,7 +1042,7 @@ input:focus, select:focus, textarea:focus {
         display: flex;
         gap: calc(var(--spacing-unit) * 1);
         padding: calc(var(--spacing-unit) * 2);
-        background: #1a1a1a;
+        background: #000000;
         position: sticky;
         bottom: 0;
     }

@@ -70,10 +70,52 @@ const languages = {
         writingTone: "Giọng điệu & Phong cách viết",
         targetAudience: "Đối tượng mục tiêu",
         
+        // API Settings
+        apiKey: "Khóa API bắt buộc",
+        geminiApiKey: "Khóa API Gemini",
+        googleClientId: "ID Khách hàng Google",
+        blogId: "ID Blog",
+        
         // Platform settings
         platformSettings: "Cài đặt nền tảng",
         platform: "Nền tảng",
-        blogAddress: "Địa chỉ blog",
+        
+        // Image settings
+        imageSettings: "Cài đặt hình ảnh",
+        imageSource: "Nguồn hình ảnh",
+        
+        // Authentication
+        authentication: "Xác thực",
+        login: "Đăng nhập",
+        logout: "Đăng xuất",
+        
+        // Content input
+        contentInput: "Nhập nội dung",
+        youtubeUrl: "URL YouTube",
+        topicInput: "Nhập chủ đề",
+        generatePost: "Tạo bài viết",
+        
+        // Buttons
+        start: "Bắt đầu",
+        stop: "Dừng",
+        clear: "Xóa",
+        preview: "Xem trước",
+        publish: "Xuất bản",
+        save: "Lưu",
+        next: "Tiếp theo",
+        
+        // Status messages
+        ready: "Sẵn sàng",
+        generating: "Đang tạo...",
+        completed: "Hoàn thành",
+        error: "Lỗi",
+        
+        // Writing tones
+        friendly: "Thân thiện",
+        professional: "Chuyên nghiệp",
+        casual: "Thoải mái",
+        formal: "Trang trọng",
+        humorous: "Hài hước"
         
         // Image settings
         imageSettings: "Cài đặt hình ảnh",
@@ -131,6 +173,12 @@ const languages = {
         platform: "Platform",
         blogAddress: "Blog Address",
         
+        // API Settings
+        apiKey: "Required API Key",
+        geminiApiKey: "Gemini API Key",
+        googleClientId: "Google Client ID",
+        blogId: "Blog ID",
+        
         // Image settings
         imageSettings: "Image Settings",
         imageSource: "Image Source",
@@ -153,6 +201,7 @@ const languages = {
         preview: "Preview",
         publish: "Publish",
         save: "Save",
+        next: "Next",
         
         // Status messages
         ready: "Ready",
