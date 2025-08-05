@@ -1,0 +1,200 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+                                                                                                                        새로운 기능 및 개선 사항에 대 한 최신 PowerShell을 설치 하세요! https://aka.ms/PSWindows                                                                                                                                                        PS C:\Users\hyoseung> cd "C:\Users\hyoseung\OneDrive\바탕 화면"                                                         PS C:\Users\hyoseung\OneDrive\바탕 화면> mkdir "AI_Blogging_Studio_Clean"
+
+
+    디렉터리: C:\Users\hyoseung\OneDrive\바탕 화면
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----   2025-08-06-수   오전 5:43                AI_Blogging_Studio_Clean
+
+
+PS C:\Users\hyoseung\OneDrive\바탕 화면> cd "AI_Blogging_Studio_Clean"
+PS C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean> # 완전히 새로운 깔끔한 버전 생성
+PS C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean> Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python/cpython/main/LICENSE" -OutFile "temp.txt" 2>$null; Remove-Item "temp.txt" -ErrorAction SilentlyContinue
+PS C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean>
+PS C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean> # 새 앱 파일 생성
+PS C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean> @'
+>> #!/usr/bin/env python3
+>> """
+>> AI 블로깅 스튜디오 Pro - 완전 새버전
+>> """
+>> import tkinter as tk
+>> from tkinter import messagebox, ttk
+>> import webbrowser
+>> import time
+>>
+>> class AIBloggingStudio:
+>>     def __init__(self):
+>>         self.root = tk.Tk()
+>>         self.root.title("AI 블로깅 스튜디오 Pro")
+>>         self.root.geometry("500x400")
+>>         self.root.resizable(False, False)
+>>         self.center_window()
+>>         self.setup_ui()
+>>
+>>     def center_window(self):
+>>         x = (self.root.winfo_screenwidth() // 2) - 250
+>>         y = (self.root.winfo_screenheight() // 2) - 200
+>>         self.root.geometry(f"500x400+{x}+{y}")
+>>
+>>     def setup_ui(self):
+>>         main_frame = tk.Frame(self.root, bg='#f8f9fa', padx=20, pady=20)
+>>         main_frame.pack(fill='both', expand=True)
+>>
+>>         # 제목
+>>         tk.Label(main_frame, text="🤖 AI 블로깅 스튜디오 Pro",
+>>                 font=('맑은 고딕', 18, 'bold'),
+>>                 bg='#f8f9fa', fg='#2c3e50').pack(pady=(0, 10))
+>>
+>>         # 설명
+>>         desc_frame = tk.Frame(main_frame, bg='#ffffff', relief='solid', bd=1)
+>>         desc_frame.pack(fill='x', pady=10)
+>>
+>>         tk.Label(desc_frame, text="✨ YouTube 영상을 AI 블로그 포스트로 자동 변환",
+>>                 font=('맑은 고딕', 11), bg='#ffffff').pack(pady=15)
+>>
+>>         features = """• Google Gemini AI 기반 고품질 콘텐츠 생성
+>> • 구글 블로거, 워드프레스, 티스토리, 네이버 블로그 발행
+>> • 맞춤형 톤앤매너 및 SEO 최적화
+>> • 예약 발행 및 자동화 기능"""
+>>
+>>         tk.Label(desc_frame, text=features, font=('맑은 고딕', 9),
+>>                 bg='#ffffff', justify='left').pack(pady=(0, 15))
+>>
+>>         # 버튼들
+>>         tk.Button(main_frame, text="🚀 AI 블로깅 스튜디오 시작",
+>>                  command=self.launch_app,
+>>                  font=('맑은 고딕', 14, 'bold'),
+>>                  bg='#3498db', fg='white',
+>>                  width=22, height=2).pack(pady=20)
+>>
+>>         button_frame = tk.Frame(main_frame, bg='#f8f9fa')
+>>         button_frame.pack()
+>>
+>>         tk.Button(button_frame, text="📖 사용법", command=self.show_guide,
+>>                  bg='#2ecc71', fg='white', width=10).pack(side='left', padx=5)
+>>         tk.Button(button_frame, text="ℹ️ 정보", command=self.show_info,
+>>                  bg='#f39c12', fg='white', width=10).pack(side='left', padx=5)
+>>         tk.Button(button_frame, text="❌ 종료", command=self.quit,
+>>                  bg='#e74c3c', fg='white', width=10).pack(side='left', padx=5)
+>>
+>>         tk.Label(main_frame, text="구매해주셔서 감사합니다! 크몽 문의는 메시지로 연락주세요.",
+>>                 font=('맑은 고딕', 8), bg='#f8f9fa', fg='#7f8c8d').pack(side='bottom', pady=10)
+>>
+>>     def launch_app(self):
+>>         try:
+>>             webbrowser.open("https://sharesiteforge-sharesiteforge.replit.app")
+>>             messagebox.showinfo("실행 완료",
+>>                                "🎉 AI 블로깅 스튜디오가 브라우저에서 열렸습니다!\n\n"
+>>                                "첫 사용시 Google 로그인이 필요합니다.")
+>>         except:
+>>             messagebox.showerror("오류", "브라우저 실행에 실패했습니다.")
+>>
+>>     def show_guide(self):
+>>         messagebox.showinfo("사용법",
+>>                            "1. '시작' 버튼 클릭\n"
+>>                            "2. Google 계정 로그인\n"
+>>                            "3. YouTube URL 또는 주제 입력\n"
+>>                            "4. AI가 자동으로 블로그 포스트 생성\n"
+>>                            "5. 원하는 플랫폼에 발행\n\n"
+>>                            "자세한 사용법은 웹에서 확인하세요!")
+>>
+>>     def show_info(self):
+>>         messagebox.showinfo("정보",
+>>                            "AI 블로깅 스튜디오 Pro v2.0\n\n"
+>>                            "YouTube → AI 블로그 자동 생성\n"
+>>                            "다중 플랫폼 동시 발행\n"
+>>                            "30일 무료 기술지원\n\n"
+>>                            "문의: 크몽 메시지")
+>>
+>>     def quit(self):
+>>         self.root.quit()
+>>
+>>     def run(self):
+>>         self.root.mainloop()
+>>
+>> if __name__ == "__main__":
+>>     app = AIBloggingStudio()
+>>     app.run()
+>> '@ | Out-File -FilePath "AI_Blogging_Studio.py" -Encoding utf8
+PS C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean> pip install pyinstaller
+Requirement already satisfied: pyinstaller in c:\users\hyoseung\appdata\local\programs\python\python313\lib\site-packages (6.15.0)
+Requirement already satisfied: setuptools>=42.0.0 in c:\users\hyoseung\appdata\local\programs\python\python313\lib\site-packages (from pyinstaller) (80.9.0)
+Requirement already satisfied: altgraph in c:\users\hyoseung\appdata\local\programs\python\python313\lib\site-packages (from pyinstaller) (0.17.4)
+Requirement already satisfied: pefile!=2024.8.26,>=2022.5.30 in c:\users\hyoseung\appdata\local\programs\python\python313\lib\site-packages (from pyinstaller) (2023.2.7)
+Requirement already satisfied: pywin32-ctypes>=0.2.1 in c:\users\hyoseung\appdata\local\programs\python\python313\lib\site-packages (from pyinstaller) (0.2.3)
+Requirement already satisfied: pyinstaller-hooks-contrib>=2025.8 in c:\users\hyoseung\appdata\local\programs\python\python313\lib\site-packages (from pyinstaller) (2025.8)
+Requirement already satisfied: packaging>=22.0 in c:\users\hyoseung\appdata\local\programs\python\python313\lib\site-packages (from pyinstaller) (25.0)
+
+[notice] A new release of pip is available: 25.1.1 -> 25.2
+[notice] To update, run: python.exe -m pip install --upgrade pip
+PS C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean> pyinstaller --onefile --noconsole --name="AI_Blogging_Studio_Pro" AI_Blogging_Studio.py
+302 INFO: PyInstaller: 6.15.0, contrib hooks: 2025.8
+303 INFO: Python: 3.13.5
+359 INFO: Platform: Windows-11-10.0.26100-SP0
+359 INFO: Python environment: C:\Users\hyoseung\AppData\Local\Programs\Python\Python313
+360 INFO: wrote C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean\AI_Blogging_Studio_Pro.spec
+371 INFO: Module search paths (PYTHONPATH):
+['C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pyinstaller.exe',
+ 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip',
+ 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\DLLs',
+ 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib',
+ 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313',
+ 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages',
+ 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor',
+ 'C:\\Users\\hyoseung\\OneDrive\\바탕 화면\\AI_Blogging_Studio_Clean']
+840 INFO: checking Analysis
+840 INFO: Building Analysis because Analysis-00.toc is non existent
+840 INFO: Running Analysis Analysis-00.toc
+840 INFO: Target bytecode optimization level: 0
+840 INFO: Initializing module dependency graph...
+841 INFO: Initializing module graph hook caches...
+858 INFO: Analyzing modules for base_library.zip ...
+2309 INFO: Processing standard module hook 'hook-encodings.py' from 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks'
+3416 INFO: Processing standard module hook 'hook-heapq.py' from 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks'
+5502 INFO: Processing standard module hook 'hook-pickle.py' from 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks'
+7461 INFO: Caching module dependency graph...
+7518 INFO: Looking for Python shared library...
+7525 INFO: Using Python shared library: C:\Users\hyoseung\AppData\Local\Programs\Python\Python313\python313.dll
+7525 INFO: Analyzing C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean\AI_Blogging_Studio.py
+7530 INFO: Processing pre-find-module-path hook 'hook-tkinter.py' from 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks\\pre_find_module_path'
+7531 INFO: TclTkInfo: initializing cached Tcl/Tk info...
+7846 INFO: Processing standard module hook 'hook-_tkinter.py' from 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks'
+8007 INFO: Processing standard module hook 'hook-_ctypes.py' from 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks'
+8052 INFO: Processing module hooks (post-graph stage)...
+8057 INFO: Processing standard module hook 'hook-_tkinter.py' from 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks'
+8069 INFO: Performing binary vs. data reclassification (927 entries)
+8200 INFO: Looking for ctypes DLLs
+8212 INFO: Analyzing run-time hooks ...
+8213 INFO: Including run-time hook 'pyi_rth_inspect.py' from 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+8217 INFO: Including run-time hook 'pyi_rth__tkinter.py' from 'C:\\Users\\hyoseung\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+8247 INFO: Creating base_library.zip...
+8305 INFO: Looking for dynamic libraries
+8445 INFO: Extra DLL search directories (AddDllDirectory): []
+8446 INFO: Extra DLL search directories (PATH): []
+8801 INFO: Warnings written to C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean\build\AI_Blogging_Studio_Pro\warn-AI_Blogging_Studio_Pro.txt
+8821 INFO: Graph cross-reference written to C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean\build\AI_Blogging_Studio_Pro\xref-AI_Blogging_Studio_Pro.html
+8868 INFO: checking PYZ
+8868 INFO: Building PYZ because PYZ-00.toc is non existent
+8868 INFO: Building PYZ (ZlibArchive) C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean\build\AI_Blogging_Studio_Pro\PYZ-00.pyz
+9149 INFO: Building PYZ (ZlibArchive) C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean\build\AI_Blogging_Studio_Pro\PYZ-00.pyz completed successfully.
+9181 INFO: checking PKG
+9181 INFO: Building PKG because PKG-00.toc is non existent
+9181 INFO: Building PKG (CArchive) AI_Blogging_Studio_Pro.pkg
+12088 INFO: Building PKG (CArchive) AI_Blogging_Studio_Pro.pkg completed successfully.
+12114 INFO: Bootloader C:\Users\hyoseung\AppData\Local\Programs\Python\Python313\Lib\site-packages\PyInstaller\bootloader\Windows-64bit-intel\runw.exe
+12114 INFO: checking EXE
+12114 INFO: Building EXE because EXE-00.toc is non existent
+12114 INFO: Building EXE from EXE-00.toc
+12114 INFO: Copying bootloader EXE to C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean\dist\AI_Blogging_Studio_Pro.exe
+12162 INFO: Copying icon to EXE
+12204 INFO: Copying 0 resources to EXE
+12204 INFO: Embedding manifest in EXE
+12212 INFO: Appending PKG archive to EXE
+12285 INFO: Fixing EXE headers
+12573 INFO: Building EXE from EXE-00.toc completed successfully.
+12600 INFO: Build complete! The results are available in: C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean\dist
+PS C:\Users\hyoseung\OneDrive\바탕 화면\AI_Blogging_Studio_Clean>
