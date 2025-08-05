@@ -1,4 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 언어 초기화 (languages.js 의존) - 약간의 지연을 두어 languages.js 로드 완료 보장
+    setTimeout(() => {
+        if (typeof initializeLanguage === 'function') {
+            console.log('언어 초기화 시작');
+            initializeLanguage();
+        } else {
+            console.error('initializeLanguage 함수를 찾을 수 없습니다');
+        }
+    }, 100);
+    
     // --- GLOBAL STATE & CONFIG ---
     const GOOGLE_API_SCOPES = 'https://www.googleapis.com/auth/blogger https://www.googleapis.com/auth/cloud-platform';
     let tokenClient;

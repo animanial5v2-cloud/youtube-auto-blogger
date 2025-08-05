@@ -171,15 +171,21 @@ const translations = {
 
 // 언어 변경 함수
 function changeLanguage(lang) {
+    console.log('언어 변경 시도:', lang);
     const elements = document.querySelectorAll('[data-i18n]');
+    console.log('번역할 요소 개수:', elements.length);
+    
     elements.forEach(element => {
         const key = element.getAttribute('data-i18n');
-        if (translations[lang] && translations[lang][key]) {
+        if (languages[lang] && languages[lang][key]) {
             if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                element.placeholder = translations[lang][key];
+                element.placeholder = languages[lang][key];
             } else {
-                element.textContent = translations[lang][key];
+                element.textContent = languages[lang][key];
             }
+            console.log('번역:', key, '→', languages[lang][key]);
+        } else {
+            console.warn('번역 키 누락:', key, 'for language:', lang);
         }
     });
     
@@ -187,13 +193,14 @@ function changeLanguage(lang) {
     const optionElements = document.querySelectorAll('[data-i18n-option]');
     optionElements.forEach(element => {
         const key = element.getAttribute('data-i18n-option');
-        if (translations[lang] && translations[lang][key]) {
-            element.textContent = translations[lang][key];
+        if (languages[lang] && languages[lang][key]) {
+            element.textContent = languages[lang][key];
         }
     });
     
     // 현재 언어 저장
     localStorage.setItem('selectedLanguage', lang);
+    console.log('언어 변경 완료:', lang);
 }
 
 // 언어 초기화
@@ -230,5 +237,5 @@ function initializeLanguage() {
     }
 }
 
-// DOM 로드 완료 시 언어 초기화
-document.addEventListener('DOMContentLoaded', initializeLanguage);
+// DOM 로드 완료 시 언어 초기화 (script.js에서 호출)
+// document.addEventListener('DOMContentLoaded', initializeLanguage);
