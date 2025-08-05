@@ -252,11 +252,68 @@
                     </div>
                     <div class="mobile-nav-buttons">
                         <button class="mobile-nav-btn" onclick="showScreen('writing-settings')">이전</button>
+                        <button class="mobile-nav-btn" onclick="showScreen('api-settings')">API 설정</button>
                         <button class="mobile-nav-btn primary" onclick="showScreen('generate')">다음</button>
                     </div>
                 </div>
 
-                <!-- 스크린 5: 생성 -->
+                <!-- 스크린 5: API 설정 -->
+                <div id="screen-api-settings" class="mobile-screen">
+                    <h2 class="screen-title">API 설정</h2>
+                    <div class="screen-content">
+                        <h3>필수 API 키</h3>
+                        <div class="form-group">
+                            <label>Gemini API 키</label>
+                            <input type="password" id="mobileApiKey" placeholder="AI 콘텐츠 생성용">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Google Client ID</label>
+                            <input type="text" id="mobileClientId" placeholder="Blogger 접근용">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>블로그 ID</label>
+                            <input type="text" id="mobileBlogId" placeholder="Blogger 블로그 ID (숫자)">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>블로그 주소</label>
+                            <input type="text" id="mobileBlogAddress" placeholder="https://yourblog.blogspot.com">
+                        </div>
+                    </div>
+                    <div class="mobile-nav-buttons">
+                        <button class="mobile-nav-btn" onclick="showScreen('platform-settings')">이전</button>
+                        <button class="mobile-nav-btn primary" onclick="showScreen('login')">다음</button>
+                    </div>
+                </div>
+
+                <!-- 스크린 6: 로그인 -->
+                <div id="screen-login" class="mobile-screen">
+                    <h2 class="screen-title">Google 로그인</h2>
+                    <div class="screen-content">
+                        <h3>Blogger 연동</h3>
+                        <div class="form-group">
+                            <p style="color: #cccccc; margin-bottom: 20px;">
+                                블로그 자동 발행을 위해 Google 계정 연동이 필요합니다.
+                            </p>
+                            
+                            <div id="mobileAuthStatus" class="auth-status-mobile">
+                                <!-- 로그인 상태가 여기 표시됩니다 -->
+                            </div>
+                            
+                            <button id="mobileLoginBtn" class="mobile-auth-btn">
+                                Google 로그인
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mobile-nav-buttons">
+                        <button class="mobile-nav-btn" onclick="showScreen('api-settings')">이전</button>
+                        <button class="mobile-nav-btn primary" onclick="showScreen('generate')">생성하기</button>
+                    </div>
+                </div>
+
+                <!-- 스크린 7: 생성 -->
                 <div id="screen-generate" class="mobile-screen">
                     <h2 class="screen-title">생성하기</h2>
                     <div class="screen-content">
@@ -266,7 +323,7 @@
                         </div>
                     </div>
                     <div class="mobile-nav-buttons">
-                        <button class="mobile-nav-btn" onclick="showScreen('platform-settings')">이전</button>
+                        <button class="mobile-nav-btn" onclick="showScreen('login')">이전</button>
                         <button class="mobile-nav-btn primary" id="mobileGenerateBtn">블로그 포스트 생성</button>
                     </div>
                 </div>

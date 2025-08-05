@@ -1079,6 +1079,47 @@ input:focus, select:focus, textarea:focus {
         cursor: not-allowed;
     }
     
+    /* 모바일 인증 관련 스타일 */
+    .mobile-auth-btn {
+        width: 100%;
+        background: #4285F4;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: calc(var(--spacing-unit) * 1.5);
+        font-size: 1rem;
+        font-weight: 600;
+        min-height: 56px;
+        cursor: pointer;
+        margin-top: calc(var(--spacing-unit) * 1);
+    }
+    
+    .mobile-auth-btn:hover {
+        background: #3367D6;
+    }
+    
+    .auth-status-mobile {
+        background: #2a2a2a;
+        border: 1px solid #333333;
+        border-radius: 8px;
+        padding: calc(var(--spacing-unit) * 1.5);
+        margin-bottom: calc(var(--spacing-unit) * 1);
+        color: #cccccc;
+        text-align: center;
+    }
+    
+    .auth-status-mobile.success {
+        background: #1a4d1a;
+        border-color: #2d7d2d;
+        color: #90ee90;
+    }
+    
+    .auth-status-mobile.error {
+        background: #4d1a1a;
+        border-color: #7d2d2d;
+        color: #ff9090;
+    }
+    
     /* 기존 채팅 인터페이스 숨기기 */
     #chatContainer,
     .chat-input-area {

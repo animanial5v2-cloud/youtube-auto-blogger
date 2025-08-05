@@ -981,6 +981,15 @@ function initializeMobileInterface() {
     if (mobileGenerateBtn) {
         mobileGenerateBtn.addEventListener('click', handleMobileGenerate);
     }
+    
+    // 모바일 로그인 버튼 처리
+    const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+    if (mobileLoginBtn) {
+        mobileLoginBtn.addEventListener('click', handleMobileLogin);
+    }
+    
+    // 모바일 API 설정 동기화
+    syncMobileApiSettings();
 }
 
 // 콘텐츠 입력 화면 업데이트
@@ -1119,6 +1128,12 @@ function handleMobileGenerate() {
     const targetAudience = document.getElementById('mobileTargetAudience')?.value || '';
     const imageSource = document.getElementById('mobileImageSource')?.value || 'none';
     
+    // API 설정 동기화
+    const apiKey = document.getElementById('mobileApiKey')?.value || '';
+    const clientId = document.getElementById('mobileClientId')?.value || '';
+    const blogId = document.getElementById('mobileBlogId')?.value || '';
+    const blogAddress = document.getElementById('mobileBlogAddress')?.value || '';
+    
     // 기존 설정에 모바일 설정 적용
     if (document.getElementById('writingTone')) {
         document.getElementById('writingTone').value = writingTone;
@@ -1129,6 +1144,20 @@ function handleMobileGenerate() {
     if (document.getElementById('targetAudience')) {
         document.getElementById('targetAudience').value = targetAudience;
     }
+    // API 설정 동기화
+    const settingsMap = {
+        'apiKey': apiKey,
+        'clientId': clientId,
+        'blogId': blogId,
+        'blogAddress': blogAddress
+    };
+    
+    Object.keys(settingsMap).forEach(id => {
+        const element = document.getElementById(id);
+        if (element && settingsMap[id]) {
+            element.value = settingsMap[id];
+        }
+    });
     
     // 기존 채팅 인터페이스로 요청 전달
     if (document.getElementById('chatInput')) {
@@ -1137,5 +1166,71 @@ function handleMobileGenerate() {
     }
 }
 
+// 모바일 API 설정 동기화
+function syncMobileApiSettings() {
+    // 기존 설정에서 모바일로 복사
+    const apiKey = document.getElementById('apiKey')?.value || '';
+    const clientId = document.getElementById('clientId')?.value || '';
+    const blogId = document.getElementById('blogId')?.value || '';
+    const blogAddress = document.getElementById('blogAddress')?.value || '';
+    
+    if (document.getElementById('mobileApiKey')) {
+        document.getElementById('mobileApiKey').value = apiKey;
+    }
+    if (document.getElementById('mobileClientId')) {
+        document.getElementById('mobileClientId').value = clientId;
+    }
+    if (document.getElementById('mobileBlogId')) {
+        document.getElementById('mobileBlogId').value = blogId;
+    }
+    if (document.getElementById('mobileBlogAddress')) {
+        document.getElementById('mobileBlogAddress').value = blogAddress;
+    }
+    
+    // 모바일에서 기존으로 복사하는 이벤트 리스너
+    const idMappings = {
+        'mobileApiKey': 'apiKey',
+        'mobileClientId': 'clientId',
+        'mobileBlogId': 'blogId',
+        'mobileBlogAddress': 'blogAddress'
+    };
+    
+    Object.keys(idMappings).forEach(mobileId => {
+        const element = document.getElementById(mobileId);
+        if (element) {
+            element.addEventListener('input', (e) => {
+                const desktopElement = document.getElementById(idMappings[mobileId]);
+                if (desktopElement) {
+                    desktopElement.value = e.target.value;
+                }
+            });
+        }
+    });
+}
+
+// 모바일 로그인 처리
+function handleMobileLogin() {
+    // 기존 로그인 버튼 클릭
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.click();
+    }
+    
+    // 상태 업데이트
+    updateMobileAuthStatus();
+}
+
+// 모바일 인증 상태 업데이트
+function updateMobileAuthStatus() {
+    const mobileAuthStatus = document.getElementById('mobileAuthStatus');
+    const authStatus = document.getElementById('authStatus');
+    
+    if (mobileAuthStatus && authStatus) {
+        mobileAuthStatus.innerHTML = authStatus.innerHTML;
+        mobileAuthStatus.className = authStatus.className.replace('status-box', 'auth-status-mobile');
+    }
+}
+
 // 전역 함수로 만들기
 window.showScreen = showScreen;
+window.updateMobileAuthStatus = updateMobileAuthStatus;
