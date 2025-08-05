@@ -24,71 +24,75 @@ class AIBloggingStudioFinal:
         self.root.geometry(f"550x420+{x}+{y}")
     
     def setup_ui(self):
-        main_frame = tk.Frame(self.root, bg='#f8f9fa', padx=25, pady=20)
+        main_frame = tk.Frame(self.root, bg='#1e1e1e', padx=30, pady=25)
         main_frame.pack(fill='both', expand=True)
         
         # 헤더
-        tk.Label(main_frame, text="🤖 AI 블로깅 스튜디오 Pro", 
-                font=('맑은 고딕', 19, 'bold'),
-                bg='#f8f9fa', fg='#2c3e50').pack(pady=(0, 8))
+        tk.Label(main_frame, text="AI 블로깅 스튜디오 Pro", 
+                font=('맑은 고딕', 20, 'bold'),
+                bg='#1e1e1e', fg='#ffffff').pack(pady=(0, 8))
         
         tk.Label(main_frame, text="YouTube 영상을 AI 블로그 포스트로 자동 변환", 
                 font=('맑은 고딕', 11),
-                bg='#f8f9fa', fg='#7f8c8d').pack(pady=(0, 15))
+                bg='#1e1e1e', fg='#b0b0b0').pack(pady=(0, 20))
         
         # 기능 소개
-        feature_frame = tk.Frame(main_frame, bg='#ffffff', relief='solid', bd=1)
-        feature_frame.pack(fill='x', pady=(0, 15))
+        feature_frame = tk.Frame(main_frame, bg='#2d2d2d', relief='flat', bd=0)
+        feature_frame.pack(fill='x', pady=(0, 20), ipady=15)
         
-        tk.Label(feature_frame, text="✨ 핵심 기능", 
-                font=('맑은 고딕', 12, 'bold'),
-                bg='#ffffff', fg='#2c3e50').pack(pady=(12, 8))
+        tk.Label(feature_frame, text="핵심 기능", 
+                font=('맑은 고딕', 13, 'bold'),
+                bg='#2d2d2d', fg='#ffffff').pack(pady=(0, 10))
         
-        features = """• Google Gemini AI 기반 고품질 콘텐츠 자동 생성
-• 구글 블로거, 워드프레스, 티스토리, 네이버 블로그 동시 발행
-• 맞춤형 톤앤매너 설정 및 SEO 최적화
-• 예약 발행 및 자동화 스케줄링 기능
-• 무제한 포스트 생성 및 히스토리 관리"""
+        features = """Google Gemini AI 기반 고품질 콘텐츠 자동 생성
+구글 블로거, 워드프레스, 티스토리, 네이버 블로그 동시 발행
+맞춤형 톤앤매너 설정 및 SEO 최적화
+예약 발행 및 자동화 스케줄링 기능
+무제한 포스트 생성 및 히스토리 관리"""
         
         tk.Label(feature_frame, text=features, 
                 font=('맑은 고딕', 9),
-                bg='#ffffff', justify='left', fg='#2c3e50').pack(pady=(0, 12), padx=15)
+                bg='#2d2d2d', justify='center', fg='#d0d0d0').pack(padx=20)
         
         # 상태 표시
-        self.status_var = tk.StringVar(value="시스템 준비 완료 ✅")
+        self.status_var = tk.StringVar(value="시스템 준비 완료")
         status_label = tk.Label(main_frame, textvariable=self.status_var,
-                               font=('맑은 고딕', 10, 'bold'),
-                               bg='#f8f9fa', fg='#27ae60')
-        status_label.pack(pady=(0, 15))
+                               font=('맑은 고딕', 10),
+                               bg='#1e1e1e', fg='#4CAF50')
+        status_label.pack(pady=(0, 25))
         
-        # 메인 실행 버튼
-        launch_btn = tk.Button(main_frame, text="🚀 AI 블로깅 스튜디오 시작",
+        # 메인 실행 버튼 (작고 고급스럽게)
+        launch_btn = tk.Button(main_frame, text="시작",
                               command=self.launch_app,
-                              font=('맑은 고딕', 14, 'bold'),
-                              bg='#3498db', fg='white',
-                              width=25, height=2,
-                              relief='flat', cursor='hand2')
-        launch_btn.pack(pady=(0, 15))
+                              font=('맑은 고딕', 12, 'bold'),
+                              bg='#007ACC', fg='white',
+                              width=15, height=1,
+                              relief='flat', cursor='hand2',
+                              bd=2, highlightthickness=0)
+        launch_btn.pack(pady=(0, 20))
         
-        # 보조 버튼들
-        button_frame = tk.Frame(main_frame, bg='#f8f9fa')
-        button_frame.pack(pady=(0, 15))
+        # 보조 버튼들 (더 세련되게)
+        button_frame = tk.Frame(main_frame, bg='#1e1e1e')
+        button_frame.pack(pady=(0, 20))
         
-        tk.Button(button_frame, text="📖 사용법", command=self.show_guide,
-                 bg='#2ecc71', fg='white', width=12, height=1,
-                 font=('맑은 고딕', 10), relief='flat', cursor='hand2').pack(side='left', padx=5)
+        tk.Button(button_frame, text="사용법", command=self.show_guide,
+                 bg='#404040', fg='#ffffff', width=10, height=1,
+                 font=('맑은 고딕', 9), relief='flat', cursor='hand2',
+                 bd=1, highlightthickness=0).pack(side='left', padx=8)
         
-        tk.Button(button_frame, text="ℹ️ 정보", command=self.show_info,
-                 bg='#f39c12', fg='white', width=12, height=1,
-                 font=('맑은 고딕', 10), relief='flat', cursor='hand2').pack(side='left', padx=5)
+        tk.Button(button_frame, text="정보", command=self.show_info,
+                 bg='#404040', fg='#ffffff', width=10, height=1,
+                 font=('맑은 고딕', 9), relief='flat', cursor='hand2',
+                 bd=1, highlightthickness=0).pack(side='left', padx=8)
         
-        tk.Button(button_frame, text="❌ 종료", command=self.quit_app,
-                 bg='#e74c3c', fg='white', width=12, height=1,
-                 font=('맑은 고딕', 10), relief='flat', cursor='hand2').pack(side='left', padx=5)
+        tk.Button(button_frame, text="종료", command=self.quit_app,
+                 bg='#404040', fg='#ffffff', width=10, height=1,
+                 font=('맑은 고딕', 9), relief='flat', cursor='hand2',
+                 bd=1, highlightthickness=0).pack(side='left', padx=8)
         
         # 하단 정보
-        tk.Label(main_frame, text="구매해주셔서 감사합니다! 문의사항은 크몽 메시지로 연락주세요.",
-                font=('맑은 고딕', 8), bg='#f8f9fa', fg='#95a5a6').pack(side='bottom')
+        tk.Label(main_frame, text="구매해주셔서 감사합니다 • 문의사항은 크몽 메시지로 연락주세요",
+                font=('맑은 고딕', 8), bg='#1e1e1e', fg='#808080').pack(side='bottom')
     
     def launch_app(self):
         """메인 앱 실행"""
