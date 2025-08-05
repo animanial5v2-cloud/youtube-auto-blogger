@@ -200,13 +200,32 @@ function changeLanguage(lang) {
 function initializeLanguage() {
     const savedLanguage = localStorage.getItem('selectedLanguage') || 'ko';
     const languageSelect = document.getElementById('languageSelect');
+    const mobileLangSelect = document.getElementById('mobileLangSelect');
     
+    // 데스크톱 언어 선택
     if (languageSelect) {
         languageSelect.value = savedLanguage;
         changeLanguage(savedLanguage);
         
         languageSelect.addEventListener('change', (e) => {
             changeLanguage(e.target.value);
+            // 모바일 셀렉트도 동기화
+            if (mobileLangSelect) {
+                mobileLangSelect.value = e.target.value;
+            }
+        });
+    }
+    
+    // 모바일 언어 선택
+    if (mobileLangSelect) {
+        mobileLangSelect.value = savedLanguage;
+        
+        mobileLangSelect.addEventListener('change', (e) => {
+            changeLanguage(e.target.value);
+            // 데스크톱 셀렉트도 동기화
+            if (languageSelect) {
+                languageSelect.value = e.target.value;
+            }
         });
     }
 }
