@@ -272,11 +272,10 @@ def chat_for_topic():
 
 각 제안은 SEO 친화적이고 바로 포스팅 가능해야 하며, 설정된 글쓰기 톤과 타겟 독자에게 적합해야 합니다."""
             
-            # Configure generation with limits to prevent memory issues
+            # Configure generation with very low limits to prevent memory issues
             generation_config = genai.types.GenerationConfig(
-                max_output_tokens=1000,
+                max_output_tokens=512,  # Much smaller
                 temperature=0.7,
-                top_p=0.8,
             )
             
             result = model.generate_content(
