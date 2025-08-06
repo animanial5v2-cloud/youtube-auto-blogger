@@ -4,8 +4,10 @@ import os
 import requests
 try:
     import google.generativeai as genai
+    from google.generativeai import types
 except ImportError:
     genai = None
+    types = None
 
 class GeminiService:
     def __init__(self):
