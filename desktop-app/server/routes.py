@@ -231,6 +231,52 @@ def generate_blog_post():
         logging.error(f"Error generating blog post: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/chat-for-topic', methods=['POST'])
+def chat_for_topic():
+    """Chat with AI for topic discovery"""
+    try:
+        data = request.get_json()
+        message = data.get('message', '').strip()
+        api_key = data.get('apiKey', '').strip()
+        
+        if not message:
+            return jsonify({'error': 'Message is required'}), 400
+        
+        if not api_key:
+            return jsonify({'error': 'Gemini API key is required'}), 400
+        
+        # Use gemini service for topic discovery chat
+        try:
+            import google.generativeai as genai
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel('gemini-1.5-pro-latest')
+            
+            prompt = f"""당신은 창의적인 블로그 주제 컨설턴트입니다. 사용자의 질문에 대해 구체적이고 실용적인 블로그 주제를 제안해주세요.
+
+사용자 질문: "{message}"
+
+아래 형식으로 응답해주세요:
+- 구체적이고 검색 친화적인 주제 제안
+- 해당 주제가 왜 좋은지 간단한 설명
+- SEO 관점에서의 키워드 포함 권장사항
+
+응답은 자연스러운 한국어로 작성하되, 바로 블로그 포스팅 생성에 활용할 수 있을 정도로 구체적이어야 합니다."""
+            
+            result = model.generate_content(prompt)
+            
+            if result and result.text:
+                return jsonify({'reply': result.text})
+            else:
+                return jsonify({'error': 'AI가 응답을 생성하지 못했습니다. 다시 시도해주세요.'}), 500
+                
+        except Exception as e:
+            logging.error(f"Gemini API error in chat-for-topic: {str(e)}")
+            return jsonify({'error': f'AI 대화 중 오류가 발생했습니다: {str(e)}'}), 500
+            
+    except Exception as e:
+        logging.error(f"Error in chat-for-topic: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/generate-post-from-youtube', methods=['POST'])
 def generate_post_from_youtube():
     """Generate blog post from YouTube URLs"""
