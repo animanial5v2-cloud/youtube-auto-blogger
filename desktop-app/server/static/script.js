@@ -545,27 +545,42 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!response.ok) {
             let errorMessage;
             try {
-                const errorData = await response.json();
+                // Clone response to avoid "body stream already read" error
+                const responseClone = response.clone();
+                const errorData = await responseClone.json();
                 errorMessage = errorData.error || '알 수 없는 오류가 발생했습니다.';
             } catch (jsonError) {
                 // HTML 응답인 경우 (404 등)
-                const text = await response.text();
-                if (response.status === 404) {
-                    errorMessage = '요청한 기능을 찾을 수 없습니다. 서버 상태를 확인해주세요.';
-                } else {
-                    errorMessage = `서버 연결 문제가 발생했습니다 (${response.status})`;
+                try {
+                    const text = await response.text();
+                    if (response.status === 404) {
+                        errorMessage = '요청한 기능을 찾을 수 없습니다. 서버 상태를 확인해주세요.';
+                    } else {
+                        errorMessage = `서버 연결 문제가 발생했습니다 (${response.status})`;
+                    }
+                    console.error('Server response:', text);
+                } catch (textError) {
+                    errorMessage = `응답 처리 중 오류가 발생했습니다 (${response.status})`;
                 }
-                console.error('Server response:', text);
             }
             throw new Error(errorMessage);
         }
 
         let data;
         try {
-            data = await response.json();
+            // Clone response to prevent "body stream already read" error
+            const responseClone = response.clone();
+            data = await responseClone.json();
         } catch (jsonParseError) {
             console.error('JSON parse error:', jsonParseError);
-            throw new Error('서버에서 올바르지 않은 응답을 받았습니다. 다시 시도해주세요.');
+            // Try to get text response for debugging
+            try {
+                const textResponse = await response.text();
+                console.error('Response text:', textResponse);
+                throw new Error('서버에서 올바르지 않은 응답을 받았습니다. 다시 시도해주세요.');
+            } catch (textError) {
+                throw new Error('응답을 읽는 중 오류가 발생했습니다. 네트워크 상태를 확인해주세요.');
+            }
         }
         
         // Check if response has error field
