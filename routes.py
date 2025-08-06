@@ -238,6 +238,9 @@ def chat_for_topic():
         data = request.get_json()
         message = data.get('message', '').strip()
         api_key = data.get('apiKey', '').strip()
+        model_name = data.get('modelName', 'gemini-1.5-pro-latest')
+        tone = data.get('tone', '친근한 (Friendly)')
+        audience = data.get('audience', '')
         
         if not message:
             return jsonify({'error': 'Message is required'}), 400
@@ -245,25 +248,29 @@ def chat_for_topic():
         if not api_key:
             return jsonify({'error': 'Gemini API key is required'}), 400
         
-        # Use gemini service for topic discovery chat with optimized configuration
+        # Use gemini service for topic discovery chat with user settings
         try:
             import google.generativeai as genai
             genai.configure(api_key=api_key)
             
-            # Use lighter model for topic discovery to reduce memory usage
-            model = genai.GenerativeModel('gemini-1.5-flash-latest')
+            # Use user-selected model instead of hardcoded one
+            model = genai.GenerativeModel(model_name)
             
-            # Shorter, optimized prompt to reduce token usage
-            prompt = f"""블로그 주제 컨설턴트로서 다음 질문에 대해 3가지 구체적인 주제를 제안해주세요:
+            # Enhanced prompt that considers user's tone and audience preferences
+            prompt = f"""당신은 전문 블로그 주제 컨설턴트입니다. 주어진 설정에 맞춰 주제를 추천해주세요.
+
+**글쓰기 톤 & 스타일:** {tone}
+**타겟 독자:** {audience or '일반 대중'}
 
 질문: "{message}"
 
-형식:
+위 설정을 고려하여 다음 형식으로 3가지 구체적인 주제를 제안해주세요:
+
 1. [구체적 주제명] - 간단한 이유
 2. [구체적 주제명] - 간단한 이유  
 3. [구체적 주제명] - 간단한 이유
 
-각 제안은 SEO 친화적이고 바로 포스팅 가능해야 합니다."""
+각 제안은 SEO 친화적이고 바로 포스팅 가능해야 하며, 설정된 글쓰기 톤과 타겟 독자에게 적합해야 합니다."""
             
             # Configure generation with limits to prevent memory issues
             generation_config = genai.types.GenerationConfig(

@@ -466,7 +466,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleTopicDiscoveryChat(userInput) {
         const thinkingMessage = addChatMessage('ai', '생성 중...');
-        const requestBody = { apiKey: apiKeyInput.value.trim(), message: userInput };
+        const requestBody = { 
+            apiKey: apiKeyInput.value.trim(), 
+            message: userInput,
+            modelName: geminiModelSelect.value,
+            tone: writingToneSelect.value,
+            audience: targetAudienceInput.value.trim()
+        };
 
         const response = await fetch('/chat-for-topic', {
             method: 'POST',
@@ -769,7 +775,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const thinkingMessage = addChatMessage('ai', '새로운 주제들을 찾고 있습니다...');
             const requestBody = { 
                 apiKey: apiKeyInput.value.trim(), 
-                message: keyword + " (다른 관점의 새로운 주제 추천)"
+                message: keyword + " (다른 관점의 새로운 주제 추천)",
+                modelName: geminiModelSelect.value,
+                tone: writingToneSelect.value,
+                audience: targetAudienceInput.value.trim()
             };
 
             const response = await fetch('/chat-for-topic', {
