@@ -875,27 +875,15 @@ input:focus, select:focus, textarea:focus {
         overflow-y: auto;
         background-color: #000000;
         min-height: 0; /* flexbox 스크롤 수정 */
-        display: flex !important; /* 강제로 표시 */
-        flex-direction: column;
     }
     
     .sidebar-right {
         display: none;
     }
     
-    /* 데스크톱 채팅 컨테이너가 모바일에서도 보이도록 */
-    .chat-container {
-        display: flex !important;
-        flex-grow: 1;
-    }
-    
-    .chat-input-area {
-        display: flex !important;
-    }
-    
     /* 모바일 멀티 스크린 인터페이스 - 블랙 테마 */
     .mobile-screens {
-        display: none !important; /* 우선 데스크톱 버전 사용 */
+        display: flex !important;
         height: 100vh;
         background: #000000;
         overflow: hidden;
