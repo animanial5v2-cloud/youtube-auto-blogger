@@ -560,7 +560,19 @@ document.addEventListener('DOMContentLoaded', () => {
             throw new Error(errorMessage);
         }
 
-        const data = await response.json();
+        let data;
+        try {
+            data = await response.json();
+        } catch (jsonParseError) {
+            console.error('JSON parse error:', jsonParseError);
+            throw new Error('서버에서 올바르지 않은 응답을 받았습니다. 다시 시도해주세요.');
+        }
+        
+        // Check if response has error field
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
         if (!data.title || !data.body) {
              throw new Error("AI가 콘텐츠를 만들었지만 내용이 비어있네요. 다시 시도해보세요.");
         }

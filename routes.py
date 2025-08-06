@@ -417,6 +417,7 @@ def generate_post():
         return jsonify({
             'title': blog_post.title,
             'body': blog_post.content,
+            'content': blog_post.content,  # Alias for compatibility
             'summary': blog_post.summary,
             'post_id': blog_post.id,
             'created_at': blog_post.created_at.isoformat()
