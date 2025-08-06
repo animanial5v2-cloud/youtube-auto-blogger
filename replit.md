@@ -7,6 +7,7 @@ AI Blogging Studio is a comprehensive web application that automates blog conten
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Code modification policy: Always request permission before making code changes ("무엇이든 수정 하기 전에 나에게 수정 해도되냐고 물어 보라고").
 
 ## Commercial Goals
 
@@ -29,6 +30,13 @@ The user plans to sell this AI Auto-Blogging Studio on Kmong (Korean freelance p
 - Final dark theme version completed and tested
 - Updated with permanent Replit Deploy URL (https://share-site-forge-animanial5v2.replit.app)
 - Full source code backup and platform migration capabilities documented
+
+### Current Technical Issues (August 6, 2025)
+- **Draft Mode Removal**: Successfully completed - all "초안으로 저장" functionality removed
+- **Memory Constraints**: Persistent "Worker was sent SIGKILL! Perhaps out of memory?" errors during Gemini API calls
+- **API Stability**: AI topic exploration works reliably, but main posting functions fail due to memory issues
+- **Core Plan Status**: User has Replit Core plan ($25/month) but memory issues persist
+- **Partial Success**: JSON parsing improvements implemented, some content generation working intermittently
 
 ## System Architecture
 
