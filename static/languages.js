@@ -154,7 +154,11 @@ const translations = {
         chatInputPlaceholder: "여기에 포스팅 주제 또는 YouTube URL을 입력하세요...",
         
         // No records message
-        noRecords: "기록이 없습니다."
+        noRecords: "기록이 없습니다.",
+        
+        // Content generation section title
+        contentGeneration: "콘텐츠 생성 (Gemini)",
+        geminiModel: "Gemini 모델"
     },
     
     en: {
@@ -311,7 +315,11 @@ const translations = {
         chatInputPlaceholder: "Enter your posting topic or YouTube URL here...",
         
         // No records message
-        noRecords: "No records available."
+        noRecords: "No records available.",
+        
+        // Content generation section title
+        contentGeneration: "Content Generation (Gemini)",
+        geminiModel: "Gemini Model"
     },
     
     vi: {
@@ -469,7 +477,11 @@ const translations = {
         chatInputPlaceholder: "Nhập chủ đề bài viết hoặc URL YouTube của bạn ở đây...",
         
         // No records message
-        noRecords: "Không có bản ghi nào."
+        noRecords: "Không có bản ghi nào.",
+        
+        // Content generation section title
+        contentGeneration: "Tạo Nội dung (Gemini)",
+        geminiModel: "Mô hình Gemini"
     }
 };
 
