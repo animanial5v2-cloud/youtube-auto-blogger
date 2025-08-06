@@ -426,6 +426,132 @@ def generate_post():
         logging.error(f"Error generating post from topic: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/generate-post-from-video', methods=['POST'])
+def generate_post_from_video():
+    """Generate blog post from uploaded video file"""
+    try:
+        user = get_or_create_user()
+        
+        # Check if video file is uploaded
+        if 'video' not in request.files:
+            return jsonify({'error': 'No video file uploaded'}), 400
+        
+        video_file = request.files['video']
+        if video_file.filename == '':
+            return jsonify({'error': 'No video file selected'}), 400
+        
+        # Get form data
+        topic = request.form.get('topic', '').strip()
+        gemini_api_key = request.form.get('apiKey', '').strip()
+        gemini_model = request.form.get('modelName', 'gemini-1.5-pro-latest')
+        writing_tone = request.form.get('tone', '친근한 (Friendly)')
+        target_audience = request.form.get('audience', '')
+        image_source = request.form.get('imageSource', 'none')
+        pexels_api_key = request.form.get('pexelsApiKey', '').strip()
+        
+        if not gemini_api_key:
+            return jsonify({'error': 'Gemini API key is required'}), 400
+        
+        if not topic:
+            topic = f"동영상 파일에서 추출된 콘텐츠 ({video_file.filename})"
+        
+        # Save uploaded video temporarily
+        import tempfile
+        import os
+        
+        temp_dir = tempfile.gettempdir()
+        temp_video_path = os.path.join(temp_dir, f"temp_video_{user.id}_{video_file.filename}")
+        
+        try:
+            video_file.save(temp_video_path)
+            logging.info(f"Video file saved temporarily: {temp_video_path}")
+            
+            # Extract content from video (placeholder for now - can be enhanced with actual video processing)
+            video_content = f"업로드된 동영상 파일: {video_file.filename}\n"
+            video_content += f"파일 크기: {os.path.getsize(temp_video_path)} bytes\n"
+            video_content += f"주제: {topic}\n\n"
+            video_content += "이 동영상을 분석하여 상세한 블로그 포스트를 작성해주세요. "
+            video_content += "동영상의 주요 내용, 메시지, 시각적 요소들을 포함하여 "
+            video_content += "독자들이 동영상을 보지 않아도 완전히 이해할 수 있도록 "
+            video_content += "2500자 이상의 풍부하고 상세한 내용으로 작성해주세요."
+            
+            # Handle image generation/fetching
+            image_url = None
+            if image_source == 'pexels' and pexels_api_key:
+                keywords = topic.split()[:5]  # Use topic words as keywords
+                image_url = youtube_service.fetch_image_from_pexels(keywords, pexels_api_key)
+            
+            # Generate content using Gemini
+            generated_content = gemini_service.generate_text_content(
+                gemini_api_key, video_content, image_url, gemini_model, writing_tone, target_audience
+            )
+            
+            if not generated_content:
+                return jsonify({'error': 'Failed to generate content'}), 500
+            
+            # Process image placement
+            final_content = generated_content.get('content_with_placeholder', '')
+            if image_url and '[IMAGE_HERE]' in final_content:
+                alt_text = generated_content.get('image_search_keywords', 'Blog post image')
+                image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
+                final_content = final_content.replace('[IMAGE_HERE]', image_tag)
+            elif image_url:
+                alt_text = generated_content.get('image_search_keywords', 'Blog post image')
+                image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
+                final_content = image_tag + final_content
+            
+            # Save to database with retry mechanism
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    blog_post = BlogPost()
+                    blog_post.user_id = user.id
+                    blog_post.title = generated_content.get('title', 'Untitled Post')
+                    blog_post.content = final_content
+                    blog_post.summary = generated_content.get('summary', '')
+                    blog_post.source_type = "video_file"
+                    blog_post.source_file_name = video_file.filename
+                    blog_post.gemini_model = gemini_model
+                    blog_post.writing_tone = writing_tone
+                    blog_post.target_audience = target_audience
+                    blog_post.image_source = image_source
+                    blog_post.image_url = image_url
+                    
+                    db.session.add(blog_post)
+                    db.session.commit()
+                    break  # Success, exit retry loop
+                    
+                except Exception as db_error:
+                    logging.warning(f"Database save attempt {attempt + 1} failed: {str(db_error)}")
+                    db.session.rollback()
+                    
+                    if attempt == max_retries - 1:
+                        raise db_error
+                    else:
+                        import time
+                        time.sleep(1)
+            
+            return jsonify({
+                'title': blog_post.title,
+                'body': blog_post.content,
+                'summary': blog_post.summary,
+                'post_id': blog_post.id,
+                'created_at': blog_post.created_at.isoformat()
+            })
+            
+        finally:
+            # Clean up temporary file
+            try:
+                if os.path.exists(temp_video_path):
+                    os.remove(temp_video_path)
+                    logging.info(f"Temporary video file removed: {temp_video_path}")
+            except Exception as cleanup_error:
+                logging.warning(f"Failed to remove temporary file: {cleanup_error}")
+        
+    except Exception as e:
+        logging.error(f"Error generating post from video: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/publish', methods=['POST'])
 def publish_to_platform():
     """Publish generated post to selected platform"""
