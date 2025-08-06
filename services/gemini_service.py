@@ -104,17 +104,29 @@ class GeminiService:
                         time.sleep(delay)
                         logging.info(f"Retrying Gemini API call (attempt {attempt + 1}) after {delay}s delay")
                     
-                    # Use reduced token limits to prevent memory issues
-                    result = model.generate_content(
-                        content_parts,
-                        generation_config=genai.GenerationConfig(
-                            temperature=0.7,
-                            top_p=0.8,
-                            top_k=40,
-                            max_output_tokens=4096,  # Reduced from 8192 to prevent memory issues
-                            candidate_count=1
+                    # Use reduced token limits and timeout to prevent memory issues
+                    import signal
+                    
+                    def timeout_handler(signum, frame):
+                        raise TimeoutError("Gemini API call timed out")
+                    
+                    # Set timeout for API call (30 seconds)
+                    signal.signal(signal.SIGALRM, timeout_handler)
+                    signal.alarm(30)
+                    
+                    try:
+                        result = model.generate_content(
+                            content_parts,
+                            generation_config=genai.GenerationConfig(
+                                temperature=0.7,
+                                top_p=0.8,
+                                top_k=40,
+                                max_output_tokens=3072,  # Further reduced for stability
+                                candidate_count=1
+                            )
                         )
-                    )
+                    finally:
+                        signal.alarm(0)  # Cancel timeout
                     
                     if not result:
                         raise ValueError("Empty result from Gemini API")
@@ -135,12 +147,20 @@ class GeminiService:
                     
                     return self._parse_gemini_json_response(generated_text)
                     
-                except Exception as retry_error:
-                    logging.warning(f"Gemini API attempt {attempt + 1} failed: {str(retry_error)}")
+                except (TimeoutError, Exception) as retry_error:
+                    error_type = "Timeout" if isinstance(retry_error, TimeoutError) else "API Error"
+                    logging.warning(f"Gemini {error_type} attempt {attempt + 1} failed: {str(retry_error)}")
+                    
+                    # Force cleanup on timeout/error
+                    gc.collect()
+                    
                     if attempt == max_retries - 1:
                         # Last attempt, raise the error
                         logging.error(f"All Gemini API attempts failed: {str(retry_error)}")
-                        raise ValueError(f"Gemini API 연결에 실패했습니다. API 키를 확인해주세요. 오류: {str(retry_error)}")
+                        if isinstance(retry_error, TimeoutError):
+                            raise ValueError("AI 서버 연결이 지연되고 있습니다. 잠시 후 다시 시도해주세요.")
+                        else:
+                            raise ValueError(f"AI 콘텐츠 생성에 실패했습니다. API 키를 확인해주세요. 오류: {str(retry_error)}")
                     
         except Exception as e:
             logging.error(f"Gemini API error: {str(e)}")

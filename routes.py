@@ -527,8 +527,8 @@ def generate_post_from_video():
         # Validate file size before processing to prevent memory issues
         if hasattr(video_file, 'content_length') and video_file.content_length:
             file_size_mb = video_file.content_length / (1024 * 1024)
-            if file_size_mb > 500:  # Limit to 500MB
-                return jsonify({'error': f'동영상 파일이 너무 큽니다. 최대 500MB까지 지원됩니다. (현재: {file_size_mb:.1f}MB)'}), 400
+            if file_size_mb > 200:  # Further reduced limit for stability
+                return jsonify({'error': f'동영상 파일이 너무 큽니다. 최대 200MB까지 지원됩니다. (현재: {file_size_mb:.1f}MB)'}), 400
         
         # Save uploaded video temporarily with improved error handling
         import tempfile
@@ -583,14 +583,26 @@ def generate_post_from_video():
             elif image_source == 'upload':
                 image_url = request.form.get('uploadedImageUrl')
             
-            # Generate content using Gemini with enhanced error handling
+            # Generate content using Gemini with enhanced error handling and memory management
+            import gc
+            gc.collect()  # Free memory before API call
+            
             try:
                 generated_content = gemini_service.generate_text_content(
                     gemini_api_key, video_content, image_url, gemini_model, writing_tone, target_audience
                 )
+                
+                if not generated_content:
+                    raise ValueError("AI가 빈 응답을 반환했습니다")
+                    
             except Exception as gemini_error:
                 logging.error(f"Gemini API failed for video content: {str(gemini_error)}")
-                return jsonify({'error': f'AI 콘텐츠 생성 중 오류가 발생했습니다: {str(gemini_error)}'}), 500
+                error_message = str(gemini_error)
+                
+                if "timeout" in error_message.lower() or "지연" in error_message:
+                    return jsonify({'error': '서버 연결이 지연되고 있습니다. 파일 크기를 줄이거나 잠시 후 다시 시도해주세요.'}), 503
+                else:
+                    return jsonify({'error': f'AI 콘텐츠 생성 중 오류가 발생했습니다: {error_message}'}), 500
             
             if not generated_content:
                 return jsonify({'error': 'Failed to generate content'}), 500
