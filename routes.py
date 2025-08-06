@@ -197,7 +197,7 @@ def generate_blog_post():
             logging.warning(f"Gemini failed, trying OpenAI: {str(gemini_error)}")
             try:
                 # Fallback to OpenAI
-                openai_key = settings.get('openaiKey') or os.getenv('OPENAI_API_KEY')
+                openai_key = settings.get('openaiKey') or os.getenv('OPENAI_API_KEY') or 'S7a7shjluIEyZweFJ3WHV7T2I2hrUv1lX4fwdtCZ4YhwsHqmZ0V9RghC'
                 if openai_key:
                     generated_content = openai_service.generate_text_content(
                         api_key=openai_key,
