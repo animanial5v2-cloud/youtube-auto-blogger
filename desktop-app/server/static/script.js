@@ -472,15 +472,37 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!response.ok) {
             let errorMessage;
             try {
-                const errorData = await response.json();
+                // Clone response to avoid "body stream already read" error
+                const responseClone = response.clone();
+                const errorData = await responseClone.json();
                 errorMessage = errorData.error || 'AI와 대화하는 중에 문제가 발생했습니다.';
             } catch (jsonError) {
-                errorMessage = `서버 연결에 문제가 발생했습니다 (${response.status})`;
+                try {
+                    const text = await response.text();
+                    errorMessage = `서버 연결에 문제가 발생했습니다 (${response.status})`;
+                    console.error('Server response:', text);
+                } catch (textError) {
+                    errorMessage = `응답 처리 중 오류가 발생했습니다 (${response.status})`;
+                }
             }
             throw new Error(errorMessage);
         }
 
-        const data = await response.json();
+        let data;
+        try {
+            // Clone response to prevent "body stream already read" error
+            const responseClone = response.clone();
+            data = await responseClone.json();
+        } catch (jsonParseError) {
+            console.error('JSON parse error in handleTopicDiscoveryChat:', jsonParseError);
+            try {
+                const textResponse = await response.text();
+                console.error('Response text:', textResponse);
+                throw new Error('서버에서 올바르지 않은 응답을 받았습니다. 다시 시도해주세요.');
+            } catch (textError) {
+                throw new Error('응답을 읽는 중 오류가 발생했습니다. 네트워크 상태를 확인해주세요.');
+            }
+        }
         const aiResponseHtml = `
             <p>${escapeHtml(data.reply).replace(/\n/g, '<br>')}</p>
             <div class="topic-suggestion-actions">
