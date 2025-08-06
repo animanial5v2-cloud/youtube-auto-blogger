@@ -406,8 +406,13 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (enabled) {
             updateTopicDiscoveryModeUI();
         } else {
-            // Check if we have Google auth status
-            if (accessToken) {
+            // Check if we have API key
+            const apiKey = apiKeyInput ? apiKeyInput.value.trim() : '';
+            if (apiKey && accessToken) {
+                chatInput.placeholder = "잠시만 기다려주세요...";
+            } else if (apiKey) {
+                chatInput.placeholder = "Google 로그인을 완료해주세요.";
+            } else if (accessToken) {
                 chatInput.placeholder = "Gemini API 키를 입력해주세요.";
             } else {
                 chatInput.placeholder = "API 키를 입력하고 Google 인증을 완료해주세요.";
@@ -440,7 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addChatMessage('user', userInput);
         chatInput.value = '';
         
-        setChatInputEnabled(false);
+        setChatInputEnabled(false, "잠시만 기다려주세요...");
         isGenerating = true;
 
         try {
