@@ -856,36 +856,31 @@ input:focus, select:focus, textarea:focus {
 
 /* === MOBILE RESPONSIVENESS === */
 @media (max-width: 768px) {
-    /* Mobile headers removed */
-    
     .app-container {
-        display: flex;
         flex-direction: column;
         height: 100vh;
-        overflow: hidden;
     }
     
-    .sidebar-left { 
-        display: none; 
+    .sidebar-left {
+        display: none;
     }
     
     .main-content {
         flex: 1;
-        padding: 0;
-        overflow-y: auto;
-        background-color: #000000;
-        min-height: 0; /* flexbox 스크롤 수정 */
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
     }
     
     .sidebar-right {
         display: none;
     }
     
-    /* 모바일 멀티 스크린 인터페이스 - 블랙 테마 */
+    /* 모바일 멀티 스크린 인터페이스 */
     .mobile-screens {
         display: flex !important;
         height: 100vh;
-        background: #000000;
+        background: var(--bg-color);
         overflow: hidden;
     }
     
