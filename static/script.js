@@ -1,26 +1,44 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 언어 초기화 (languages.js 의존) - 더 긴 지연으로 확실한 로드 보장
-    const initLanguages = () => {
-        if (typeof initializeLanguage === 'function') {
-            console.log('언어 초기화 시작');
-            initializeLanguage();
-        } else {
-            console.error('initializeLanguage 함수를 찾을 수 없습니다');
-            // 재시도
-            setTimeout(initLanguages, 200);
-        }
-    };
-    
-    // 다양한 시점에서 시도
-    setTimeout(initLanguages, 100);
-    setTimeout(initLanguages, 500);
-    setTimeout(initLanguages, 1000);
+    // 언어 초기화 (중복 방지)
+    if (typeof initializeLanguage === 'function' && !window.languageInitAttempted) {
+        window.languageInitAttempted = true;
+        console.log('언어 초기화 시작');
+        setTimeout(initializeLanguage, 500);
+    }
     
     // 사이드바 토글 기능 초기화
     initializeSidebarToggle();
     
     // 모바일 인터페이스 초기화
     initializeMobileInterface();
+    
+    // 모바일 화면 전환 함수 글로벌 등록
+    window.showMobileScreen = function(screenId) {
+        // 모든 화면 숨기기
+        document.querySelectorAll('.mobile-screen').forEach(screen => {
+            screen.classList.remove('active');
+        });
+        
+        // 모든 네비게이션 아이템 비활성화
+        document.querySelectorAll('.mobile-nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // 선택된 화면 표시
+        const targetScreen = document.getElementById(`screen-${screenId}`);
+        if (targetScreen) {
+            targetScreen.classList.add('active');
+        }
+        
+        // 해당 네비게이션 아이템 활성화
+        const targetNavItems = document.querySelectorAll('.mobile-nav-item');
+        targetNavItems.forEach((item, index) => {
+            const screens = ['api-settings', 'login', 'content-source', 'writing-settings', 'generate'];
+            if (screens[index] === screenId) {
+                item.classList.add('active');
+            }
+        });
+    };
     
     // --- GLOBAL STATE & CONFIG ---
     const GOOGLE_API_SCOPES = 'https://www.googleapis.com/auth/blogger https://www.googleapis.com/auth/cloud-platform';

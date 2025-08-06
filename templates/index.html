@@ -147,62 +147,141 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- 모바일 멀티 스크린 인터페이스 -->
+            <!-- 모바일 멀티 스크린 인터페이스 - 스마트 홈 스타일 -->
             <div class="mobile-screens" style="display: none;">
-                <!-- 스크린 1: API 설정 -->
-                <div id="screen-api-settings" class="mobile-screen active">
-                    <h2 class="screen-title">API 설정</h2>
-                    <div class="screen-content">
-                        <h3 data-i18n="apiKey">필수 API 키</h3>
-                        <div class="form-group">
-                            <label data-i18n="geminiApiKey">Gemini API 키</label>
-                            <input type="password" id="mobileApiKey" placeholder="AI 콘텐츠 생성용">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label data-i18n="googleClientId">Google Client ID</label>
-                            <input type="text" id="mobileClientId" placeholder="Blogger 접근용">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label data-i18n="blogId">블로그 ID</label>
-                            <input type="text" id="mobileBlogId" placeholder="Blogger 블로그 ID (숫자)">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label data-i18n="blogAddress">블로그 주소</label>
-                            <input type="text" id="mobileBlogAddress" placeholder="https://yourblog.blogspot.com">
-                        </div>
-                    </div>
-                    <div class="mobile-nav-buttons">
-                        <button class="mobile-nav-btn primary" onclick="showScreen('login')" data-i18n="next">다음</button>
-                    </div>
+                <!-- 왼쪽 네비게이션 바 -->
+                <div class="mobile-nav-sidebar">
+                    <button class="mobile-nav-item active" onclick="showMobileScreen('api-settings')" title="API 설정">
+                        🔑
+                    </button>
+                    <button class="mobile-nav-item" onclick="showMobileScreen('login')" title="로그인">
+                        👤
+                    </button>
+                    <button class="mobile-nav-item" onclick="showMobileScreen('content-source')" title="콘텐츠 소스">
+                        📝
+                    </button>
+                    <button class="mobile-nav-item" onclick="showMobileScreen('writing-settings')" title="글쓰기 설정">
+                        ⚙️
+                    </button>
+                    <button class="mobile-nav-item" onclick="showMobileScreen('generate')" title="생성하기">
+                        ✨
+                    </button>
                 </div>
-
-                <!-- 스크린 2: Google 로그인 -->
-                <div id="screen-login" class="mobile-screen">
-                    <h2 class="screen-title">Google 로그인</h2>
-                    <div class="screen-content">
-                        <h3 data-i18n="authentication">Blogger 연동</h3>
-                        <div class="form-group">
-                            <p style="color: #cccccc; margin-bottom: 20px;">
-                                블로그 자동 발행을 위해 Google 계정 연동이 필요합니다.
-                            </p>
-                            
-                            <div id="mobileAuthStatus" class="auth-status-mobile">
-                                로그인이 필요합니다
+                
+                <!-- 메인 콘텐츠 영역 -->
+                <div class="mobile-content-area">
+                    <!-- 스크린 1: API 설정 -->
+                    <div id="screen-api-settings" class="mobile-screen active">
+                        <div class="screen-header">
+                            <h2 class="screen-title" data-i18n="apiKey">API Settings</h2>
+                            <p class="screen-subtitle">Configure your AI and blog connections</p>
+                        </div>
+                        <div class="screen-content">
+                            <div class="form-group">
+                                <label data-i18n="geminiApiKey">Gemini API Key</label>
+                                <input type="password" id="mobileApiKey" placeholder="AI content generation">
                             </div>
                             
-                            <button id="mobileLoginBtn" class="mobile-auth-btn" data-i18n="login">
-                                Google 로그인
-                            </button>
+                            <div class="form-group">
+                                <label data-i18n="googleClientId">Google Client ID</label>
+                                <input type="text" id="mobileClientId" placeholder="Blogger access">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label data-i18n="blogId">Blog ID</label>
+                                <input type="text" id="mobileBlogId" placeholder="Blogger blog ID (numbers)">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label data-i18n="blogAddress">Blog Address</label>
+                                <input type="text" id="mobileBlogAddress" placeholder="https://yourblog.blogspot.com">
+                            </div>
                         </div>
                     </div>
-                    <div class="mobile-nav-buttons">
-                        <button class="mobile-nav-btn" onclick="showScreen('api-settings')">이전</button>
-                        <button class="mobile-nav-btn primary" id="mobileLoginNextBtn" onclick="showScreen('content-source')" disabled data-i18n="next">다음</button>
+
+                    <!-- 스크린 2: Google 로그인 -->
+                    <div id="screen-login" class="mobile-screen">
+                        <div class="screen-header">
+                            <h2 class="screen-title" data-i18n="authentication">Google Login</h2>
+                            <p class="screen-subtitle">Connect your Google account for blog publishing</p>
+                        </div>
+                        <div class="screen-content">
+                            <div class="form-group">
+                                <div id="mobileAuthStatus" class="auth-status-mobile">
+                                    Login required
+                                </div>
+                                
+                                <button id="mobileLoginBtn" class="mobile-auth-btn" data-i18n="login">
+                                    Google Login
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 스크린 3: 콘텐츠 소스 -->
+                    <div id="screen-content-source" class="mobile-screen">
+                        <div class="screen-header">
+                            <h2 class="screen-title" data-i18n="contentInput">Content Source</h2>
+                            <p class="screen-subtitle">Choose your content generation method</p>
+                        </div>
+                        <div class="screen-content">
+                            <div class="form-group">
+                                <label data-i18n="youtubeUrl">YouTube URL</label>
+                                <input type="text" id="mobileYoutubeUrl" placeholder="https://www.youtube.com/watch?v=...">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label data-i18n="topicInput">Topic Input</label>
+                                <textarea id="mobileTopicInput" placeholder="Enter your blog topic here..." rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 스크린 4: 글쓰기 설정 -->
+                    <div id="screen-writing-settings" class="mobile-screen">
+                        <div class="screen-header">
+                            <h2 class="screen-title" data-i18n="writingTone">Writing Settings</h2>
+                            <p class="screen-subtitle">Customize your content style and audience</p>
+                        </div>
+                        <div class="screen-content">
+                            <div class="form-group">
+                                <label data-i18n="writingTone">Writing Tone</label>
+                                <select id="mobileWritingTone">
+                                    <option value="friendly" data-i18n-option="friendly">Friendly</option>
+                                    <option value="professional" data-i18n-option="professional">Professional</option>
+                                    <option value="casual" data-i18n-option="casual">Casual</option>
+                                    <option value="formal" data-i18n-option="formal">Formal</option>
+                                    <option value="humorous" data-i18n-option="humorous">Humorous</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label data-i18n="targetAudience">Target Audience</label>
+                                <input type="text" id="mobileTargetAudience" placeholder="e.g., IT beginners">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 스크린 5: 생성하기 -->
+                    <div id="screen-generate" class="mobile-screen">
+                        <div class="screen-header">
+                            <h2 class="screen-title" data-i18n="generatePost">Generate Post</h2>
+                            <p class="screen-subtitle">Create and publish your blog content</p>
+                        </div>
+                        <div class="screen-content">
+                            <div class="form-group">
+                                <button id="mobileGenerateBtn" class="mobile-auth-btn" data-i18n="generatePost">
+                                    Generate Blog Post
+                                </button>
+                            </div>
+                            
+                            <div id="mobileGenerationStatus" class="auth-status-mobile" style="display: none;">
+                                Ready to generate
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
                 <!-- 스크린 3: 콘텐츠 소스 선택 -->
                 <div id="screen-content-source" class="mobile-screen">

@@ -300,80 +300,75 @@ function changeLanguage(lang) {
 }
 
 // 언어 초기화
+let isLanguageInitialized = false;
+
 function initializeLanguage() {
+    if (isLanguageInitialized) {
+        console.log('언어 시스템 이미 초기화됨');
+        return;
+    }
+    
     console.log('언어 시스템 초기화 시작');
     
-    // DOM 완전 로드 대기
-    const waitForDOM = () => {
-        if (document.readyState !== 'complete') {
-            setTimeout(waitForDOM, 50);
-            return;
-        }
-        
-        const savedLanguage = localStorage.getItem('selectedLanguage') || 'ko';
-        console.log('저장된 언어:', savedLanguage);
-        
-        const languageSelect = document.getElementById('languageSelect');
-        const mobileLangSelect = document.getElementById('mobileLangSelect');
-        
-        // 즉시 언어 적용
-        changeLanguage(savedLanguage);
-        
-        // 데스크톱 언어 선택
-        if (languageSelect) {
-            languageSelect.value = savedLanguage;
-            
-            languageSelect.addEventListener('change', (e) => {
-                console.log('데스크톱에서 언어 변경:', e.target.value);
-                changeLanguage(e.target.value);
-                // 모바일 셀렉트도 동기화
-                if (mobileLangSelect) {
-                    mobileLangSelect.value = e.target.value;
-                }
-            });
-        }
-        
-        // 모바일 언어 선택
-        if (mobileLangSelect) {
-            mobileLangSelect.value = savedLanguage;
-            
-            mobileLangSelect.addEventListener('change', (e) => {
-                console.log('모바일에서 언어 변경:', e.target.value);
-                changeLanguage(e.target.value);
-                // 다른 셀렉트들도 동기화
-                if (languageSelect) languageSelect.value = e.target.value;
-                const tabletLangSelect = document.getElementById('tabletLangSelect');
-                if (tabletLangSelect) tabletLangSelect.value = e.target.value;
-            });
-        }
-        
-        // 태블릿 언어 선택
-        const tabletLangSelect = document.getElementById('tabletLangSelect');
-        if (tabletLangSelect) {
-            tabletLangSelect.value = savedLanguage;
-            
-            tabletLangSelect.addEventListener('change', (e) => {
-                console.log('태블릿에서 언어 변경:', e.target.value);
-                changeLanguage(e.target.value);
-                // 다른 셀렉트들도 동기화
-                if (languageSelect) languageSelect.value = e.target.value;
-                if (mobileLangSelect) mobileLangSelect.value = e.target.value;
-            });
-        }
-        
-        console.log('언어 시스템 초기화 완료');
-    };
+    const savedLanguage = localStorage.getItem('selectedLanguage') || 'ko';
+    console.log('저장된 언어:', savedLanguage);
     
-    waitForDOM();
+    const languageSelect = document.getElementById('languageSelect');
+    const mobileLangSelect = document.getElementById('mobileLangSelect');
+    const tabletLangSelect = document.getElementById('tabletLangSelect');
+    
+    // 즉시 언어 적용
+    changeLanguage(savedLanguage);
+    
+    // 이벤트 리스너 중복 방지
+    if (languageSelect && !languageSelect.hasAttribute('data-listener-added')) {
+        languageSelect.value = savedLanguage;
+        languageSelect.setAttribute('data-listener-added', 'true');
+        
+        languageSelect.addEventListener('change', (e) => {
+            console.log('데스크톱에서 언어 변경:', e.target.value);
+            changeLanguage(e.target.value);
+            // 다른 셀렉트 동기화 (이벤트 발생 방지)
+            if (mobileLangSelect) mobileLangSelect.value = e.target.value;
+            if (tabletLangSelect) tabletLangSelect.value = e.target.value;
+        });
+    }
+    
+    if (mobileLangSelect && !mobileLangSelect.hasAttribute('data-listener-added')) {
+        mobileLangSelect.value = savedLanguage;
+        mobileLangSelect.setAttribute('data-listener-added', 'true');
+        
+        mobileLangSelect.addEventListener('change', (e) => {
+            console.log('모바일에서 언어 변경:', e.target.value);
+            changeLanguage(e.target.value);
+            // 다른 셀렉트 동기화 (이벤트 발생 방지)
+            if (languageSelect) languageSelect.value = e.target.value;
+            if (tabletLangSelect) tabletLangSelect.value = e.target.value;
+        });
+    }
+    
+    if (tabletLangSelect && !tabletLangSelect.hasAttribute('data-listener-added')) {
+        tabletLangSelect.value = savedLanguage;
+        tabletLangSelect.setAttribute('data-listener-added', 'true');
+        
+        tabletLangSelect.addEventListener('change', (e) => {
+            console.log('태블릿에서 언어 변경:', e.target.value);
+            changeLanguage(e.target.value);
+            // 다른 셀렉트 동기화 (이벤트 발생 방지)
+            if (languageSelect) languageSelect.value = e.target.value;
+            if (mobileLangSelect) mobileLangSelect.value = e.target.value;
+        });
+    }
+    
+    isLanguageInitialized = true;
+    console.log('언어 시스템 초기화 완료');
 }
 
-// DOM 로드 완료 시 언어 초기화 (script.js에서 호출)
-// 자체적으로도 시도
+// DOM 로드 완료 시 언어 초기화 (한번만 실행)
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(initializeLanguage, 2000);
-});
-
-// 페이지 완전 로드 시에도 시도
-window.addEventListener('load', () => {
-    setTimeout(initializeLanguage, 500);
+    setTimeout(() => {
+        if (!isLanguageInitialized) {
+            initializeLanguage();
+        }
+    }, 1000);
 });
