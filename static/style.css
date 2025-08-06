@@ -365,6 +365,21 @@ input:focus, select:focus, textarea:focus {
     display: none;
 }
 
+/* AI Icon styling */
+.ai-icon {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: currentColor;
+}
+
+/* Plus Icon styling */
+.plus-icon {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1;
+}
+
 .chat-form {
     flex-grow: 1;
     display: flex;
