@@ -231,6 +231,169 @@ def generate_blog_post():
         logging.error(f"Error generating blog post: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/generate-post-from-youtube', methods=['POST'])
+def generate_post_from_youtube():
+    """Generate blog post from YouTube URLs"""
+    try:
+        user = get_or_create_user()
+        data = request.get_json()
+        
+        urls = data.get('urls', [])
+        if not urls:
+            return jsonify({'error': 'YouTube URLs are required'}), 400
+        
+        # Extract settings from request data
+        gemini_api_key = data.get('apiKey', '').strip()
+        gemini_model = data.get('modelName', 'gemini-1.5-pro-latest')
+        writing_tone = data.get('tone', '친근한 (Friendly)')
+        target_audience = data.get('audience', '')
+        image_source = data.get('imageSource', 'none')
+        pexels_api_key = data.get('pexelsApiKey', '').strip()
+        youtube_source_type = data.get('youtubeSourceType', 'transcript')
+        
+        if not gemini_api_key:
+            return jsonify({'error': 'Gemini API key is required'}), 400
+        
+        # Process first URL (for queue processing, there's typically only one)
+        youtube_url = urls[0]
+        logging.info(f"Processing YouTube URL: {youtube_url}")
+        
+        # Extract transcript
+        transcript = youtube_service.extract_transcript(youtube_url)
+        if not transcript:
+            return jsonify({'error': 'Failed to extract transcript from YouTube video'}), 400
+        
+        # Handle image generation/fetching
+        image_url = None
+        if image_source == 'pexels' and pexels_api_key:
+            # Extract keywords from video content for image search
+            keywords = transcript.split()[:10]  # Use first 10 words as keywords
+            image_url = youtube_service.fetch_image_from_pexels(keywords, pexels_api_key)
+        
+        # Generate content using Gemini
+        generated_content = gemini_service.generate_text_content(
+            gemini_api_key, transcript, image_url, gemini_model, writing_tone, target_audience
+        )
+        
+        if not generated_content:
+            return jsonify({'error': 'Failed to generate content'}), 500
+        
+        # Process image placement
+        final_content = generated_content.get('content_with_placeholder', '')
+        if image_url and '[IMAGE_HERE]' in final_content:
+            alt_text = generated_content.get('image_search_keywords', 'Blog post image')
+            image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
+            final_content = final_content.replace('[IMAGE_HERE]', image_tag)
+        elif image_url:
+            alt_text = generated_content.get('image_search_keywords', 'Blog post image')
+            image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
+            final_content = image_tag + final_content
+        
+        # Save to database
+        blog_post = BlogPost()
+        blog_post.user_id = user.id
+        blog_post.title = generated_content.get('title', 'Untitled Post')
+        blog_post.content = final_content
+        blog_post.summary = generated_content.get('summary', '')
+        blog_post.source_type = "youtube"
+        blog_post.source_url = youtube_url
+        blog_post.gemini_model = gemini_model
+        blog_post.writing_tone = writing_tone
+        blog_post.target_audience = target_audience
+        blog_post.image_source = image_source
+        blog_post.image_url = image_url
+        
+        db.session.add(blog_post)
+        db.session.commit()
+        
+        return jsonify({
+            'title': blog_post.title,
+            'body': blog_post.content,
+            'summary': blog_post.summary,
+            'post_id': blog_post.id,
+            'created_at': blog_post.created_at.isoformat()
+        })
+        
+    except Exception as e:
+        logging.error(f"Error generating post from YouTube: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/generate-post', methods=['POST'])
+def generate_post():
+    """Generate blog post from topic"""
+    try:
+        user = get_or_create_user()
+        data = request.get_json()
+        
+        topic = data.get('topic', '').strip()
+        if not topic:
+            return jsonify({'error': 'Topic is required'}), 400
+        
+        # Extract settings from request data
+        gemini_api_key = data.get('apiKey', '').strip()
+        gemini_model = data.get('modelName', 'gemini-1.5-pro-latest')
+        writing_tone = data.get('tone', '친근한 (Friendly)')
+        target_audience = data.get('audience', '')
+        image_source = data.get('imageSource', 'none')
+        pexels_api_key = data.get('pexelsApiKey', '').strip()
+        
+        if not gemini_api_key:
+            return jsonify({'error': 'Gemini API key is required'}), 400
+        
+        # Handle image generation/fetching
+        image_url = None
+        if image_source == 'pexels' and pexels_api_key:
+            keywords = topic.split()[:5]  # Use first 5 words as keywords
+            image_url = youtube_service.fetch_image_from_pexels(keywords, pexels_api_key)
+        
+        # Generate content using Gemini
+        generated_content = gemini_service.generate_text_content(
+            gemini_api_key, topic, image_url, gemini_model, writing_tone, target_audience
+        )
+        
+        if not generated_content:
+            return jsonify({'error': 'Failed to generate content'}), 500
+        
+        # Process image placement
+        final_content = generated_content.get('content_with_placeholder', '')
+        if image_url and '[IMAGE_HERE]' in final_content:
+            alt_text = generated_content.get('image_search_keywords', 'Blog post image')
+            image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
+            final_content = final_content.replace('[IMAGE_HERE]', image_tag)
+        elif image_url:
+            alt_text = generated_content.get('image_search_keywords', 'Blog post image')
+            image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
+            final_content = image_tag + final_content
+        
+        # Save to database
+        blog_post = BlogPost()
+        blog_post.user_id = user.id
+        blog_post.title = generated_content.get('title', 'Untitled Post')
+        blog_post.content = final_content
+        blog_post.summary = generated_content.get('summary', '')
+        blog_post.source_type = "topic"
+        blog_post.source_url = None
+        blog_post.gemini_model = gemini_model
+        blog_post.writing_tone = writing_tone
+        blog_post.target_audience = target_audience
+        blog_post.image_source = image_source
+        blog_post.image_url = image_url
+        
+        db.session.add(blog_post)
+        db.session.commit()
+        
+        return jsonify({
+            'title': blog_post.title,
+            'body': blog_post.content,
+            'summary': blog_post.summary,
+            'post_id': blog_post.id,
+            'created_at': blog_post.created_at.isoformat()
+        })
+        
+    except Exception as e:
+        logging.error(f"Error generating post from topic: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/publish', methods=['POST'])
 def publish_to_platform():
     """Publish generated post to selected platform"""
