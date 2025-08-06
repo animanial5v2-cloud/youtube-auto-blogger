@@ -480,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handlePostGeneration(topicOrUrl) {
-        const thinkingMessage = addChatMessage('ai', `생성 중: "${topicOrUrl.substring(0, 50)}..."`);
+        const thinkingMessage = addChatMessage('ai', `AI가 콘텐츠를 생성하고 있습니다: "${topicOrUrl.substring(0, 50)}..."`);
         
         const youtubeSourceType = document.querySelector('input[name="youtubeSourceType"]:checked').value;
         const videoFile = userVideoUpload.files[0];
