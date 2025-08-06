@@ -3,23 +3,29 @@ import json
 import os
 import requests
 import gc
+import time
+import signal
+import base64
+
 try:
     import google.generativeai as genai
     from google.generativeai import types
+    HAS_GENAI = True
 except ImportError:
     genai = None
     types = None
+    HAS_GENAI = False
 
 class GeminiService:
     def __init__(self):
         self.api_key = os.getenv('GEMINI_API_KEY')
-        if self.api_key and genai:
+        if self.api_key and HAS_GENAI:
             genai.configure(api_key=self.api_key)
     
     def generate_text_content(self, api_key, topic, image_url=None, model_name='gemini-1.5-pro-latest', tone='친근한', audience=''):
         """Generate blog content using Gemini API"""
         try:
-            if not genai:
+            if not HAS_GENAI:
                 raise ValueError("Google Generative AI library not available")
                 
             # Use provided API key or fallback to environment
@@ -83,11 +89,10 @@ class GeminiService:
             content_parts = [prompt]
             
             # Add image if provided
-            if image_url and types:
+            if image_url and HAS_GENAI and types:
                 try:
                     if image_url.startswith('data:'):
                         # Handle data URI
-                        import base64
                         header, data = image_url.split(',', 1)
                         mime_type = header.split(';')[0].split(':')[1]
                         image_data = base64.b64decode(data)
@@ -113,9 +118,6 @@ class GeminiService:
             max_retries = 3
             for attempt in range(max_retries):
                 try:
-                    import time
-                    import gc
-                    
                     # Force garbage collection before each attempt
                     gc.collect()
                     
@@ -126,8 +128,6 @@ class GeminiService:
                         logging.info(f"Retrying Gemini API call (attempt {attempt + 1}) after {delay}s delay")
                     
                     # Use reduced token limits and timeout to prevent memory issues
-                    import signal
-                    
                     def timeout_handler(signum, frame):
                         raise TimeoutError("Gemini API call timed out")
                     
@@ -136,14 +136,14 @@ class GeminiService:
                     signal.alarm(30)
                     
                     try:
-                        if genai:
+                        if HAS_GENAI:
                             result = model.generate_content(
                                 content_parts,
                                 generation_config=genai.GenerationConfig(
                                     temperature=0.7,
                                     top_p=0.8,
                                     top_k=40,
-                                    max_output_tokens=3072,  # Further reduced for stability
+                                    max_output_tokens=3072,
                                     candidate_count=1
                                 )
                             )
