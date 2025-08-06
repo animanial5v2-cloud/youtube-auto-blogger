@@ -22,7 +22,7 @@ class GeminiService:
         if self.api_key and HAS_GENAI:
             genai.configure(api_key=self.api_key)
     
-    def generate_text_content(self, api_key, topic, image_url=None, model_name='gemini-1.5-pro', tone='친근한', audience=''):
+    def generate_text_content(self, api_key, topic, image_url=None, model_name='gemini-1.5-flash', tone='친근한', audience=''):
         """Generate blog content using Gemini API"""
         try:
             if not HAS_GENAI:
@@ -39,8 +39,8 @@ class GeminiService:
             # Initialize model
             model = genai.GenerativeModel(model_name)
             
-            # Very simple prompt
-            prompt = f"주제: {topic}. 간단한 블로그 글을 JSON으로: title, content, summary"
+            # Ultra-simple prompt for memory efficiency
+            prompt = f"주제: {topic}. JSON: title, content, summary"
             
             # Prepare content for generation
             content_parts = [prompt]
@@ -90,7 +90,7 @@ class GeminiService:
                             content_parts,
                             generation_config=genai.GenerationConfig(
                                 temperature=0.7,
-                                max_output_tokens=256,  # Extremely small to prevent memory issues
+                                max_output_tokens=512,  # Conservative limit for stability
                                 candidate_count=1
                             )
                         )
@@ -163,16 +163,21 @@ class GeminiService:
         """Parse JSON response from Gemini output"""
         logging.info("Parsing JSON from Gemini response...")
         
+        # Remove markdown code blocks first
+        import re
+        cleaned_text = re.sub(r'```(?:json)?\s*', '', raw_text)
+        cleaned_text = re.sub(r'\s*```', '', cleaned_text)
+        
         # Find JSON object boundaries
-        json_start = raw_text.find('{')
-        json_end = raw_text.rfind('}')
+        json_start = cleaned_text.find('{')
+        json_end = cleaned_text.rfind('}')
         
         if json_start == -1 or json_end == -1 or json_end < json_start:
             logging.error("No valid JSON object found in Gemini response")
-            logging.error(f"Raw response: {raw_text}")
+            logging.error(f"Raw response: {raw_text[:500]}...")
             raise ValueError("AI response does not contain valid JSON")
         
-        json_string = raw_text[json_start:json_end + 1]
+        json_string = cleaned_text[json_start:json_end + 1]
         
         try:
             parsed = json.loads(json_string)
