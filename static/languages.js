@@ -168,9 +168,33 @@ const translations = {
         
         // API Settings
         apiKey: "Khóa API bắt buộc",
-        geminiApiKey: "Khóa API Gemini",
+        geminiApiKey: "Khóa API Gemini", 
         googleClientId: "ID Khách hàng Google",
         blogId: "ID Blog",
+        blogAddress: "Địa chỉ Blog",
+        
+        // Content Settings Summary
+        contentSettingsSummary: "Tóm tắt cài đặt nội dung",
+        contentSource: "Nguồn nội dung",
+        notSpecified: "Chưa chỉ định",
+        
+        // Final prompt
+        finalPrompt: "Prompt cuối cùng (tùy chọn chỉnh sửa)",
+        
+        // Placeholders
+        aiContentGeneration: "Tạo nội dung AI",
+        bloggerAccess: "Truy cập Blogger",
+        bloggerBlogId: "ID blog Blogger (số)",
+        bloggerBlogAddress: "https://yourblog.blogspot.com",
+        enterYourBlogTopic: "Nhập chủ đề blog của bạn...",
+        aiDetailedInstructions: "Nhập hướng dẫn chi tiết cho AI...",
+        finalAiInstructions: "Hướng dẫn cuối cùng cho AI...",
+        connectGoogleAccount: "Kết nối tài khoản Google của bạn để xuất bản blog",
+        loginRequired: "Yêu cầu đăng nhập",
+        reviewSettingsCreate: "Xem lại cài đặt và tạo nội dung blog của bạn",
+        customizeContentStyle: "Tùy chỉnh phong cách nội dung và đối tượng của bạn",
+        itBeginners: "ví dụ: Người mới bắt đầu IT",
+        configureAiConnections: "Cấu hình AI và kết nối blog của bạn",
         
         // Buttons
         start: "Bắt đầu",
