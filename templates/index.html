@@ -124,6 +124,39 @@
 
         <!-- Main Content -->
         <main class="main-content">
+            <div class="chat-container">
+                <div class="chat-message ai">
+                    <div class="chat-bubble">
+                        <p data-i18n="chatWelcome1">안녕하세요! AI 자동 블로깅 스튜디오입니다.</p>
+                        <p><strong data-i18n="chatWelcome2">아래 입력창에 포스팅할 주제, YouTube URL을 입력하거나, 오른쪽 '콘텐츠 소스'에서 동영상 파일을 선택한 후 전송 버튼(➤)을 누르세요.</strong></p>
+                        <p data-i18n="chatWelcome3">아이디어가 필요하시면 '주제 탐색' 모드를 켜고 대화를 시작할 수 있습니다.</p>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="chat-input-area">
+                <div class="chat-mode-toggle">
+                    <button id="topicDiscoveryBtn" title="주제 탐색 모드 켜기/끄기">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                            <path d="M12 9v4"></path>
+                            <path d="M12 17h.01"></path>
+                        </svg>
+                        <span data-i18n="topicDiscovery">주제 탐색</span>
+                    </button>
+                </div>
+                <form id="chatForm" class="chat-form">
+                    <input type="text" id="chatInput" data-i18n-placeholder="chatInputPlaceholder" placeholder="여기에 포스팅 주제 또는 YouTube URL을 입력하세요..." autocomplete="off" disabled>
+                    <button type="button" id="addToQueueFromChatBtn" title="큐에 추가" disabled>+</button>
+                    <button type="submit" id="sendBtn" title="전송" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+
             <!-- 모바일 멀티 스크린 인터페이스 - 스마트 홈 스타일 -->
             <div class="mobile-screens" style="display: none;">
                 <!-- 왼쪽 네비게이션 바 -->
@@ -345,38 +378,6 @@
                         <button class="mobile-nav-btn primary" id="mobileGenerateBtn">블로그 포스트 생성</button>
                     </div>
                 </div>
-            </div>
-            <div id="chatContainer" class="chat-container">
-                <div class="chat-message ai">
-                    <div class="chat-bubble">
-                        <p data-i18n="chatWelcome1">안녕하세요! AI 자동 블로깅 스튜디오입니다.</p>
-                        <p><strong data-i18n="chatWelcome2">아래 입력창에 포스팅할 주제, YouTube URL을 입력하거나, 오른쪽 '콘텐츠 소스'에서 동영상 파일을 선택한 후 전송 버튼(➤)을 누르세요.</strong></p>
-                        <p data-i18n="chatWelcome3">아이디어가 필요하시면 '주제 탐색' 모드를 켜고 대화를 시작할 수 있습니다.</p>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="chat-input-area">
-                <div class="chat-mode-toggle">
-                    <button id="topicDiscoveryBtn" title="주제 탐색 모드 켜기/끄기">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
-                            <path d="M12 9v4"></path>
-                            <path d="M12 17h.01"></path>
-                        </svg>
-                        <span data-i18n="topicDiscovery">주제 탐색</span>
-                    </button>
-                </div>
-                <form id="chatForm" class="chat-form">
-                    <input type="text" id="chatInput" data-i18n-placeholder="chatInputPlaceholder" placeholder="여기에 포스팅 주제 또는 YouTube URL을 입력하세요..." autocomplete="off" disabled>
-                    <button type="button" id="addToQueueFromChatBtn" title="큐에 추가" disabled>+</button>
-                    <button type="submit" id="sendBtn" title="전송" disabled>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                    </button>
-                </form>
             </div>
         </main>
 
