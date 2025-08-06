@@ -1,88 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 언어 초기화 (중복 방지)
-    if (typeof initializeLanguage === 'function' && !window.languageInitAttempted) {
-        window.languageInitAttempted = true;
-        console.log('언어 초기화 시작');
-        setTimeout(initializeLanguage, 500);
-    }
-    
-    // 사이드바 토글 기능 초기화
-    initializeSidebarToggle();
-    
-    // 모바일 인터페이스 초기화
-    initializeMobileInterface();
-    
-    // 모바일 화면 전환 함수 글로벌 등록
-    window.showMobileScreen = function(screenId) {
-        // 모든 화면 숨기기
-        document.querySelectorAll('.mobile-screen').forEach(screen => {
-            screen.classList.remove('active');
-        });
-        
-        // 모든 네비게이션 아이템 비활성화
-        document.querySelectorAll('.mobile-nav-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        
-        // 선택된 화면 표시
-        const targetScreen = document.getElementById(`screen-${screenId}`);
-        if (targetScreen) {
-            targetScreen.classList.add('active');
-        }
-        
-        // 해당 네비게이션 아이템 활성화
-        const targetNavItems = document.querySelectorAll('.mobile-nav-item');
-        targetNavItems.forEach((item, index) => {
-            const screens = ['api-settings', 'login', 'content-source', 'writing-settings', 'generate'];
-            if (screens[index] === screenId) {
-                item.classList.add('active');
-            }
-        });
-        
-        // 생성 화면에 도달하면 설정 요약 업데이트
-        if (screenId === 'generate') {
-            updateGenerationSummary();
-        }
-    };
-    
-    // 생성 화면 설정 요약 업데이트 함수
-    function updateGenerationSummary() {
-        const summarySource = document.getElementById('summarySource');
-        const summaryTone = document.getElementById('summaryTone'); 
-        const summaryAudience = document.getElementById('summaryAudience');
-        const finalPromptInput = document.getElementById('finalPromptInput');
-        
-        // 콘텐츠 소스 확인
-        const youtubeUrl = document.getElementById('mobileYoutubeUrl')?.value.trim();
-        const topicInput = document.getElementById('mobileTopicInput')?.value.trim(); 
-        const promptInput = document.getElementById('mobilePromptInput')?.value.trim();
-        
-        let contentSource = 'Not specified';
-        if (youtubeUrl) {
-            contentSource = `YouTube: ${youtubeUrl.substring(0, 50)}...`;
-        } else if (topicInput) {
-            contentSource = `Topic: ${topicInput.substring(0, 50)}...`;
-        } else if (promptInput) {
-            contentSource = `Custom Prompt: ${promptInput.substring(0, 50)}...`;
-        }
-        
-        // 글쓰기 톤 확인
-        const writingTone = document.getElementById('mobileWritingTone')?.value || 'Not selected';
-        
-        // 타겟 독자 확인  
-        const targetAudience = document.getElementById('mobileTargetAudience')?.value.trim() || 'Not specified';
-        
-        // 요약 업데이트
-        if (summarySource) summarySource.textContent = contentSource;
-        if (summaryTone) summaryTone.textContent = writingTone;
-        if (summaryAudience) summaryAudience.textContent = targetAudience;
-        
-        // 최종 프롬프트에 기존 프롬프트 입력 복사
-        if (finalPromptInput && promptInput) {
-            finalPromptInput.value = promptInput;
-        }
-    }
-    
     // --- GLOBAL STATE & CONFIG ---
     const GOOGLE_API_SCOPES = 'https://www.googleapis.com/auth/blogger https://www.googleapis.com/auth/cloud-platform';
     let tokenClient;
@@ -94,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let isTopicDiscoveryMode = false;
     let postQueue = [];
     let currentQueueIndex = 0;
-    let sidebarCollapsed = false;
     
     // A temporary store for generated content before it's approved
     const generatedContentStore = {};
@@ -134,9 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const removeVideoBtn = document.getElementById('removeVideoBtn');
     const previewBeforePostCheckbox = document.getElementById('previewBeforePost');
     const postAsDraftCheckbox = document.getElementById('postAsDraft');
-    
-    // Platform selection elements
-    const platformSelect = document.getElementById('platformSelect');
 
     // Automation & PC Control
     const loopIntervalSelect = document.getElementById('loopInterval');
@@ -195,48 +107,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- EVENT LISTENERS ---
-    themeToggleBtn?.addEventListener('click', toggleTheme);
-    loginBtn?.addEventListener('click', handleAuthClick);
-    chatForm?.addEventListener('submit', handleChatSubmit);
-    chatContainer?.addEventListener('click', handleChatContainerClick);
-    topicDiscoveryBtn?.addEventListener('click', toggleTopicDiscoveryMode);
+    themeToggleBtn.addEventListener('click', toggleTheme);
+    loginBtn.addEventListener('click', handleAuthClick);
+    chatForm.addEventListener('submit', handleChatSubmit);
+    chatContainer.addEventListener('click', handleChatContainerClick);
+    topicDiscoveryBtn.addEventListener('click', toggleTopicDiscoveryMode);
     
     // Settings
-    geminiModelSelect?.addEventListener('change', checkModelCompatibility);
-    imageSourceRadios?.forEach(radio => radio.addEventListener('change', handleImageSourceChange));
-    aiImageModelSelect?.addEventListener('change', handleAiImageModelChange);
-    youtubeSourceTypeRadios?.forEach(radio => radio.addEventListener('change', handleYoutubeSourceChange));
-    userImageUpload?.addEventListener('change', handleImageUpload);
-    removeImageBtn?.addEventListener('click', handleRemoveImage);
-    userVideoUpload?.addEventListener('change', handleVideoUpload);
-    removeVideoBtn?.addEventListener('click', handleRemoveVideo);
-    platformSelect?.addEventListener('change', handlePlatformChange);
+    geminiModelSelect.addEventListener('change', checkModelCompatibility);
+    imageSourceRadios.forEach(radio => radio.addEventListener('change', handleImageSourceChange));
+    aiImageModelSelect.addEventListener('change', handleAiImageModelChange);
+    youtubeSourceTypeRadios.forEach(radio => radio.addEventListener('change', handleYoutubeSourceChange));
+    userImageUpload.addEventListener('change', handleImageUpload);
+    removeImageBtn.addEventListener('click', handleRemoveImage);
+    userVideoUpload.addEventListener('change', handleVideoUpload);
+    removeVideoBtn.addEventListener('click', handleRemoveVideo);
 
     // Automation & PC Control
-    addToQueueFromChatBtn?.addEventListener('click', handleAddToQueueFromChat);
-    startLoopBtn?.addEventListener('click', startLoop);
-    stopLoopBtn?.addEventListener('click', stopLoop);
-    shutdownPcBtn?.addEventListener('click', shutdownPC);
-    cancelShutdownBtn?.addEventListener('click', cancelShutdown);
+    addToQueueFromChatBtn.addEventListener('click', handleAddToQueueFromChat);
+    startLoopBtn.addEventListener('click', startLoop);
+    stopLoopBtn.addEventListener('click', stopLoop);
+    shutdownPcBtn.addEventListener('click', shutdownPC);
+    cancelShutdownBtn.addEventListener('click', cancelShutdown);
 
     // History
-    clearHistoryBtn?.addEventListener('click', (e) => {
+    clearHistoryBtn.addEventListener('click', (e) => {
         e.preventDefault();
         handleClearHistory();
     });
 
     // Modal
-    closeModalBtn?.addEventListener('click', () => previewModal?.classList.add('hidden'));
-    cancelPostBtn?.addEventListener('click', () => previewModal?.classList.add('hidden'));
-    approvePostBtn?.addEventListener('click', handleApprovePost);
+    closeModalBtn.addEventListener('click', () => previewModal.classList.add('hidden'));
+    cancelPostBtn.addEventListener('click', () => previewModal.classList.add('hidden'));
+    approvePostBtn.addEventListener('click', handleApprovePost);
 
     // --- THEME & UI ---
     function setInitialTheme() {
         const savedTheme = localStorage.getItem('theme') || 'dark';
         document.body.setAttribute('data-theme', savedTheme);
-        if (themeToggleBtn) {
-            themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-        }
+        themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
     }
 
     function toggleTheme() {
@@ -244,67 +153,55 @@ document.addEventListener('DOMContentLoaded', () => {
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         document.body.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
-        if (themeToggleBtn) {
-            themeToggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-        }
+        themeToggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
     }
 
     // --- SETTINGS PERSISTENCE ---
-    async function saveSettings() {
-        const settings = {
-            apiKey: apiKeyInput?.value || '',
-            clientId: clientIdInput?.value || '',
-            blogId: blogIdInput?.value || '',
-            blogAddress: blogAddressInput?.value || '',
-            pexelsApiKey: pexelsApiKeyInput?.value || '',
-            gcpProjectId: gcpProjectIdInput?.value || '',
-            geminiModel: geminiModelSelect?.value || 'gemini-1.5-pro-latest',
-            writingTone: writingToneSelect?.value || '친근한 (Friendly)',
-            targetAudience: targetAudienceInput?.value || '',
-            aiImageModel: aiImageModelSelect?.value || 'imagen-2',
-            previewBeforePost: previewBeforePostCheckbox?.checked || false,
-            postAsDraft: postAsDraftCheckbox?.checked || false,
-        };
+    const settingsToPersist = {
+        apiKey: apiKeyInput,
+        clientId: clientIdInput,
+        blogId: blogIdInput,
+        blogAddress: blogAddressInput,
+        pexelsApiKey: pexelsApiKeyInput,
+        gcpProjectId: gcpProjectIdInput,
+        geminiModel: geminiModelSelect,
+        writingTone: writingToneSelect,
+        targetAudience: targetAudienceInput,
+        aiImageModel: aiImageModelSelect,
+        previewBeforePost: {
+            get: () => previewBeforePostCheckbox.checked,
+            set: (value) => { previewBeforePostCheckbox.checked = value; }
+        },
+        postAsDraft: {
+            get: () => postAsDraftCheckbox.checked,
+            set: (value) => { postAsDraftCheckbox.checked = value; }
+        },
+    };
 
-        try {
-            const response = await fetch('/api/settings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(settings)
-            });
-            
-            if (!response.ok) {
-                console.error('Failed to save settings');
+    function saveSettings() {
+        const settings = {};
+        for (const key in settingsToPersist) {
+            if (settingsToPersist[key]) {
+                 settings[key] = typeof settingsToPersist[key].get === 'function' ? settingsToPersist[key].get() : settingsToPersist[key].value;
             }
-        } catch (error) {
-            console.error('Error saving settings:', error);
         }
+        localStorage.setItem('autoBloggerSettings', JSON.stringify(settings));
     }
 
-    async function loadSettings() {
-        try {
-            const response = await fetch('/api/settings');
-            if (response.ok) {
-                const settings = await response.json();
-                
-                if (apiKeyInput) apiKeyInput.value = settings.apiKey || '';
-                if (clientIdInput) clientIdInput.value = settings.clientId || '';
-                if (blogIdInput) blogIdInput.value = settings.blogId || '';
-                if (blogAddressInput) blogAddressInput.value = settings.blogAddress || '';
-                if (pexelsApiKeyInput) pexelsApiKeyInput.value = settings.pexelsApiKey || '';
-                if (gcpProjectIdInput) gcpProjectIdInput.value = settings.gcpProjectId || '';
-                if (geminiModelSelect) geminiModelSelect.value = settings.geminiModel || 'gemini-1.5-pro-latest';
-                if (writingToneSelect) writingToneSelect.value = settings.writingTone || '친근한 (Friendly)';
-                if (targetAudienceInput) targetAudienceInput.value = settings.targetAudience || '';
-                if (aiImageModelSelect) aiImageModelSelect.value = settings.aiImageModel || 'imagen-2';
-                if (previewBeforePostCheckbox) previewBeforePostCheckbox.checked = settings.previewBeforePost || false;
-                if (postAsDraftCheckbox) postAsDraftCheckbox.checked = settings.postAsDraft || false;
+    function loadSettings() {
+        const savedSettings = localStorage.getItem('autoBloggerSettings');
+        if (savedSettings) {
+            const settings = JSON.parse(savedSettings);
+            for (const key in settings) {
+                if (settingsToPersist[key] && settings[key] !== null && settings[key] !== undefined) {
+                    if (typeof settingsToPersist[key].set === 'function') {
+                        settingsToPersist[key].set(settings[key]);
+                    } else {
+                        settingsToPersist[key].value = settings[key];
+                    }
+                }
             }
-        } catch (error) {
-            console.error('Error loading settings:', error);
         }
-        
-        // Load saved radio button states from localStorage
         const savedImageSource = localStorage.getItem('autoBloggerImageSource');
         if (savedImageSource) {
             const radioToSelect = document.querySelector(`input[name="imageSource"][value="${savedImageSource}"]`);
@@ -313,7 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 handleImageSourceChange();
             }
         }
-        
         const savedYoutubeSource = localStorage.getItem('autoBloggerYoutubeSource');
         if (savedYoutubeSource) {
             const radioToSelect = document.querySelector(`input[name="youtubeSourceType"][value="${savedYoutubeSource}"]`);
@@ -322,415 +218,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 handleYoutubeSourceChange();
             }
         }
-        
         handleAiImageModelChange();
     }
 
-    // Add event listeners for auto-save
-    [apiKeyInput, clientIdInput, blogIdInput, blogAddressInput, pexelsApiKeyInput, 
-     gcpProjectIdInput, geminiModelSelect, writingToneSelect, targetAudienceInput, 
-     aiImageModelSelect, previewBeforePostCheckbox, postAsDraftCheckbox].forEach(element => {
-        if (element) {
-            element.addEventListener('input', saveSettings);
-            element.addEventListener('change', saveSettings);
-        }
+    Object.values(settingsToPersist).forEach(item => {
+        if (!item) return;
+        const element = item.get ? (item === settingsToPersist.previewBeforePost ? previewBeforePostCheckbox : postAsDraftCheckbox) : item;
+        element.addEventListener('input', saveSettings);
+        element.addEventListener('change', saveSettings);
     });
     
-    imageSourceRadios?.forEach(radio => {
+    imageSourceRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
             localStorage.setItem('autoBloggerImageSource', e.target.value);
             handleImageSourceChange();
         });
     });
     
-    youtubeSourceTypeRadios?.forEach(radio => {
+    youtubeSourceTypeRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
             localStorage.setItem('autoBloggerYoutubeSource', e.target.value);
             handleYoutubeSourceChange();
         });
     });
 
-    // --- HISTORY MANAGEMENT ---
-    async function loadHistory() {
-        try {
-            const response = await fetch('/api/history');
-            if (response.ok) {
-                const history = await response.json();
-                postingHistory = history;
-                updateHistoryDisplay();
-            }
-        } catch (error) {
-            console.error('Error loading history:', error);
-        }
-    }
-
-    function updateHistoryDisplay() {
-        if (!historyList) return;
-        
-        historyList.innerHTML = '';
-        
-        if (postingHistory.length === 0) {
-            const placeholder = document.createElement('li');
-            placeholder.className = 'history-placeholder';
-            placeholder.setAttribute('data-i18n', 'noRecords');
-            placeholder.textContent = '기록이 없습니다.';
-            historyList.appendChild(placeholder);
-            
-            // 현재 언어에 맞게 텍스트 업데이트
-            if (typeof changeLanguage === 'function') {
-                const currentLang = localStorage.getItem('selectedLanguage') || 'ko';
-                const translation = translations[currentLang];
-                if (translation && translation.noRecords) {
-                    placeholder.textContent = translation.noRecords;
-                }
-            }
-            return;
-        }
-        
-        postingHistory.forEach(post => {
-            const item = document.createElement('li');
-            item.className = 'history-item';
-            item.innerHTML = `
-                <span class="history-title">${post.title}</span>
-                <div class="history-details">
-                    <span>${new Date(post.created_at).toLocaleDateString()}</span>
-                    ${post.blogger_url ? `<a href="${post.blogger_url}" target="_blank" class="history-link">View Post</a>` : ''}
-                </div>
-            `;
-            historyList.appendChild(item);
-        });
-    }
-
-    async function handleClearHistory() {
-        if (!confirm('모든 포스팅 기록을 삭제하시겠습니까?')) return;
-        
-        try {
-            const response = await fetch('/api/history', { method: 'DELETE' });
-            if (response.ok) {
-                postingHistory = [];
-                updateHistoryDisplay();
-                addChatMessage('ai', '포스팅 기록이 모두 삭제되었습니다.');
-            }
-        } catch (error) {
-            console.error('Error clearing history:', error);
-            addChatMessage('ai', '기록 삭제 중 오류가 발생했습니다.');
-        }
-    }
-
-    // --- CHAT FUNCTIONALITY ---
-    function addChatMessage(type, content) {
-        if (!chatContainer) return;
-        
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `chat-message ${type}`;
-        
-        const bubbleDiv = document.createElement('div');
-        bubbleDiv.className = 'chat-bubble';
-        
-        if (typeof content === 'string') {
-            bubbleDiv.innerHTML = content;
-        } else {
-            bubbleDiv.appendChild(content);
-        }
-        
-        messageDiv.appendChild(bubbleDiv);
-        chatContainer.appendChild(messageDiv);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    async function handleChatSubmit(e) {
-        e.preventDefault();
-        
-        if (!chatInput || isGenerating) return;
-        
-        const input = chatInput.value.trim();
-        if (!input) return;
-        
-        // Add user message
-        addChatMessage('user', input);
-        chatInput.value = '';
-        
-        if (isTopicDiscoveryMode) {
-            handleTopicDiscoveryChat(input);
-        } else {
-            await handleContentGeneration(input);
-        }
-    }
-
-    function handleTopicDiscoveryChat(input) {
-        // Simple topic discovery responses
-        const responses = [
-            "흥미로운 주제네요! 다음과 같은 관련 주제들은 어떠신가요?",
-            "그 주제에 대해 더 구체적으로 어떤 부분에 초점을 맞추고 싶으신가요?",
-            "좋은 아이디어입니다. 타겟 독자층을 염두에 두고 어떤 접근 방식을 원하시나요?"
-        ];
-        
-        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-        addChatMessage('ai', randomResponse);
-    }
-
-    async function handleContentGeneration(input) {
-        setGeneratingState(true);
-        
-        try {
-            const settings = await getCurrentSettings();
-            
-            const response = await fetch('/api/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    input: input,
-                    settings: settings,
-                    accessToken: accessToken
-                })
-            });
-            
-            if (response.ok) {
-                const result = await response.json();
-                
-                if (previewBeforePostCheckbox?.checked) {
-                    showPreviewModal(result);
-                } else {
-                    await publishPost(result.post_id);
-                }
-                
-                // Reload history
-                await loadHistory();
-                
-            } else {
-                const error = await response.json();
-                addChatMessage('ai', `오류가 발생했습니다: ${error.error}`);
-            }
-            
-        } catch (error) {
-            console.error('Content generation error:', error);
-            addChatMessage('ai', '콘텐츠 생성 중 오류가 발생했습니다.');
-        } finally {
-            setGeneratingState(false);
-        }
-    }
-
-    async function getCurrentSettings() {
-        const response = await fetch('/api/settings');
-        return response.ok ? await response.json() : {};
-    }
-
-    function setGeneratingState(generating) {
-        isGenerating = generating;
-        if (sendBtn) sendBtn.disabled = generating;
-        if (chatInput) chatInput.disabled = generating;
-        
-        if (generating) {
-            addChatMessage('ai', '콘텐츠를 생성하고 있습니다... 잠시만 기다려주세요.');
-        }
-    }
-
-    // --- MODAL FUNCTIONALITY ---
-    function showPreviewModal(result) {
-        if (!previewModal) return;
-        
-        generatedContentStore.currentPost = result;
-        
-        if (previewTitleInput) previewTitleInput.value = result.title;
-        if (previewBodyTextarea) previewBodyTextarea.value = result.content;
-        
-        previewModal.classList.remove('hidden');
-    }
-
-    async function handleApprovePost() {
-        if (!generatedContentStore.currentPost) return;
-        
-        const postId = generatedContentStore.currentPost.post_id;
-        await publishPost(postId);
-        
-        if (previewModal) previewModal.classList.add('hidden');
-        generatedContentStore.currentPost = null;
-    }
-
-    async function publishPost(postId) {
-        const selectedPlatform = document.getElementById('platformSelect')?.value || 'blogger';
-        
-        // Validate platform-specific requirements
-        let publishData = {
-            post_id: postId,
-            platform: selectedPlatform,
-            is_draft: postAsDraftCheckbox?.checked || false
-        };
-        
-        if (selectedPlatform === 'blogger') {
-            if (!accessToken || !document.getElementById('bloggerBlogId')?.value) {
-                addChatMessage('ai', 'Google 로그인과 Blogger 블로그 ID가 필요합니다.');
-                return;
-            }
-            publishData.access_token = accessToken;
-            publishData.blog_id = document.getElementById('bloggerBlogId').value;
-            
-        } else if (selectedPlatform === 'wordpress') {
-            const siteUrl = document.getElementById('wordpressSite')?.value;
-            const token = document.getElementById('wordpressToken')?.value;
-            if (!siteUrl || !token) {
-                addChatMessage('ai', 'WordPress 사이트 주소와 API 토큰이 필요합니다.');
-                return;
-            }
-            publishData.site_url = siteUrl;
-            publishData.access_token = token;
-            
-        } else if (selectedPlatform === 'tistory') {
-            const blogName = document.getElementById('tistoryBlogName')?.value;
-            const token = document.getElementById('tistoryAccessToken')?.value;
-            if (!blogName || !token) {
-                addChatMessage('ai', 'Tistory 블로그명과 Access Token이 필요합니다.');
-                return;
-            }
-            publishData.blog_name = blogName;
-            publishData.access_token = token;
-            
-        } else if (selectedPlatform === 'naver') {
-            const blogId = document.getElementById('naverBlogId')?.value;
-            const clientId = document.getElementById('naverClientId')?.value;
-            const clientSecret = document.getElementById('naverClientSecret')?.value;
-            if (!blogId || !clientId || !clientSecret) {
-                addChatMessage('ai', '네이버 블로그 ID, Client ID, Client Secret이 필요합니다.');
-                return;
-            }
-            publishData.blog_id = blogId;
-            publishData.client_id = clientId;
-            publishData.client_secret = clientSecret;
-        }
-        
-        try {
-            const response = await fetch('/api/publish', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(publishData)
-            });
-            
-            if (response.ok || response.status === 202) {
-                const result = await response.json();
-                const platformName = {
-                    'blogger': 'Blogger',
-                    'wordpress': 'WordPress',
-                    'tistory': 'Tistory',
-                    'naver': '네이버 블로그'
-                }[selectedPlatform] || selectedPlatform;
-                
-                if (result.status === 'manual_required') {
-                    // Tistory manual publishing guide
-                    addChatMessage('ai', `
-                        <div class="manual-guide">
-                            <strong>⚠️ ${result.message}</strong><br><br>
-                            <strong>수동 발행 가이드:</strong><br>
-                            ${result.manual_guide.replace(/\n/g, '<br>')}<br><br>
-                            <a href="${result.blog_url}" target="_blank" class="manual-link">Tistory 새 글 작성 페이지로 이동</a><br><br>
-                            <strong>제목:</strong> ${result.title}<br>
-                            <strong>내용:</strong> (아래 내용을 복사하세요)<br>
-                            <textarea readonly style="width:100%; height:100px; margin:10px 0;">${result.content}</textarea>
-                        </div>
-                    `);
-                } else {
-                    addChatMessage('ai', `${platformName}에 게시물이 성공적으로 업로드되었습니다! <a href="${result.post_url}" target="_blank">확인하기</a>`);
-                }
-            } else {
-                const error = await response.json();
-                addChatMessage('ai', `업로드 실패: ${error.error}`);
-            }
-            
-        } catch (error) {
-            console.error('Publish error:', error);
-            addChatMessage('ai', '업로드 중 오류가 발생했습니다.');
-        }
-    }
-
-    // --- UI HANDLERS ---
-    function handleImageSourceChange() {
-        const selected = document.querySelector('input[name="imageSource"]:checked')?.value;
-        
-        [pexelsConfig, aiImageConfig, uploadConfig].forEach(config => {
-            config?.classList.add('hidden');
-        });
-        
-        if (selected === 'pexels' && pexelsConfig) {
-            pexelsConfig.classList.remove('hidden');
-        } else if (selected === 'ai' && aiImageConfig) {
-            aiImageConfig.classList.remove('hidden');
-        } else if (selected === 'upload' && uploadConfig) {
-            uploadConfig.classList.remove('hidden');
-        }
-    }
-
-    function handleAiImageModelChange() {
-        const model = aiImageModelSelect?.value;
-        if (gcpProjectGroup) {
-            gcpProjectGroup.style.display = model === 'imagen-2' ? 'block' : 'none';
-        }
-    }
-
-    function handleYoutubeSourceChange() {
-        const selected = document.querySelector('input[name="youtubeSourceType"]:checked')?.value;
-        
-        if (youtubeAudioWarning) {
-            youtubeAudioWarning.style.display = selected === 'audio' ? 'block' : 'none';
-        }
-        
-        if (videoUploadConfig) {
-            videoUploadConfig.style.display = selected === 'videoFile' ? 'block' : 'none';
-        }
-    }
-
-    function handlePlatformChange() {
-        const selected = document.getElementById('platformSelect')?.value;
-        const configs = ['bloggerConfig', 'wordpressConfig', 'tistoryConfig', 'naverConfig'];
-        
-        // Hide all platform configs
-        configs.forEach(configId => {
-            const config = document.getElementById(configId);
-            if (config) config.classList.add('hidden');
-        });
-        
-        // Show selected platform config
-        const selectedConfig = document.getElementById(`${selected}Config`);
-        if (selectedConfig) {
-            selectedConfig.classList.remove('hidden');
-        }
-    }
-
-    function handleImageUpload(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            if (imagePreview && imagePreviewContainer) {
-                imagePreview.src = event.target.result;
-                imagePreviewContainer.classList.remove('hidden');
-            }
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function handleRemoveImage() {
-        if (userImageUpload) userImageUpload.value = '';
-        if (imagePreviewContainer) imagePreviewContainer.classList.add('hidden');
-    }
-
-    function handleVideoUpload(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        if (videoFileName && videoFileInfo) {
-            videoFileName.textContent = file.name;
-            videoFileInfo.classList.remove('hidden');
-        }
-    }
-
-    function handleRemoveVideo() {
-        if (userVideoUpload) userVideoUpload.value = '';
-        if (videoFileInfo) videoFileInfo.classList.add('hidden');
-    }
-
+    // --- MODEL COMPATIBILITY ---
     function checkModelCompatibility() {
-        const selectedModel = geminiModelSelect?.value;
-        const specialPurposeModels = new Set([
+        const selectedModel = geminiModelSelect.value;
+        // This set is now only for providing a non-blocking warning.
+        const SPECIAL_PURPOSE_MODELS = new Set([
             'gemini-live-2.5-flash-preview',
             'gemini-2.5-flash-preview-native-audio-dialog',
             'gemini-2.5-flash-exp-native-audio-thinking-dialog',
@@ -740,201 +256,317 @@ document.addEventListener('DOMContentLoaded', () => {
             'gemini-2.0-flash-live-001'
         ]);
 
-        const isSpecialPurpose = specialPurposeModels.has(selectedModel);
+        const isSpecialPurpose = SPECIAL_PURPOSE_MODELS.has(selectedModel);
+        const isLoggedIn = !!accessToken;
 
-        if (accessToken) {
-            setChatInputEnabled(true);
+        if (isLoggedIn) {
+            setChatInputEnabled(true); // Always enable if logged in.
         }
 
-        if (modelCompatibilityWarning) {
-            if (isSpecialPurpose) {
-                modelCompatibilityWarning.classList.remove('hidden');
-                let warningText = '';
-                if (selectedModel?.includes('tts')) warningText = 'TTS 전용 모델입니다.';
-                else if (selectedModel?.includes('live')) warningText = '실시간 음성/영상 상호작용 전용 모델입니다.';
-                else if (selectedModel?.includes('image-generation')) warningText = '대화형 이미지 생성 전용 모델입니다.';
-                else if (selectedModel?.includes('audio')) warningText = '대화형 오디오 출력 전용 모델입니다.';
-                else warningText = '특수 목적용 모델입니다.';
-                
-                warningText += ' 블로그 생성에 적합하지 않을 수 있습니다.';
-                modelCompatibilityWarning.textContent = warningText;
-            } else {
-                modelCompatibilityWarning.classList.add('hidden');
-            }
+        if (isSpecialPurpose) {
+            modelCompatibilityWarning.classList.remove('hidden');
+            let warningText = '';
+            if (selectedModel.includes('tts')) warningText = 'TTS 전용 모델입니다.';
+            else if (selectedModel.includes('live')) warningText = '실시간 음성/영상 상호작용 전용 모델입니다.';
+            else if (selectedModel.includes('image-generation')) warningText = '대화형 이미지 생성 전용 모델입니다.';
+            else if (selectedModel.includes('audio')) warningText = '대화형 오디오 출력 전용 모델입니다.';
+            else warningText = '특수 목적용 모델입니다.';
+            modelCompatibilityWarning.textContent = `ℹ️ 정보: ${warningText} 선택됨. 일반 포스팅 생성에 적합하지 않을 수 있습니다.`;
+        } else {
+            modelCompatibilityWarning.classList.add('hidden');
+            modelCompatibilityWarning.textContent = '';
         }
     }
 
-    function setChatInputEnabled(enabled) {
-        if (chatInput) {
-            chatInput.disabled = !enabled;
-            chatInput.placeholder = enabled ? 
-                '여기에 포스팅 주제 또는 YouTube URL을 입력하세요...' : 
-                'Google 로그인이 필요합니다.';
-        }
-        if (sendBtn) sendBtn.disabled = !enabled;
-        if (addToQueueFromChatBtn) addToQueueFromChatBtn.disabled = !enabled;
+    // --- IMAGE & VIDEO SOURCE & UPLOAD ---
+    function handleImageSourceChange() {
+        const selectedSource = document.querySelector('input[name="imageSource"]:checked').value;
+        pexelsConfig.classList.toggle('hidden', selectedSource !== 'pexels');
+        aiImageConfig.classList.toggle('hidden', selectedSource !== 'ai');
+        uploadConfig.classList.toggle('hidden', selectedSource !== 'upload');
     }
 
-    function toggleTopicDiscoveryMode() {
-        isTopicDiscoveryMode = !isTopicDiscoveryMode;
-        if (topicDiscoveryBtn) {
-            topicDiscoveryBtn.classList.toggle('active', isTopicDiscoveryMode);
-        }
-        
-        const message = isTopicDiscoveryMode ? 
-            '주제 탐색 모드가 활성화되었습니다. 아이디어를 자유롭게 대화해보세요!' :
-            '주제 탐색 모드가 비활성화되었습니다.';
-        addChatMessage('ai', message);
+    function handleAiImageModelChange() {
+        const selectedModel = aiImageModelSelect.value;
+        gcpProjectGroup.classList.toggle('hidden', !selectedModel.startsWith('imagen'));
+        saveSettings();
+    }
+    
+    function handleYoutubeSourceChange() {
+        const sourceType = document.querySelector('input[name="youtubeSourceType"]:checked').value;
+        const isAudioOrVideo = sourceType === 'audio' || sourceType === 'videoFile';
+        youtubeAudioWarning.classList.toggle('hidden', !isAudioOrVideo);
+        videoUploadConfig.classList.toggle('hidden', sourceType !== 'videoFile');
+        updateTopicDiscoveryModeUI();
     }
 
-    // --- GOOGLE AUTH ---
+    function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            imagePreview.src = e.target.result;
+            imagePreviewContainer.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function handleRemoveImage() {
+        userImageUpload.value = '';
+        imagePreview.src = '#';
+        imagePreviewContainer.classList.add('hidden');
+    }
+
+    function handleVideoUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        videoFileName.textContent = file.name;
+        videoFileInfo.classList.remove('hidden');
+        updateTopicDiscoveryModeUI();
+    }
+
+    function handleRemoveVideo() {
+        userVideoUpload.value = '';
+        videoFileName.textContent = '';
+        videoFileInfo.classList.add('hidden');
+        updateTopicDiscoveryModeUI();
+    }
+
+    // --- AUTHENTICATION ---
     function handleAuthClick() {
         if (!isGisLoaded) {
-            console.error('Google GIS client not loaded yet.');
+            updateAuthStatus('error', 'Google 인증 라이브러리 로딩 중...');
             return;
         }
-        
-        if (!clientIdInput?.value) {
-            addChatMessage('ai', 'Google Client ID를 먼저 입력해주세요.');
+        const clientIdVal = clientIdInput.value.trim();
+        if (!clientIdVal) {
+            updateAuthStatus('error', 'OAuth 클라이언트 ID를 입력하세요.');
             return;
         }
-        
         if (accessToken) {
-            // Logout
-            accessToken = null;
-            updateAuthStatus('로그아웃되었습니다.', 'error');
-            setChatInputEnabled(false);
-            return;
-        }
-        
-        // Initialize token client
-        tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: clientIdInput.value,
-            scope: GOOGLE_API_SCOPES,
-            callback: (response) => {
-                if (response.access_token) {
-                    accessToken = response.access_token;
-                    updateAuthStatus('Google 계정에 로그인되었습니다.', 'success');
-                    setChatInputEnabled(true);
-                    checkModelCompatibility();
-                } else {
-                    updateAuthStatus('로그인에 실패했습니다.', 'error');
-                }
-            },
-        });
-        
-        tokenClient.requestAccessToken();
-    }
-
-    function updateAuthStatus(message, type) {
-        if (!authStatus || !loginBtn) return;
-        
-        authStatus.textContent = message;
-        authStatus.className = `status-box ${type}`;
-        authStatus.classList.remove('hidden');
-        
-        loginBtn.innerHTML = accessToken ? 
-            '<span>로그아웃</span>' : 
-            '<svg aria-hidden="true" class="google-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.5 1 10.22 1 12s.43 3.5 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path></svg><span>Google 로그인</span>';
-    }
-
-    // --- QUEUE FUNCTIONALITY ---
-    function handleAddToQueueFromChat() {
-        const input = chatInput?.value.trim();
-        if (!input) return;
-        
-        addToQueue(input);
-        if (chatInput) chatInput.value = '';
-    }
-
-    async function addToQueue(topicOrUrl) {
-        try {
-            const response = await fetch('/api/queue', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topic_or_url: topicOrUrl })
+            google.accounts.oauth2.revoke(accessToken, () => {
+                accessToken = null;
+                updateAuthStatus('logged_out');
             });
-            
-            if (response.ok) {
-                addChatMessage('ai', `"${topicOrUrl}"이(가) 대기열에 추가되었습니다.`);
-                await loadQueue();
-            }
-        } catch (error) {
-            console.error('Error adding to queue:', error);
+        } else {
+            tokenClient = window.google.accounts.oauth2.initTokenClient({
+                client_id: clientIdVal,
+                scope: GOOGLE_API_SCOPES,
+                callback: handleTokenResponse,
+            });
+            tokenClient.requestAccessToken({ prompt: 'consent' });
         }
     }
 
-    async function loadQueue() {
-        try {
-            const response = await fetch('/api/queue');
-            if (response.ok) {
-                postQueue = await response.json();
-                updateQueueDisplay();
-            }
-        } catch (error) {
-            console.error('Error loading queue:', error);
-        }
-    }
-
-    function updateQueueDisplay() {
-        if (!postQueueContainer) return;
-        
-        postQueueContainer.innerHTML = '';
-        
-        if (postQueue.length === 0) {
-            postQueueContainer.innerHTML = '<p>대기열이 비어있습니다.</p>';
+    function handleTokenResponse(response) {
+        if (response.error) {
+            updateAuthStatus('error', `인증 오류: ${response.error}`);
             return;
         }
-        
-        postQueue.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'queue-item';
-            div.innerHTML = `
-                <span>${item.topic_or_url}</span>
-                <span class="queue-status ${item.status}">${item.status}</span>
-                <button onclick="removeFromQueue('${item.id}')">×</button>
-            `;
-            postQueueContainer.appendChild(div);
-        });
+        accessToken = response.access_token;
+        updateAuthStatus('logged_in');
     }
 
-    async function removeFromQueue(queueId) {
+    function updateAuthStatus(status, message = '') {
+        authStatus.classList.remove('hidden', 'success', 'error');
+        const loginBtnText = loginBtn.querySelector('span');
+        switch (status) {
+            case 'logged_in':
+                authStatus.classList.add('success');
+                authStatus.textContent = '✅ 로그인 성공';
+                if(loginBtnText) loginBtnText.textContent = 'Google 로그아웃';
+                setChatInputEnabled(true);
+                break;
+            case 'logged_out':
+                authStatus.classList.add('error');
+                authStatus.textContent = '로그아웃됨';
+                if(loginBtnText) loginBtnText.textContent = 'Google 로그인';
+                setChatInputEnabled(false);
+                stopLoop();
+                break;
+            case 'error':
+                authStatus.classList.add('error');
+                authStatus.textContent = `❌ ${message}`;
+                setChatInputEnabled(false);
+                stopLoop();
+                break;
+        }
+        authStatus.classList.remove('hidden');
+    }
+
+    // --- CHAT & GENERATION LOGIC ---
+    function setChatInputEnabled(enabled, placeholderText = null) {
+        chatInput.disabled = !enabled;
+        sendBtn.disabled = !enabled;
+        addToQueueFromChatBtn.disabled = !enabled;
+        topicDiscoveryBtn.disabled = !enabled;
+        
+        if (placeholderText) {
+            chatInput.placeholder = placeholderText;
+        } else if (enabled) {
+            updateTopicDiscoveryModeUI();
+        } else {
+            chatInput.placeholder = "먼저 로그인하고 설정을 완료해주세요.";
+        }
+        
+        startLoopBtn.disabled = !enabled;
+    }
+
+    function addChatMessage(sender, content, isHtml = false) {
+        const messageEl = document.createElement('div');
+        messageEl.classList.add('chat-message', sender);
+        const bubbleEl = document.createElement('div');
+        bubbleEl.classList.add('chat-bubble');
+        if (isHtml) bubbleEl.innerHTML = content;
+        else bubbleEl.textContent = content;
+        messageEl.appendChild(bubbleEl);
+        chatContainer.appendChild(messageEl);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        return messageEl;
+    }
+
+    async function handleChatSubmit(e) {
+        if (e) e.preventDefault();
+        const userInput = chatInput.value.trim();
+        if (!userInput || isGenerating) return;
+
+        if (!validateInputs(isTopicDiscoveryMode)) return;
+
+        addChatMessage('user', userInput);
+        chatInput.value = '';
+        
+        setChatInputEnabled(false);
+        isGenerating = true;
+
         try {
-            const response = await fetch(`/api/queue/${queueId}`, { method: 'DELETE' });
-            if (response.ok) {
-                await loadQueue();
+            if (isTopicDiscoveryMode) {
+                await handleTopicDiscoveryChat(userInput);
+            } else {
+                await handlePostGeneration(userInput);
             }
         } catch (error) {
-            console.error('Error removing from queue:', error);
+            console.error("Chat Submit Error:", error);
+            addChatMessage('ai', `❌ 오류 발생: ${error.message}`, true);
+        } finally {
+            isGenerating = false;
+            setChatInputEnabled(true);
+            chatInput.focus();
         }
     }
 
-    // Make removeFromQueue available globally
-    window.removeFromQueue = removeFromQueue;
+    async function handleTopicDiscoveryChat(userInput) {
+        const thinkingMessage = addChatMessage('ai', '생성 중...');
+        const requestBody = { apiKey: apiKeyInput.value.trim(), message: userInput };
 
-    // --- LOOP AND AUTOMATION ---
-    function startLoop() {
-        // Implementation for automated posting loop
-        addChatMessage('ai', '자동 포스팅 루프 기능은 개발 중입니다.');
-    }
+        const response = await fetch('/chat-for-topic', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
+        });
 
-    function stopLoop() {
-        if (loopIntervalId) {
-            clearInterval(loopIntervalId);
-            loopIntervalId = null;
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Gemini API 오류 (${response.status}): ${errorData.error || '알 수 없는 오류'}`);
         }
-        addChatMessage('ai', '자동 포스팅이 중지되었습니다.');
+
+        const data = await response.json();
+        const aiResponseHtml = `
+            <p>${escapeHtml(data.reply).replace(/\n/g, '<br>')}</p>
+            <div class="topic-suggestion-actions">
+                <button class="button-secondary post-from-topic-btn" data-topic="${escapeHtml(data.reply)}">✅ 이 내용으로 포스팅하기</button>
+            </div>
+        `;
+        thinkingMessage.querySelector('.chat-bubble').innerHTML = aiResponseHtml;
     }
 
-    function shutdownPC() {
-        addChatMessage('ai', 'PC 자동 종료 기능은 웹 환경에서 지원되지 않습니다.');
-    }
+    async function handlePostGeneration(topicOrUrl) {
+        const thinkingMessage = addChatMessage('ai', `생성 중: "${topicOrUrl.substring(0, 50)}..."`);
+        
+        const youtubeSourceType = document.querySelector('input[name="youtubeSourceType"]:checked').value;
+        const videoFile = userVideoUpload.files[0];
+        const isYoutubeUrl = topicOrUrl.includes('youtube.com/') || topicOrUrl.includes('youtu.be/');
+        const imageSource = document.querySelector('input[name="imageSource"]:checked').value;
 
-    function cancelShutdown() {
-        addChatMessage('ai', '예약된 종료가 취소되었습니다.');
-    }
+        let endpoint;
+        const fetchOptions = { method: 'POST' };
+        let requestBody;
 
-    // --- MISSING FUNCTIONS ---
+        if (youtubeSourceType === 'videoFile' && videoFile) {
+            endpoint = '/generate-post-from-video';
+            const formData = new FormData();
+            formData.append('video', videoFile);
+            formData.append('topic', topicOrUrl);
+            fetchOptions.body = formData;
+        } else if (isYoutubeUrl) {
+            endpoint = '/generate-post-from-youtube';
+            requestBody = { urls: [topicOrUrl], youtubeSourceType };
+        } else {
+            endpoint = '/generate-post';
+            requestBody = { topic: topicOrUrl };
+        }
+
+        const commonData = {
+            apiKey: apiKeyInput.value.trim(),
+            modelName: geminiModelSelect.value,
+            imageSource: imageSource,
+            aiImageModel: aiImageModelSelect.value,
+            gcpProjectId: gcpProjectIdInput.value.trim(),
+            pexelsApiKey: pexelsApiKeyInput.value.trim(),
+            accessToken: accessToken,
+            tone: writingToneSelect.value,
+            audience: targetAudienceInput.value.trim(),
+            uploadedImageUri: (imageSource === 'upload' && userImageUpload.files[0]) ? imagePreview.src : null
+        };
+
+        if (requestBody) { // JSON request
+            Object.assign(requestBody, commonData);
+            fetchOptions.headers = { 'Content-Type': 'application/json' };
+            fetchOptions.body = JSON.stringify(requestBody);
+        } else { // FormData request
+            for (const key in commonData) {
+                if (commonData[key] !== null) {
+                    fetchOptions.body.append(key, commonData[key]);
+                }
+            }
+        }
+
+        const response = await fetch(endpoint, fetchOptions);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`백엔드 서버 오류 (${response.status}): ${errorData.error || '알 수 없는 오류'}`);
+        }
+
+        const data = await response.json();
+        if (!data.title || !data.body) {
+             throw new Error("콘텐츠는 받았지만 제목/본문이 비어있습니다.");
+        }
+        
+        thinkingMessage.remove(); // Remove "thinking" message
+
+        if (!previewBeforePostCheckbox.checked && !loopIntervalId) {
+            const isDraft = postAsDraftCheckbox.checked;
+            const actionText = isDraft ? "초안으로 즉시 저장합니다" : "즉시 발행합니다";
+            addChatMessage('ai', `✅ '발행 전 미리보기' 기능이 꺼져있습니다. "${data.title}" 포스트를 생성하여 ${actionText}...`, true);
+            await postToBloggerAndHandleResult(data.title, data.body, isDraft);
+        } else {
+            const contentId = `content-${Date.now()}`;
+            generatedContentStore[contentId] = { title: data.title, body: data.body };
+            const previewText = data.body.replace(/<[^>]+>/g, '').substring(0, 200);
+            const aiResponseHtml = `
+                <p>✅ 포스트 초안이 생성되었습니다.</p>
+                <div class="generated-post-container">
+                    <h3>${data.title}</h3>
+                    <div class="generated-post-body-preview">${previewText}...</div>
+                    <div class="generated-post-actions">
+                        <button class="button-primary show-preview-btn" data-content-id="${contentId}">미리보기 및 포스팅</button>
+                    </div>
+                </div>
+            `;
+            addChatMessage('ai', aiResponseHtml, true);
+        }
+        return data; // Return data for loop processing
+    }
+    
     function handleChatContainerClick(event) {
         if (event.target.classList.contains('show-preview-btn')) {
             const contentId = event.target.dataset.contentId;
@@ -954,526 +586,385 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function validateInputs(isDiscoveryMode = false, skipFileValidation = false) {
+        if (!accessToken) { alert('Google 계정으로 먼저 로그인해주세요.'); return false; }
+        if (!apiKeyInput.value.trim()) { alert('Gemini API 키를 입력해주세요.'); return false; }
+
+        if (!isDiscoveryMode) {
+            if (!blogIdInput.value.trim()) { alert('대상 블로그 ID를 입력해주세요.'); return false; }
+            if (!blogAddressInput.value.trim()) { alert('블로그 주소를 입력해주세요.'); return false; }
+            
+            const imageSource = document.querySelector('input[name="imageSource"]:checked').value;
+            if (imageSource === 'pexels' && !pexelsApiKeyInput.value.trim()) { alert('Pexels API 키를 입력해주세요.'); return false; }
+            if (imageSource === 'ai' && aiImageModelSelect.value.startsWith('imagen') && !gcpProjectIdInput.value.trim()) { alert('Google Imagen 모델을 사용하려면 GCP Project ID를 입력해주세요.'); return false; }
+            
+            if (!skipFileValidation) {
+                if (imageSource === 'upload' && !userImageUpload.files[0]) { alert('업로드할 이미지를 선택해주세요.'); return false; }
+                const youtubeSourceType = document.querySelector('input[name="youtubeSourceType"]:checked').value;
+                if (youtubeSourceType === 'videoFile' && !userVideoUpload.files[0]) {
+                    alert('업로드할 동영상 파일을 선택해주세요.');
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     function toggleTopicDiscoveryMode() {
         isTopicDiscoveryMode = !isTopicDiscoveryMode;
-        const topicDiscoveryBtn = document.getElementById('topicDiscoveryBtn');
-        if (topicDiscoveryBtn) {
-            if (isTopicDiscoveryMode) {
-                topicDiscoveryBtn.textContent = '일반 모드로 전환';
-                topicDiscoveryBtn.classList.add('active');
-                addChatMessage('ai', '주제 발견 모드가 활성화되었습니다. YouTube 링크나 주제를 입력하면 관련 블로그 포스팅 주제를 제안해드립니다.');
-            } else {
-                topicDiscoveryBtn.textContent = '주제 발견 모드';
-                topicDiscoveryBtn.classList.remove('active');
-                addChatMessage('ai', '일반 모드로 돌아왔습니다.');
-            }
-        }
+        updateTopicDiscoveryModeUI();
     }
 
-    // Add event listener for chat container clicks
-    if (chatContainer) {
-        chatContainer.addEventListener('click', handleChatContainerClick);
-    }
+    function updateTopicDiscoveryModeUI() {
+        const youtubeSourceType = document.querySelector('input[name="youtubeSourceType"]:checked').value;
+        const videoFileSelected = userVideoUpload.files.length > 0;
 
-    // Make functions globally available
-    window.handleChatContainerClick = handleChatContainerClick;
-    window.toggleTopicDiscoveryMode = toggleTopicDiscoveryMode;
-
-    // --- PLATFORM HANDLERS ---
-    function handlePlatformChange() {
-        const selectedPlatform = document.getElementById('platformSelect')?.value || 'blogger';
-        
-        // Hide all platform configs
-        const allConfigs = document.querySelectorAll('.platform-config');
-        allConfigs.forEach(config => config.classList.add('hidden'));
-        
-        // Show selected platform config
-        const selectedConfig = document.getElementById(`${selectedPlatform}Config`);
-        if (selectedConfig) {
-            selectedConfig.classList.remove('hidden');
-        }
-    }
-
-    // --- INITIALIZATION ---
-    setInitialTheme();
-    initializeCollapsibles();
-    loadGisScript();
-    loadSettings();
-    loadHistory();
-    loadQueue();
-    checkModelCompatibility();
-    
-    // Add platform change listener
-    if (platformSelect) {
-        platformSelect.addEventListener('change', handlePlatformChange);
-        handlePlatformChange(); // Initialize display
-    }
-});
-
-// 사이드바 토글 기능 초기화
-function initializeSidebarToggle() {
-    const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
-    const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
-    const sidebarRight = document.querySelector('.sidebar-right');
-    
-    function toggleSidebar() {
-        if (sidebarRight) {
-            sidebarRight.classList.toggle('collapsed');
-            const isCollapsed = sidebarRight.classList.contains('collapsed');
-            
-            // 버튼 텍스트 업데이트
-            if (sidebarToggleBtn) {
-                sidebarToggleBtn.textContent = isCollapsed ? '설정 보기' : '설정 숨기기';
-            }
-            if (mobileSidebarToggle) {
-                mobileSidebarToggle.textContent = isCollapsed ? '설정 보기' : '설정 숨기기';
-            }
-        }
-    }
-    
-    // 이벤트 리스너 추가
-    if (sidebarToggleBtn) {
-        sidebarToggleBtn.addEventListener('click', toggleSidebar);
-    }
-    if (mobileSidebarToggle) {
-        mobileSidebarToggle.addEventListener('click', toggleSidebar);
-    }
-}
-
-// 모바일 인터페이스 초기화
-function initializeMobileInterface() {
-    const mobileContentType = document.getElementById('mobileContentType');
-    const mobileYoutubeInput = document.getElementById('mobileYoutubeInput');
-    const mobileTopicInput = document.getElementById('mobileTopicInput');
-    const mobileFileInput = document.getElementById('mobileFileInput');
-    const mobileGenerateBtn = document.getElementById('mobileGenerateBtn');
-    
-    // 콘텐츠 타입 변경 시 해당 입력 필드 표시
-    if (mobileContentType) {
-        mobileContentType.addEventListener('change', updateContentInputScreen);
-        // 초기 화면 설정
-        updateContentInputScreen();
-    }
-    
-    // 생성 버튼 클릭 처리
-    if (mobileGenerateBtn) {
-        mobileGenerateBtn.addEventListener('click', handleMobileGenerate);
-    }
-    
-    // 모바일 로그인 버튼 처리
-    const mobileLoginBtn = document.getElementById('mobileLoginBtn');
-    if (mobileLoginBtn) {
-        mobileLoginBtn.addEventListener('click', handleMobileLogin);
-    }
-    
-    // 모바일 API 설정 동기화
-    syncMobileApiSettings();
-    
-    // 초기 로그인 상태 체크
-    setTimeout(checkLoginStatus, 500);
-}
-
-// 콘텐츠 입력 화면 업데이트
-function updateContentInputScreen() {
-    const contentType = document.getElementById('mobileContentType')?.value;
-    const mobileYoutubeInput = document.getElementById('mobileYoutubeInput');
-    const mobileTopicInput = document.getElementById('mobileTopicInput');
-    const mobileFileInput = document.getElementById('mobileFileInput');
-    
-    // 모든 입력 필드 숨기기
-    if (mobileYoutubeInput) mobileYoutubeInput.style.display = 'none';
-    if (mobileTopicInput) mobileTopicInput.style.display = 'none';
-    if (mobileFileInput) mobileFileInput.style.display = 'none';
-    
-    // 선택된 타입에 따라 해당 필드 표시
-    switch (contentType) {
-        case 'youtube':
-            if (mobileYoutubeInput) mobileYoutubeInput.style.display = 'block';
-            break;
-        case 'topic':
-            if (mobileTopicInput) mobileTopicInput.style.display = 'block';
-            break;
-        case 'file':
-            if (mobileFileInput) mobileFileInput.style.display = 'block';
-            break;
-    }
-}
-
-// 모바일 화면 전환
-function showScreen(screenId) {
-    // 모든 화면 숨기기
-    const screens = document.querySelectorAll('.mobile-screen');
-    screens.forEach(screen => screen.classList.remove('active'));
-    
-    // 선택된 화면 표시
-    const targetScreen = document.getElementById(`screen-${screenId}`);
-    if (targetScreen) {
-        targetScreen.classList.add('active');
-        
-        // 특별한 화면 처리
-        if (screenId === 'content-input') {
-            updateContentInputScreen();
-        } else if (screenId === 'generate') {
-            updateSettingsSummary();
-        }
-    }
-}
-
-// 설정 요약 업데이트
-function updateSettingsSummary() {
-    const summaryDiv = document.getElementById('mobileSettingsSummary');
-    if (!summaryDiv) return;
-    
-    const contentType = document.getElementById('mobileContentType')?.value || '';
-    const writingTone = document.getElementById('mobileWritingTone')?.value || '';
-    const platform = document.getElementById('mobilePlatform')?.value || '';
-    const imageSource = document.getElementById('mobileImageSource')?.value || '';
-    
-    let inputValue = '';
-    switch (contentType) {
-        case 'youtube':
-            inputValue = document.getElementById('mobileYoutubeUrl')?.value || '';
-            break;
-        case 'topic':
-            inputValue = document.getElementById('mobileTopicText')?.value || '';
-            break;
-        case 'file':
-            const fileInput = document.getElementById('mobileFileUpload');
-            inputValue = fileInput?.files.length > 0 ? fileInput.files[0].name : '';
-            break;
-    }
-    
-    const contentTypeNames = {
-        'youtube': 'YouTube 동영상',
-        'topic': '주제 입력',
-        'file': '파일 업로드'
-    };
-    
-    const toneNames = {
-        'friendly': '친근한',
-        'professional': '전문적인',
-        'casual': '캐주얼한',
-        'formal': '격식있는'
-    };
-    
-    const platformNames = {
-        'blogger': 'Google Blogger',
-        'wordpress': 'WordPress'
-    };
-    
-    const imageNames = {
-        'none': '이미지 없음',
-        'ai': 'AI 생성',
-        'pexels': 'Pexels 검색'
-    };
-    
-    summaryDiv.innerHTML = `
-        <p style="color: #cccccc; margin-bottom: 15px;"><strong>콘텐츠:</strong> ${contentTypeNames[contentType] || contentType}</p>
-        <p style="color: #cccccc; margin-bottom: 15px;"><strong>입력:</strong> ${inputValue || '없음'}</p>
-        <p style="color: #cccccc; margin-bottom: 15px;"><strong>스타일:</strong> ${toneNames[writingTone] || writingTone}</p>
-        <p style="color: #cccccc; margin-bottom: 15px;"><strong>플랫폼:</strong> ${platformNames[platform] || platform}</p>
-        <p style="color: #cccccc; margin-bottom: 0;"><strong>이미지:</strong> ${imageNames[imageSource] || imageSource}</p>
-    `;
-}
-
-// 모바일 생성 처리
-function handleMobileGenerate() {
-    const contentType = document.getElementById('mobileContentType')?.value;
-    let inputValue = '';
-    
-    // 선택된 콘텐츠 타입에 따라 입력값 가져오기
-    switch (contentType) {
-        case 'youtube':
-            inputValue = document.getElementById('mobileYoutubeUrl')?.value || '';
-            break;
-        case 'topic':
-            inputValue = document.getElementById('mobileTopicText')?.value || '';
-            break;
-        case 'file':
-            const fileInput = document.getElementById('mobileFileUpload');
-            if (fileInput && fileInput.files.length > 0) {
-                alert('파일 업로드 기능은 준비 중입니다.');
-                return;
-            }
-            break;
-    }
-    
-    if (!inputValue.trim()) {
-        alert('내용을 입력해주세요.');
-        return;
-    }
-    
-    // 설정값 가져오기
-    const writingTone = document.getElementById('mobileWritingTone')?.value || 'friendly';
-    const platform = document.getElementById('mobilePlatform')?.value || 'blogger';
-    const targetAudience = document.getElementById('mobileTargetAudience')?.value || '';
-    const imageSource = document.getElementById('mobileImageSource')?.value || 'none';
-    
-    // API 설정 동기화
-    const apiKey = document.getElementById('mobileApiKey')?.value || '';
-    const clientId = document.getElementById('mobileClientId')?.value || '';
-    const blogId = document.getElementById('mobileBlogId')?.value || '';
-    const blogAddress = document.getElementById('mobileBlogAddress')?.value || '';
-    
-    // 기존 설정에 모바일 설정 적용
-    if (document.getElementById('writingTone')) {
-        document.getElementById('writingTone').value = writingTone;
-    }
-    if (document.getElementById('platformSelect')) {
-        document.getElementById('platformSelect').value = platform;
-    }
-    if (document.getElementById('targetAudience')) {
-        document.getElementById('targetAudience').value = targetAudience;
-    }
-    // API 설정 동기화
-    const settingsMap = {
-        'apiKey': apiKey,
-        'clientId': clientId,
-        'blogId': blogId,
-        'blogAddress': blogAddress
-    };
-    
-    Object.keys(settingsMap).forEach(id => {
-        const element = document.getElementById(id);
-        if (element && settingsMap[id]) {
-            element.value = settingsMap[id];
-        }
-    });
-    
-    // 기존 채팅 인터페이스로 요청 전달
-    if (document.getElementById('chatInput')) {
-        document.getElementById('chatInput').value = inputValue;
-        document.getElementById('chatForm').dispatchEvent(new Event('submit'));
-    }
-}
-
-// 모바일 API 설정 동기화
-function syncMobileApiSettings() {
-    // 기존 설정에서 모바일로 복사
-    const apiKey = document.getElementById('apiKey')?.value || '';
-    const clientId = document.getElementById('clientId')?.value || '';
-    const blogId = document.getElementById('blogId')?.value || '';
-    const blogAddress = document.getElementById('blogAddress')?.value || '';
-    
-    if (document.getElementById('mobileApiKey')) {
-        document.getElementById('mobileApiKey').value = apiKey;
-    }
-    if (document.getElementById('mobileClientId')) {
-        document.getElementById('mobileClientId').value = clientId;
-    }
-    if (document.getElementById('mobileBlogId')) {
-        document.getElementById('mobileBlogId').value = blogId;
-    }
-    if (document.getElementById('mobileBlogAddress')) {
-        document.getElementById('mobileBlogAddress').value = blogAddress;
-    }
-    
-    // 모바일에서 기존으로 복사하는 이벤트 리스너
-    const idMappings = {
-        'mobileApiKey': 'apiKey',
-        'mobileClientId': 'clientId',
-        'mobileBlogId': 'blogId',
-        'mobileBlogAddress': 'blogAddress'
-    };
-    
-    Object.keys(idMappings).forEach(mobileId => {
-        const element = document.getElementById(mobileId);
-        if (element) {
-            element.addEventListener('input', (e) => {
-                const desktopElement = document.getElementById(idMappings[mobileId]);
-                if (desktopElement) {
-                    desktopElement.value = e.target.value;
-                }
-            });
-        }
-    });
-}
-
-// 모바일 로그인 처리
-function handleMobileLogin() {
-    // 기존 로그인 버튼 클릭
-    const loginBtn = document.getElementById('loginBtn');
-    if (loginBtn) {
-        loginBtn.click();
-    }
-    
-    // 상태 업데이트 (약간의 지연 후)
-    setTimeout(() => {
-        updateMobileAuthStatus();
-        checkLoginStatus();
-    }, 1000);
-}
-
-// 로그인 상태 체크 및 다음 버튼 활성화
-function checkLoginStatus() {
-    const authStatus = document.getElementById('authStatus');
-    const mobileLoginNextBtn = document.getElementById('mobileLoginNextBtn');
-    
-    if (authStatus && mobileLoginNextBtn) {
-        // 로그인 성공 여부 확인 (성공 클래스나 텍스트로 판단)
-        const isLoggedIn = authStatus.classList.contains('success') || 
-                          authStatus.innerHTML.includes('성공') ||
-                          authStatus.innerHTML.includes('로그인됨');
-        
-        if (isLoggedIn) {
-            mobileLoginNextBtn.disabled = false;
-            mobileLoginNextBtn.textContent = '포스팅 시작';
+        if (isTopicDiscoveryMode) {
+            topicDiscoveryBtn.classList.add('active');
+            chatInput.placeholder = "Gemini와 대화하며 주제를 찾아보세요...";
         } else {
-            mobileLoginNextBtn.disabled = true;
-            mobileLoginNextBtn.textContent = '로그인 필요';
+            topicDiscoveryBtn.classList.remove('active');
+            if (youtubeSourceType === 'videoFile' && videoFileSelected) {
+                chatInput.placeholder = "선택된 동영상을 요약할 주제를 여기에 입력하세요...";
+            } else {
+                chatInput.placeholder = "여기에 포스팅 주제 또는 YouTube URL을 입력하세요...";
+            }
         }
     }
-}
 
-// 모바일 인증 상태 업데이트
-function updateMobileAuthStatus() {
-    const mobileAuthStatus = document.getElementById('mobileAuthStatus');
-    const authStatus = document.getElementById('authStatus');
-    
-    if (mobileAuthStatus && authStatus) {
-        mobileAuthStatus.innerHTML = authStatus.innerHTML;
-        mobileAuthStatus.className = authStatus.className.replace('status-box', 'auth-status-mobile');
+    // --- MODAL & POSTING ---
+    async function handleApprovePost() {
+        const contentId = approvePostBtn.dataset.contentId;
+        const contentData = generatedContentStore[contentId];
+        if (!contentData) {
+            addChatMessage('ai', `❌ 포스팅 오류: 원본 콘텐츠를 찾을 수 없습니다.`, true);
+            previewModal.classList.add('hidden');
+            return;
+        }
+
+        const title = previewTitleInput.value;
+        const content = previewBodyTextarea.value;
+        const isDraft = postAsDraftCheckbox.checked;
+
+        approvePostBtn.disabled = true;
+        approvePostBtn.textContent = '포스팅 중...';
+
+        try {
+            await postToBloggerAndHandleResult(title, content, isDraft);
+        } finally {
+            previewModal.classList.add('hidden');
+            approvePostBtn.disabled = false;
+            approvePostBtn.textContent = '승인 및 포스팅';
+            delete generatedContentStore[contentId];
+        }
     }
-    
-    // 로그인 상태 체크
-    checkLoginStatus();
-}
 
-// 모바일에서 콘텐츠 생성 처리
-async function handleMobileGenerate() {
-    if (isGenerating) return;
-    
-    const progressDiv = document.getElementById('generationProgress');
-    const progressBar = document.getElementById('progressBar');
-    const progressText = document.getElementById('progressText');
-    const statusDiv = document.getElementById('mobileGenerationStatus');
-    
-    try {
-        setGeneratingState(true);
+    async function postToBloggerAndHandleResult(title, content, isDraft) {
+        try {
+            const result = await postToBlogger(title, content, isDraft);
+            const postUrl = result.url;
+            addChatMessage('ai', `🎉 포스팅 성공! <a href="${postUrl}" target="_blank">여기서 확인하세요</a>.`, true);
+            addHistoryEntry(title, postUrl);
+        } catch (error) {
+            console.error("Blogger Post Error:", error);
+            const errorMessage = error.apiResponse ? JSON.stringify(error.apiResponse.error.message) : error.message;
+            addChatMessage('ai', `❌ Blogger 포스팅 실패: ${errorMessage}`, true);
+            throw error; // Re-throw to be caught by the loop handler
+        }
+    }
+
+    // --- AUTOMATION & PC CONTROL ---
+    function handleAddToQueueFromChat() {
+        const topicOrUrl = chatInput.value.trim();
+        if (!topicOrUrl) {
+            alert('큐에 추가할 주제나 URL을 입력하세요.');
+            return;
+        }
+        const queueItems = postQueueContainer.querySelectorAll('.queue-item');
+        if (queueItems.length >= 5) {
+            alert('최대 5개의 항목만 큐에 추가할 수 있습니다.');
+            return;
+        }
         
-        // 프로그레스 표시
-        if (progressDiv) progressDiv.style.display = 'block';
-        if (progressBar) progressBar.style.width = '10%';
-        if (progressText) progressText.textContent = 'Collecting inputs...';
+        addQueueItemToDisplay(topicOrUrl);
+        chatInput.value = '';
+        chatInput.focus();
+        addChatMessage('ai', `✅ <strong>"${topicOrUrl.substring(0, 50)}..."</strong> 항목이 포스팅 큐에 추가되었습니다.`, true);
+    }
+
+    function addQueueItemToDisplay(text) {
+        const queueItem = document.createElement('div');
+        queueItem.className = 'form-group queue-item';
+        queueItem.innerHTML = `
+            <input type="text" class="queue-input" value="${escapeHtml(text)}" readonly>
+            <button class="button-icon remove-queue-item-btn" title="큐에서 제거">&times;</button>
+        `;
+        postQueueContainer.appendChild(queueItem);
+
+        queueItem.querySelector('.remove-queue-item-btn').addEventListener('click', () => {
+            queueItem.remove();
+        });
+    }
+
+    function startLoop() {
+        // For loops, we skip file validation as it's not supported.
+        if (!validateInputs(false, true)) return;
+
+        const queueInputs = postQueueContainer.querySelectorAll('.queue-input');
+        // Use a temporary variable for the new queue.
+        const newQueue = Array.from(queueInputs).map(input => input.value.trim()).filter(value => value);
+
+        if (newQueue.length === 0) {
+            alert('큐에 포스팅할 항목을 하나 이상 입력해주세요.');
+            return;
+        }
+
+        stopLoop(); // Clear any existing loop. This will reset the global postQueue.
+
+        // Now, assign the new queue to the global variable.
+        postQueue = newQueue;
+        currentQueueIndex = 0;
+
+        const interval = parseInt(loopIntervalSelect.value, 10);
+        addChatMessage('ai', `🔁 총 ${postQueue.length}개의 포스트를 ${interval / 60000}분 간격으로 일괄 포스팅 시작합니다.`, true);
+
+        processQueueItem(); // Process the first item immediately
+        loopIntervalId = setInterval(processQueueItem, interval);
+
+        startLoopBtn.disabled = true;
+        stopLoopBtn.disabled = false;
+        addToQueueFromChatBtn.disabled = true;
+        postQueueContainer.querySelectorAll('input, button').forEach(el => el.disabled = true);
+    }
+
+    async function processQueueItem() {
+        if (isGenerating) {
+            console.log("Queue: Generation in progress, skipping interval.");
+            return;
+        }
+        if (currentQueueIndex >= postQueue.length) {
+            addChatMessage('ai', '✅ 모든 큐 작업이 완료되었습니다. 일괄 포스팅을 중지합니다.', true);
+            stopLoop();
+            return;
+        }
+
+        const itemToProcess = postQueue[currentQueueIndex];
+        addChatMessage('ai', `➡️ 큐 작업 ${currentQueueIndex + 1}/${postQueue.length} 처리 중: "${itemToProcess.substring(0, 50)}..."`, true);
         
-        // 모바일 입력값 수집
-        const settings = {
-            apiKey: document.getElementById('mobileApiKey')?.value.trim(),
-            clientId: document.getElementById('mobileClientId')?.value.trim(),
-            blogId: document.getElementById('mobileBlogId')?.value.trim(),
-            blogAddress: document.getElementById('mobileBlogAddress')?.value.trim(),
-            geminiModel: 'gemini-1.5-pro',
-            writingTone: document.getElementById('mobileWritingTone')?.value || 'friendly',
-            targetAudience: document.getElementById('mobileTargetAudience')?.value.trim() || 'general'
+        isGenerating = true;
+        try {
+            const generatedData = await generatePostFromQueueItem(itemToProcess);
+            if (generatedData) {
+                await postToBloggerAndHandleResult(generatedData.title, generatedData.body, postAsDraftCheckbox.checked);
+            }
+        } catch (error) {
+            console.error("Queue Processing Error:", error);
+            addChatMessage('ai', `❌ 큐 작업 실패로 인해 일괄 포스팅을 중단합니다. 오류: ${error.message}`, true);
+            stopLoop();
+            return;
+        } finally {
+            isGenerating = false;
+        }
+
+        currentQueueIndex++;
+    }
+
+    async function generatePostFromQueueItem(topicOrUrl) {
+        const isYoutubeUrl = topicOrUrl.includes('youtube.com/') || topicOrUrl.includes('youtu.be/');
+        const imageSource = document.querySelector('input[name="imageSource"]:checked').value;
+        
+        const youtubeSourceType = isYoutubeUrl ? document.querySelector('input[name="youtubeSourceType"]:checked').value : 'transcript';
+        if (youtubeSourceType === 'videoFile') {
+            throw new Error("일괄 포스팅 큐는 동영상 파일 업로드를 지원하지 않습니다.");
+        }
+
+        let endpoint;
+        let requestBody;
+
+        if (isYoutubeUrl) {
+            endpoint = '/generate-post-from-youtube';
+            requestBody = { urls: [topicOrUrl], youtubeSourceType };
+        } else {
+            endpoint = '/generate-post';
+            requestBody = { topic: topicOrUrl };
+        }
+
+        const commonData = {
+            apiKey: apiKeyInput.value.trim(),
+            modelName: geminiModelSelect.value,
+            imageSource: imageSource,
+            aiImageModel: aiImageModelSelect.value,
+            gcpProjectId: gcpProjectIdInput.value.trim(),
+            pexelsApiKey: pexelsApiKeyInput.value.trim(),
+            accessToken: accessToken,
+            tone: writingToneSelect.value,
+            audience: targetAudienceInput.value.trim(),
+            uploadedImageUri: null // Image upload is not supported in queue mode
         };
         
-        // 콘텐츠 소스 확인
-        const youtubeUrl = document.getElementById('mobileYoutubeUrl')?.value.trim();
-        const topicInput = document.getElementById('mobileTopicInput')?.value.trim();
-        const promptInput = document.getElementById('finalPromptInput')?.value.trim() || 
-                          document.getElementById('mobilePromptInput')?.value.trim();
-        
-        let input = '';
-        if (youtubeUrl) {
-            input = youtubeUrl;
-        } else if (topicInput) {
-            input = topicInput;
-        } else if (promptInput) {
-            input = promptInput;
-        } else {
-            throw new Error('Please provide content source (YouTube URL, topic, or prompt)');
-        }
-        
-        if (progressBar) progressBar.style.width = '30%';
-        if (progressText) progressText.textContent = 'Generating content...';
-        
-        // API 호출
-        const response = await fetch('/api/generate', {
+        Object.assign(requestBody, commonData);
+
+        const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                input: input,
-                settings: settings,
-                accessToken: accessToken
-            })
+            body: JSON.stringify(requestBody)
         });
-        
-        if (progressBar) progressBar.style.width = '70%';
-        if (progressText) progressText.textContent = 'Processing response...';
-        
-        const data = await response.json();
-        
+
         if (!response.ok) {
-            throw new Error(data.error || 'Generation failed');
+            const errorData = await response.json();
+            throw new Error(`백엔드 서버 오류 (${response.status}): ${errorData.error || '알 수 없는 오류'}`);
         }
-        
-        if (progressBar) progressBar.style.width = '100%';
-        if (progressText) progressText.textContent = 'Complete!';
-        
-        // 성공 메시지 표시
-        if (statusDiv) {
-            statusDiv.style.display = 'block';
-            statusDiv.innerHTML = `
-                <div style="color: #4ade80; font-weight: 500;">✅ Blog post generated successfully!</div>
-                <div style="font-size: 0.8rem; margin-top: 5px; color: #888;">
-                    Title: ${data.title || 'Generated Post'}<br>
-                    Status: ${data.blogger_url ? 'Published' : 'Generated'}
-                </div>
-            `;
-        }
-        
-        // 기록 업데이트
-        if (data.post_id) {
-            await loadHistory();
-        }
-        
-    } catch (error) {
-        console.error('Mobile generation error:', error);
-        
-        if (statusDiv) {
-            statusDiv.style.display = 'block';
-            statusDiv.innerHTML = `
-                <div style="color: #ef4444; font-weight: 500;">❌ Error: ${error.message}</div>
-                <div style="font-size: 0.8rem; margin-top: 5px; color: #888;">
-                    Please check your settings and try again.
-                </div>
-            `;
-        }
-        
-        if (progressText) progressText.textContent = 'Error occurred';
-    } finally {
-        setGeneratingState(false);
-        
-        // 프로그레스 숨기기 (3초 후)
-        setTimeout(() => {
-            if (progressDiv) progressDiv.style.display = 'none';
-            if (progressBar) progressBar.style.width = '0%';
-        }, 3000);
+        return await response.json();
     }
-}
 
-// 모바일 인터페이스 이벤트 리스너 추가
-document.addEventListener('DOMContentLoaded', () => {
-    // 모바일 생성 버튼 이벤트 리스너
-    const mobileGenerateBtn = document.getElementById('mobileGenerateBtn');
-    if (mobileGenerateBtn) {
-        mobileGenerateBtn.addEventListener('click', handleMobileGenerate);
-    }
-    
-    // 모바일 로그인 버튼 이벤트 리스너  
-    const mobileLoginBtn = document.getElementById('mobileLoginBtn');
-    if (mobileLoginBtn) {
-        mobileLoginBtn.addEventListener('click', () => {
-            if (accessToken) {
-                signOut();
-            } else {
-                getToken();
+    function stopLoop() {
+        if (loopIntervalId) {
+            clearInterval(loopIntervalId);
+            loopIntervalId = null;
+            if (postQueue.length > 0) {
+                 addChatMessage('ai', `⏹️ 일괄 포스팅을 중지했습니다.`, true);
             }
-        });
+        }
+        startLoopBtn.disabled = false;
+        stopLoopBtn.disabled = true;
+        
+        if (accessToken) {
+            addToQueueFromChatBtn.disabled = false;
+        }
+        if(postQueueContainer) {
+            postQueueContainer.querySelectorAll('input, button').forEach(el => el.disabled = false);
+        }
+        
+        postQueue = [];
+        currentQueueIndex = 0;
+        isGenerating = false; // Ensure flag is reset
     }
-});
 
-// 전역 함수로 만들기
-window.showScreen = showScreen;
-window.updateMobileAuthStatus = updateMobileAuthStatus;
-window.handleMobileGenerate = handleMobileGenerate;
+    async function shutdownPC() {
+        const queueCount = postQueueContainer.querySelectorAll('.queue-input').length;
+        if (queueCount === 0) {
+            alert("PC 종료를 예약하려면 먼저 큐에 항목을 추가해야 합니다.");
+            return;
+        }
+        const interval = parseInt(loopIntervalSelect.value, 10);
+        const totalTimeMs = interval * queueCount;
+        const delayInSeconds = (totalTimeMs / 1000) + 300; // Add 5 min buffer
+        const confirmationMessage = `총 ${queueCount}개의 작업이 완료된 후 (약 ${Math.round(delayInSeconds / 60)}분 후) PC를 종료하시겠습니까?`;
+
+        if (confirm(confirmationMessage)) {
+            try {
+                await fetch('/shutdown-pc', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ delay: delayInSeconds })
+                });
+                addChatMessage('ai', `🖥️ PC 종료가 예약되었습니다. (약 ${Math.round(delayInSeconds / 60)}분 후)`, true);
+            } catch (error) {
+                addChatMessage('ai', `❌ PC 종료 예약 실패: ${error.message}`, true);
+            }
+        }
+    }
+
+    async function cancelShutdown() {
+        try {
+            await fetch('/cancel-shutdown', { method: 'POST' });
+            addChatMessage('ai', '✅ PC 종료가 취소되었습니다.', true);
+        } catch (error) {
+            addChatMessage('ai', `❌ 종료 취소 실패: ${error.message}`, true);
+        }
+    }
+
+    // --- HISTORY ---
+    function loadHistory() {
+        const savedHistory = localStorage.getItem('postingHistory');
+        if (savedHistory) postingHistory = JSON.parse(savedHistory);
+        renderHistory();
+    }
+
+    function saveHistory() {
+        localStorage.setItem('postingHistory', JSON.stringify(postingHistory));
+    }
+
+    function renderHistory() {
+        historyList.innerHTML = '';
+        if (postingHistory.length === 0) {
+            historyList.innerHTML = '<li class="history-placeholder">기록이 없습니다.</li>';
+            clearHistoryBtn.style.display = 'none';
+        } else {
+            postingHistory.slice(0, 50).forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'history-item';
+                li.innerHTML = `
+                    <span class="history-title" title="${item.title}">${item.title}</span>
+                    <div class="history-details">
+                        <span class="history-date">${new Date(item.date).toLocaleDateString('ko-KR')}</span>
+                        <a href="${item.url}" target="_blank" class="history-link">보기</a>
+                    </div>`;
+                historyList.appendChild(li);
+            });
+            clearHistoryBtn.style.display = 'block';
+        }
+    }
+
+    function addHistoryEntry(title, url) {
+        const newEntry = { title, url, date: new Date().toISOString() };
+        postingHistory.unshift(newEntry);
+        if (postingHistory.length > 50) postingHistory.pop(); 
+        saveHistory();
+        renderHistory();
+    }
+
+    function handleClearHistory() {
+        if (confirm('정말로 모든 포스팅 기록을 삭제하시겠습니까?')) {
+            postingHistory = [];
+            saveHistory();
+            renderHistory();
+        }
+    }
+
+    // --- API CALLS ---
+    async function postToBlogger(title, content, isDraft = true) {
+        const BLOG_ID = blogIdInput.value.trim();
+        if (!BLOG_ID) throw new Error("블로그 ID가 비어있습니다. 설정을 확인해주세요.");
+        
+        const API_URL = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/?isDraft=${isDraft}`;
+        const postData = { kind: "blogger#post", blog: { id: BLOG_ID }, title, content };
+
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(postData),
+        });
+        
+        const result = await response.json();
+        if (!response.ok) {
+            const error = new Error(`Blogger API 오류 (${result.error.code}): ${result.error.message}`);
+            error.apiResponse = result;
+            throw error;
+        }
+
+        if (!result.url) {
+            console.warn("Blogger API did not return a post URL. Falling back to editor link.");
+            result.url = `https://www.blogger.com/blog/post/edit/${BLOG_ID}/${result.id}`;
+        }
+        
+        return result;
+    }
+
+    // --- HELPERS ---
+    function escapeHtml(unsafe) {
+        if (typeof unsafe !== 'string') return '';
+        return unsafe.replace(/&/g, "&amp;").replace(/</g, "<").replace(/>/g, ">").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // --- KICKSTART ---
+    setInitialTheme();
+    loadGisScript();
+    initializeCollapsibles();
+    loadHistory();
+    loadSettings();
+    handleImageSourceChange();
+    handleYoutubeSourceChange();
+    setChatInputEnabled(false);
+    checkModelCompatibility();
+});
