@@ -180,31 +180,48 @@ class GeminiService:
         cleaned_text = re.sub(r'\s*```', '', cleaned_text)
         cleaned_text = cleaned_text.strip()
         
-        # Try to find JSON by looking for opening and closing braces
+        # Try multiple JSON extraction methods
+        json_string = None
+        
+        # Method 1: Try to find complete JSON with proper brace matching
         start_idx = cleaned_text.find('{')
-        if start_idx == -1:
-            logging.error("No opening brace found in response")
+        if start_idx != -1:
+            brace_count = 0
+            end_idx = -1
+            for i in range(start_idx, len(cleaned_text)):
+                if cleaned_text[i] == '{':
+                    brace_count += 1
+                elif cleaned_text[i] == '}':
+                    brace_count -= 1
+                    if brace_count == 0:
+                        end_idx = i
+                        break
+            
+            if end_idx != -1:
+                json_string = cleaned_text[start_idx:end_idx + 1]
+        
+        # Method 2: If incomplete JSON, try to fix it by adding missing closing braces
+        if not json_string and start_idx != -1:
+            partial_json = cleaned_text[start_idx:]
+            open_braces = partial_json.count('{')
+            close_braces = partial_json.count('}')
+            
+            if open_braces > close_braces:
+                # Add missing closing braces
+                missing_braces = open_braces - close_braces
+                json_string = partial_json + '}' * missing_braces
+        
+        # Method 3: Last resort - use regex to find any JSON-like structure
+        if not json_string:
+            import re
+            json_match = re.search(r'\{[^}]*\}', cleaned_text, re.DOTALL)
+            if json_match:
+                json_string = json_match.group(0)
+        
+        if not json_string:
+            logging.error("No valid JSON structure found")
             logging.error(f"Raw response: {raw_text[:500]}...")
             return self._create_fallback_response(raw_text)
-        
-        # Find matching closing brace
-        brace_count = 0
-        end_idx = -1
-        for i in range(start_idx, len(cleaned_text)):
-            if cleaned_text[i] == '{':
-                brace_count += 1
-            elif cleaned_text[i] == '}':
-                brace_count -= 1
-                if brace_count == 0:
-                    end_idx = i
-                    break
-        
-        if end_idx == -1:
-            logging.error("No matching closing brace found")
-            logging.error(f"Raw response: {raw_text[:500]}...")
-            return self._create_fallback_response(raw_text)
-        
-        json_string = cleaned_text[start_idx:end_idx + 1]
         
         try:
             parsed = json.loads(json_string)
