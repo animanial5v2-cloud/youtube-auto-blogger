@@ -39,8 +39,19 @@ class GeminiService:
             # Initialize model
             model = genai.GenerativeModel(model_name)
             
-            # Ultra-simple prompt for memory efficiency
-            prompt = f"주제: {topic}. JSON: title, content, summary"
+            # JSON format prompt for consistent output
+            prompt = f"""주제: {topic}
+톤: {tone}
+독자: {audience}
+
+반드시 아래 JSON 형식으로만 응답하세요:
+{{
+  "title": "블로그 제목",
+  "content_with_placeholder": "HTML 태그 포함 블로그 내용 [IMAGE_HERE] 플레이스홀더 포함",
+  "summary": "요약",
+  "image_search_keywords": "키워드",
+  "hashtags": "#태그"
+}}"""
             
             # Prepare content for generation
             content_parts = [prompt]

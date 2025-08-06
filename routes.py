@@ -170,10 +170,12 @@ def generate_blog_post():
         image_url = None
         if image_source == 'pexels':
             pexels_api_key = settings.get('pexelsApiKey')
-            if pexels_api_key:
+            if pexels_api_key and pexels_api_key != 'test-key':
                 # Extract keywords for image search
                 keywords = [topic_or_url.split()[:3]]  # Simple keyword extraction
                 image_url = youtube_service.fetch_image_from_pexels(keywords, pexels_api_key)
+            else:
+                logging.warning("Pexels API key not provided or invalid, skipping image fetch")
         elif image_source == 'ai':
             gcp_project_id = settings.get('gcpProjectId')
             access_token = data.get('accessToken')
