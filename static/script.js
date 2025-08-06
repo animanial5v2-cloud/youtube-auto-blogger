@@ -382,10 +382,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 authStatus.textContent = '✅ 로그인 성공';
                 if(loginBtnText) loginBtnText.textContent = 'Google 로그아웃';
                 setChatInputEnabled(true);
-                // Reset content source to default (URL/text)
-                const urlRadio = document.querySelector('input[name="youtubeSourceType"][value="url"]');
-                if (urlRadio) {
-                    urlRadio.checked = true;
+                // Reset content source to default (transcript)
+                const transcriptRadio = document.querySelector('input[name="youtubeSourceType"][value="transcript"]');
+                if (transcriptRadio) {
+                    transcriptRadio.checked = true;
                     handleYoutubeSourceTypeChange();
                 }
                 break;
