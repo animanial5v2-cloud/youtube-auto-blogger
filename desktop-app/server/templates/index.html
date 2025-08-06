@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-container">
@@ -100,12 +100,7 @@
             </div>
             <footer class="sidebar-footer">
                 <button id="loginBtn" class="button-google">
-                    <svg aria-hidden="true" class="google-icon" viewBox="0 0 24 24">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.5 1 10.22 1 12s.43 3.5 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
-                    </svg>
+                    <svg aria-hidden="true" class="google-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path><path d="M1 1h22v22H1z" fill="none"></path></svg>
                     <span>Google 로그인</span>
                 </button>
                 <div id="authStatus" class="status-box hidden"></div>
@@ -127,11 +122,7 @@
             <div class="chat-input-area">
                 <div class="chat-mode-toggle">
                     <button id="topicDiscoveryBtn" title="주제 탐색 모드 켜기/끄기">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
-                            <path d="M12 9v4"></path>
-                            <path d="M12 17h.01"></path>
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
                         <span>주제 탐색</span>
                     </button>
                 </div>
@@ -139,10 +130,7 @@
                     <input type="text" id="chatInput" placeholder="여기에 포스팅 주제 또는 YouTube URL을 입력하세요..." autocomplete="off" disabled>
                     <button type="button" id="addToQueueFromChatBtn" title="큐에 추가" disabled>+</button>
                     <button type="submit" id="sendBtn" title="전송" disabled>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     </button>
                 </form>
             </div>
@@ -155,67 +143,15 @@
                 <button id="themeToggleBtn" class="button-icon" title="테마 전환">☀️</button>
             </div>
             <div class="settings-panel">
-                <details id="apiSettingsSection" class="collapsible-section" open>
-                    <summary class="sidebar-section-header">
-                        <h3 class="sidebar-section-title">API 설정</h3>
-                        <span class="collapse-icon"></span>
-                    </summary>
-                    <div class="collapsible-content-wrapper">
-                        <div class="form-group-description">
-                            💡 <strong>필수 설정:</strong> 블로그 자동 생성을 위해 필요한 API 키들을 입력하세요.<br>
-                            • <a href="https://aistudio.google.com/app/apikey" target="_blank">Gemini API 키 발급받기</a><br>
-                            • <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Client ID 발급받기</a><br>
-                            • Blogger 블로그 ID는 블로그 설정에서 확인 가능합니다.
-                        </div>
-                        <div class="form-group">
-                            <label for="apiKey">Gemini API 키</label>
-                            <input type="password" id="apiKey" placeholder="Gemini API 키 (AI 콘텐츠 생성용)">
-                        </div>
-                        <div class="form-group">
-                            <label for="clientId">Google Client ID</label>
-                            <input type="text" id="clientId" placeholder="Google OAuth Client ID (Blogger 접근용)">
-                        </div>
-                        <div class="form-group">
-                            <label for="blogId">블로그 ID</label>
-                            <input type="text" id="blogId" placeholder="Blogger 블로그 ID (숫자)">
-                            <small class="help-text">블로그 관리 → 설정 → 기본 → 블로그 ID에서 확인 가능</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="blogAddress">블로그 주소</label>
-                            <input type="text" id="blogAddress" placeholder="https://yourblog.blogspot.com">
-                            <small class="help-text">본인의 Blogger 블로그 주소를 입력하세요</small>
-                        </div>
-                    </div>
-                </details>
-
-                <details id="imageSettingsSection" class="collapsible-section" open>
-                    <summary class="sidebar-section-header">
-                        <h3 class="sidebar-section-title">이미지 소스</h3>
-                        <span class="collapse-icon"></span>
-                    </summary>
-                    <div class="collapsible-content-wrapper">
-                        <div class="form-group-description">
-                            🖼️ <strong>이미지 설정:</strong> 블로그 글에 삽입할 이미지 소스를 선택하세요.<br>
-                            • <strong>없음:</strong> 이미지 없이 텍스트만 생성<br>
-                            • <strong>Pexels:</strong> 무료 스톡 이미지 자동 검색 (<a href="https://www.pexels.com/api/" target="_blank">API 키 필요</a>)<br>
-                            • <strong>AI 생성:</strong> 주제에 맞는 이미지를 AI로 생성<br>
-                            • <strong>업로드:</strong> 직접 이미지 파일 업로드
-                        </div>
+                <div class="settings-group">
+                    <h3>이미지 소스</h3>
                     <div class="form-group image-source-selector">
-                        <input type="radio" name="imageSource" value="none" id="imageNone" checked>
-                        <label for="imageNone">없음</label>
-                        <input type="radio" name="imageSource" value="pexels" id="imagePexels">
-                        <label for="imagePexels">Pexels</label>
-                        <input type="radio" name="imageSource" value="ai" id="imageAi">
-                        <label for="imageAi">AI 생성</label>
-                        <input type="radio" name="imageSource" value="upload" id="imageUpload">
-                        <label for="imageUpload">업로드</label>
+                        <label><input type="radio" name="imageSource" value="none" checked> 없음</label>
+                        <label><input type="radio" name="imageSource" value="pexels"> Pexels</label>
+                        <label><input type="radio" name="imageSource" value="ai"> AI 생성</label>
+                        <label><input type="radio" name="imageSource" value="upload"> 업로드</label>
                     </div>
-                    <div id="pexelsConfig" class="form-group hidden">
-                        <label for="pexelsApiKey">Pexels API 키</label>
-                        <input type="password" id="pexelsApiKey" placeholder="Pexels API 키 (무료)">
-                        <small class="help-text">무료 계정으로 월 200회 이미지 검색 가능</small>
-                    </div>
+                    <div id="pexelsConfig" class="form-group hidden"><label for="pexelsApiKey">Pexels API 키</label><input type="password" id="pexelsApiKey" placeholder="Pexels API 키"></div>
                     <div id="aiImageConfig" class="form-group hidden">
                         <div class="form-group">
                             <label for="aiImageModel">AI 이미지 모델</label>
@@ -225,222 +161,143 @@
                         </div>
                         <div id="gcpProjectGroup" class="form-group">
                             <label for="gcpProjectId">GCP Project ID</label>
-                            <input type="text" id="gcpProjectId" placeholder="Google Cloud 프로젝트 ID">
-                            <small class="help-text">Google Cloud Console에서 프로젝트 생성 후 ID 입력</small>
+                            <input type="text" id="gcpProjectId" placeholder="Imagen 2용 GCP 프로젝트 ID">
                         </div>
                     </div>
                     <div id="uploadConfig" class="form-group hidden">
                         <label for="userImageUpload">이미지 파일</label>
                         <input type="file" id="userImageUpload" accept="image/jpeg, image/png, image/webp" class="file-input">
                         <div id="imagePreviewContainer" class="image-preview-container hidden">
-                            <img id="imagePreview" src="#" alt="Preview">
-                            <button id="removeImageBtn" type="button">&times;</button>
+                            <img id="imagePreview" src="#" alt="Preview"><button id="removeImageBtn">&times;</button>
                         </div>
                     </div>
-                    </div>
-                </details>
+                </div>
                 
-                <details id="contentSettingsSection" class="collapsible-section" open>
-                    <summary class="sidebar-section-header">
-                        <h3 class="sidebar-section-title">콘텐츠 소스</h3>
-                        <span class="collapse-icon"></span>
-                    </summary>
-                    <div class="collapsible-content-wrapper">
-                        <div class="form-group-description">
-                            🎬 <strong>YouTube 처리 방식:</strong> YouTube 영상을 블로그 글로 변환하는 방법을 선택하세요.<br>
-                            • <strong>자막:</strong> YouTube 자막을 추출하여 글 생성 (권장)<br>
-                            • <strong>음성:</strong> 영상 음성을 텍스트로 변환 (개발 중)<br>
-                            • <strong>동영상 파일:</strong> 직접 업로드한 동영상 파일 처리
-                        </div>
+                <div class="settings-group">
+                    <h3>콘텐츠 소스</h3>
                     <div class="form-group image-source-selector">
-                        <input type="radio" name="youtubeSourceType" value="transcript" id="youtubeTranscript" checked>
-                        <label for="youtubeTranscript">자막 (URL)</label>
-                        <input type="radio" name="youtubeSourceType" value="audio" id="youtubeAudio">
-                        <label for="youtubeAudio">음성 (URL)</label>
-                        <input type="radio" name="youtubeSourceType" value="videoFile" id="youtubeFile">
-                        <label for="youtubeFile">동영상 파일</label>
+                        <label><input type="radio" name="youtubeSourceType" value="transcript" checked> 자막 (URL)</label>
+                        <label><input type="radio" name="youtubeSourceType" value="audio"> 음성 (URL)</label>
+                        <label><input type="radio" name="youtubeSourceType" value="videoFile"> 동영상 파일</label>
                     </div>
-                    <div id="youtubeAudioWarning" class="form-group-description hidden">
-                        ⚠️ 음성 추출 기능은 개발 중입니다.
-                    </div>
+                    <p id="youtubeAudioWarning" class="info-text hidden">💡 음성/동영상 분석은 Gemini 1.5+ 모델만 지원합니다.</p>
                     <div id="videoUploadConfig" class="form-group hidden">
-                        <label for="userVideoUpload">동영상 파일</label>
-                        <input type="file" id="userVideoUpload" accept="video/*" class="file-input">
-                        <div id="videoFileInfo" class="hidden">
-                            <p>선택된 파일: <span id="videoFileName"></span></p>
-                            <button id="removeVideoBtn" type="button">파일 제거</button>
+                        <label for="userVideoUpload">동영상 파일 선택</label>
+                        <input type="file" id="userVideoUpload" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-flv,video/x-matroska" class="file-input">
+                        <div id="videoFileInfo" class="file-info-container hidden">
+                            <span id="videoFileName"></span>
+                            <button id="removeVideoBtn" class="remove-file-btn">&times;</button>
                         </div>
+                        <p class="form-group-description">동영상 파일을 선택한 경우, 위 채팅창에는 영상 내용을 요약할 <strong>주제</strong>를 입력해주세요.</p>
                     </div>
-                    </div>
-                </details>
+                </div>
 
-                <details id="postingOptionsSection" class="collapsible-section" open>
-                    <summary class="sidebar-section-header">
-                        <h3 class="sidebar-section-title">포스팅 옵션</h3>
-                        <span class="collapse-icon"></span>
-                    </summary>
-                    <div class="collapsible-content-wrapper">
-                        <div class="form-group-description">
-                            🌐 <strong>플랫폼 & 발행 설정:</strong> 블로그 플랫폼과 발행 방식을 설정하세요.<br>
-                            • <strong>플랫폼:</strong> Blogger, WordPress, Tistory, Naver 블로그 지원<br>
-                            • <strong>미리보기:</strong> 생성된 글을 검토 후 수동으로 발행<br>
-                            • <strong>임시 저장:</strong> 블로그에 초안으로만 저장 (즉시 발행 안함)
+                <div class="settings-group">
+                    <details id="apiKeysSection" class="collapsible-section" open>
+                        <summary class="settings-group-header">
+                            <h3>API 키 및 연동 정보</h3>
+                            <span class="collapse-icon"></span>
+                        </summary>
+                        <div class="collapsible-content-wrapper">
+                            <div class="form-group">
+                                <label for="apiKey">Google Gemini API 키</label>
+                                <input type="password" id="apiKey" placeholder="AIzaSy... 키 (콘텐츠 생성 및 주제 탐색용)">
+                                <p class="form-group-description">콘텐츠 생성 및 '주제 탐색'에 모두 사용됩니다. <a href="https://aistudio.google.com/app/apikey" target="_blank">여기서 발급받으세요.</a></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientId">Google OAuth 클라이언트 ID</label>
+                                <input type="password" id="clientId" placeholder="...apps.googleusercontent.com">
+                                <p class="form-group-description">Blogger 포스팅 연동에 필요합니다. <a href="https://console.cloud.google.com/apis/credentials" target="_blank">여기서 생성하세요.</a> (웹 애플리케이션 타입)</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="blogId">대상 블로그 ID</label>
+                                <input type="text" id="blogId" placeholder="Blogger URL의 blogID= 뒤 숫자">
+                                <p class="form-group-description">Blogger 대시보드 URL의 'blogID=' 뒤 숫자입니다.</p>
+                            </div>
+                             <div class="form-group">
+                                <label for="blogAddress">블로그 주소</label>
+                                <input type="text" id="blogAddress" placeholder="https://your-blog.blogspot.com">
+                                <p class="form-group-description">포스팅 후 바로가기 링크에 사용됩니다.</p>
+                            </div>
                         </div>
-                    
-                    <div class="form-group">
-                        <label for="platformSelect">발행 플랫폼</label>
-                        <select id="platformSelect">
-                            <option value="blogger" selected>Google Blogger</option>
-                            <option value="wordpress">WordPress.com</option>
-                            <option value="tistory">Tistory</option>
-                            <option value="naver">네이버 블로그</option>
-                        </select>
-                    </div>
+                    </details>
+                </div>
 
-                    <!-- Platform-specific configurations -->
-                    <div id="bloggerConfig" class="platform-config">
-                        <div class="form-group">
-                            <label for="bloggerBlogId">Blogger 블로그 ID</label>
-                            <input type="text" id="bloggerBlogId" placeholder="숫자로 된 블로그 ID">
-                            <small class="help-text">Blogger 관리 → 설정 → 기본에서 확인</small>
-                        </div>
-                    </div>
-
-                    <div id="wordpressConfig" class="platform-config hidden">
-                        <div class="form-group">
-                            <label for="wordpressSite">WordPress 사이트</label>
-                            <input type="text" id="wordpressSite" placeholder="yoursite.wordpress.com">
-                        </div>
-                        <div class="form-group">
-                            <label for="wordpressToken">WordPress API 토큰</label>
-                            <input type="password" id="wordpressToken" placeholder="WordPress.com API 토큰">
-                            <small class="help-text"><a href="https://developer.wordpress.com/apps/" target="_blank">WordPress.com에서 토큰 발급</a></small>
-                        </div>
-                    </div>
-
-                    <div id="tistoryConfig" class="platform-config hidden">
-                        <div class="status-box error" style="margin-bottom: 15px;">
-                            <strong>⚠️ 중요 공지</strong><br>
-                            Tistory는 2021년부터 공식 API를 중단했습니다.<br>
-                            자동 발행이 불가능하며, 생성된 콘텐츠를 수동으로 복사하여 포스팅해야 합니다.
-                        </div>
-                        <div class="form-group">
-                            <label for="tistoryBlogName">Tistory 블로그명</label>
-                            <input type="text" id="tistoryBlogName" placeholder="yourblog (예: myblog)">
-                            <small class="help-text">수동 포스팅을 위한 블로그명만 입력</small>
-                        </div>
-                    </div>
-
-                    <div id="naverConfig" class="platform-config hidden">
-                        <div class="form-group">
-                            <label for="naverBlogId">네이버 블로그 ID</label>
-                            <input type="text" id="naverBlogId" placeholder="네이버 블로그 ID">
-                        </div>
-                        <div class="form-group">
-                            <label for="naverClientId">네이버 Client ID</label>
-                            <input type="text" id="naverClientId" placeholder="네이버 개발자센터 Client ID">
-                        </div>
-                        <div class="form-group">
-                            <label for="naverClientSecret">네이버 Client Secret</label>
-                            <input type="password" id="naverClientSecret" placeholder="네이버 개발자센터 Client Secret">
-                            <small class="help-text"><a href="https://developers.naver.com/apps/" target="_blank">네이버 개발자센터에서 앱 등록</a></small>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="previewBeforePost">
-                            포스팅 전 미리보기
-                        </label>
+                <div class="settings-group">
+                    <h3>포스팅 옵션</h3>
+                    <div class="form-group toggle-group">
+                        <label for="previewBeforePost">발행 전 미리보기</label>
+                        <label class="switch"><input type="checkbox" id="previewBeforePost" checked><span class="slider"></span></label>
                     </div>
                     <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="postAsDraft">
-                            임시 저장으로 포스팅
-                        </label>
-                    </div>
-                    </div>
-                </details>
-
-                <details id="automationSection" class="collapsible-section">
-                    <summary class="sidebar-section-header">
-                        <h3 class="sidebar-section-title">자동화 & PC 제어</h3>
-                        <span class="collapse-icon"></span>
-                    </summary>
-                    <div class="collapsible-content-wrapper">
-                        <div class="form-group-description">
-                            🤖 <strong>고급 기능:</strong> 자동 포스팅 및 시스템 제어 기능입니다.<br>
-                            • <strong>자동 포스팅:</strong> 설정한 간격으로 자동으로 글 생성 및 발행<br>
-                            • <strong>PC 제어:</strong> 웹 환경에서는 지원되지 않습니다
+                        <div class="toggle-group">
+                            <label for="postAsDraft">초안으로 저장</label>
+                            <label class="switch"><input type="checkbox" id="postAsDraft" checked><span class="slider"></span></label>
                         </div>
-                    <div class="form-group">
-                        <label for="loopInterval">자동 포스팅 간격</label>
-                        <select id="loopInterval">
-                            <option value="30">30분</option>
-                            <option value="60" selected>1시간</option>
-                            <option value="120">2시간</option>
-                            <option value="180">3시간</option>
-                            <option value="360">6시간</option>
-                            <option value="720">12시간</option>
-                            <option value="1440">24시간</option>
-                        </select>
+                        <p class="form-group-description">Blogger에 공개글이 아닌 초안으로 포스트합니다. '미리보기' 기능이 꺼져있어도 적용됩니다.</p>
                     </div>
-                    <div class="form-group">
-                        <button id="startLoopBtn" class="button button-primary">자동 포스팅 시작</button>
-                        <button id="stopLoopBtn" class="button button-secondary">자동 포스팅 중지</button>
-                    </div>
-                    <div class="form-group">
-                        <button id="shutdownPcBtn" class="button button-secondary">PC 자동 종료</button>
-                        <button id="cancelShutdownBtn" class="button button-secondary">종료 취소</button>
-                    </div>
-                    </div>
-                </details>
+                </div>
 
-                <details id="queueSection" class="collapsible-section">
-                    <summary class="sidebar-section-header">
-                        <h3 class="sidebar-section-title">포스팅 대기열</h3>
-                        <span class="collapse-icon"></span>
-                    </summary>
-                    <div class="collapsible-content-wrapper">
-                        <div class="form-group-description">
-                            📋 <strong>대기열 관리:</strong> 여러 주제나 YouTube URL을 대기열에 추가하여 순차적으로 처리할 수 있습니다.<br>
-                            • 메인 채팅창에서 "+" 버튼을 눌러 대기열에 추가<br>
-                            • 대기 상태, 처리 중, 완료 상태를 실시간으로 확인
-                        </div>
+                <div class="settings-group">
+                    <h3>자동화 (일괄 포스팅)</h3>
                     <div id="postQueueContainer">
-                        <p>대기열이 비어있습니다.</p>
+                        <!-- JS will add queue items here -->
                     </div>
+                    <div class="form-group">
+                        <label for="loopInterval">포스팅 간격</label>
+                        <select id="loopInterval">
+                            <option value="60000">1분</option>
+                            <option value="300000">5분</option>
+                            <option value="600000">10분</option>
+                            <option value="1800000">30분</option>
+                            <option value="3600000" selected>1시간</option>
+                        </select>
                     </div>
-                </details>
+                    <div class="button-group">
+                        <button id="startLoopBtn" class="button-primary">일괄 시작</button>
+                        <button id="stopLoopBtn" class="button-secondary" disabled>일괄 중지</button>
+                    </div>
+                    <p class="form-group-description">주제/URL을 큐에 추가하고 '일괄 시작'을 누르면 설정된 간격으로 순차적으로 포스팅합니다. (최대 5개)<br><strong>참고:</strong> 일괄 포스팅은 주제/URL만 지원하며, 동영상 파일 업로드는 지원하지 않습니다.</p>
+                </div>
+
+                <div class="settings-group">
+                    <h3>PC 원격 제어 (Windows 전용)</h3>
+                    <div class="button-group">
+                        <button id="shutdownPcBtn" class="button-danger">다음 작업 후 PC 종료</button>
+                        <button id="cancelShutdownBtn" class="button-secondary">종료 취소</button>
+                    </div>
+                </div>
             </div>
         </aside>
     </div>
 
-    <!-- Preview Modal -->
-    <div id="previewModal" class="modal hidden">
+    <!-- Preview & Edit Modal -->
+    <div id="previewModal" class="modal-backdrop hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>포스팅 미리보기</h2>
-                <button id="closeModalBtn" class="button-icon">&times;</button>
+                <h2>콘텐츠 미리보기 및 수정</h2>
+                <button id="closeModalBtn" class="modal-close-btn">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label for="previewTitle">제목</label>
-                    <input type="text" id="previewTitle" readonly>
+                <div class="modal-guidance-text">
+                    <p>💡 <strong>이 내용은 AI 초안입니다.</strong> Google 정책 및 저작권 준수를 위해, 발행 전 반드시 자신의 생각과 경험을 담아 내용을 수정하고 보완해주세요.</p>
                 </div>
                 <div class="form-group">
-                    <label for="previewBody">내용</label>
-                    <textarea id="previewBody" readonly></textarea>
+                    <label for="previewTitle">제목</label>
+                    <input type="text" id="previewTitle">
+                </div>
+                <div class="form-group">
+                    <label for="previewBody">본문 (HTML)</label>
+                    <textarea id="previewBody" rows="15"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="cancelPostBtn" class="button button-secondary">취소</button>
-                <button id="approvePostBtn" class="button button-primary">포스팅 승인</button>
+                <button id="cancelPostBtn" class="button-secondary">취소</button>
+                <button id="approvePostBtn" class="button-primary">승인 및 포스팅</button>
             </div>
         </div>
     </div>
 
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
