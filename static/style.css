@@ -4,16 +4,16 @@
     --spacing-unit: 8px;
     --transition-speed: 0.2s;
 
-    /* New Color Palette - Inspired by modern IDEs */
-    --bg-color-dark: #0D1117;
-    --surface-color-dark: #161B22;
+    /* New Color Palette - Pure Black Theme */
+    --bg-color-dark: #000000;
+    --surface-color-dark: #111111;
     --primary-color-dark: #58A6FF;
     --secondary-color-dark: #3FB950;
-    --text-color-dark: #C9D1D9;
-    --text-secondary-dark: #8B949E;
+    --text-color-dark: #FFFFFF;
+    --text-secondary-dark: #CCCCCC;
     --error-color-dark: #F85149;
-    --border-color-dark: #30363D;
-    --input-bg-dark: #0D1117;
+    --border-color-dark: #333333;
+    --input-bg-dark: #000000;
 
     --bg-color-light: #F6F8FA;
     --surface-color-light: #FFFFFF;
@@ -64,6 +64,19 @@ body {
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+/* 기본 테마를 다크로 설정 */
+:root {
+    --bg-color: var(--bg-color-dark);
+    --surface-color: var(--surface-color-dark);
+    --primary-color: var(--primary-color-dark);
+    --secondary-color: var(--secondary-color-dark);
+    --text-color: var(--text-color-dark);
+    --text-secondary: var(--text-secondary-dark);
+    --error-color: var(--error-color-dark);
+    --border-color: var(--border-color-dark);
+    --input-bg: var(--input-bg-dark);
 }
 
 .app-container {
