@@ -36,14 +36,33 @@ class YouTubeService:
                 if video_id:
                     logging.info(f"Attempting transcript extraction for video ID: {video_id}")
                     
-                    # Try multiple languages
+                    # Try multiple languages with proper method calls
                     languages = ['ko', 'en', 'auto']
                     for lang in languages:
                         try:
-                            transcript_list = YouTubeTranscriptApi.get_transcript(video_id, languages=[lang])
-                            transcript_text = ' '.join([item['text'] for item in transcript_list])
-                            logging.info(f"Successfully extracted transcript in language: {lang}")
-                            break
+                            # Use list_transcripts to get available transcripts first
+                            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+                            
+                            # Try to get transcript in preferred language
+                            if lang == 'auto':
+                                # Get any available transcript
+                                try:
+                                    transcript = transcript_list.find_transcript(['ko'])
+                                except:
+                                    try:
+                                        transcript = transcript_list.find_transcript(['en'])
+                                    except:
+                                        transcript = transcript_list.find_generated_transcript(['ko'])
+                            else:
+                                transcript = transcript_list.find_transcript([lang])
+                            
+                            transcript_data = transcript.fetch()
+                            transcript_text = ' '.join([item['text'] for item in transcript_data])
+                            
+                            if transcript_text and len(transcript_text.strip()) > 50:
+                                logging.info(f"Successfully extracted transcript in language: {lang}, length: {len(transcript_text)}")
+                                break
+                            
                         except Exception as lang_error:
                             logging.warning(f"Failed to get transcript in {lang}: {str(lang_error)}")
                             continue
