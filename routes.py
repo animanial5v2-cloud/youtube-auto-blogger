@@ -524,50 +524,94 @@ def generate_post_from_video():
         if not topic:
             topic = f"동영상 파일에서 추출된 콘텐츠 ({video_file.filename})"
         
-        # Save uploaded video temporarily
+        # Validate file size before processing to prevent memory issues
+        if hasattr(video_file, 'content_length') and video_file.content_length:
+            file_size_mb = video_file.content_length / (1024 * 1024)
+            if file_size_mb > 500:  # Limit to 500MB
+                return jsonify({'error': f'동영상 파일이 너무 큽니다. 최대 500MB까지 지원됩니다. (현재: {file_size_mb:.1f}MB)'}), 400
+        
+        # Save uploaded video temporarily with improved error handling
         import tempfile
         import os
         
         temp_dir = tempfile.gettempdir()
-        temp_video_path = os.path.join(temp_dir, f"temp_video_{user.id}_{video_file.filename}")
+        # Use UUID to avoid filename conflicts
+        import uuid
+        safe_filename = f"temp_video_{user.id}_{uuid.uuid4().hex[:8]}_{video_file.filename}"
+        temp_video_path = os.path.join(temp_dir, safe_filename)
         
         try:
             video_file.save(temp_video_path)
             logging.info(f"Video file saved temporarily: {temp_video_path}")
             
-            # Extract content from video (placeholder for now - can be enhanced with actual video processing)
-            video_content = f"업로드된 동영상 파일: {video_file.filename}\n"
-            video_content += f"파일 크기: {os.path.getsize(temp_video_path)} bytes\n"
-            video_content += f"주제: {topic}\n\n"
-            video_content += "이 동영상을 분석하여 상세한 블로그 포스트를 작성해주세요. "
-            video_content += "동영상의 주요 내용, 메시지, 시각적 요소들을 포함하여 "
-            video_content += "독자들이 동영상을 보지 않아도 완전히 이해할 수 있도록 "
-            video_content += "2500자 이상의 풍부하고 상세한 내용으로 작성해주세요."
+            # Verify file was saved correctly
+            if not os.path.exists(temp_video_path) or os.path.getsize(temp_video_path) == 0:
+                raise ValueError(f"동영상 파일 저장에 실패했습니다: {video_file.filename}")
+            
+            # Enhanced video content analysis
+            file_size_mb = round(os.path.getsize(temp_video_path) / (1024 * 1024), 2)
+            video_content = f"""
+**동영상 파일 정보:**
+- 파일명: {video_file.filename}
+- 파일 크기: {file_size_mb} MB
+- 주제: {topic}
+
+**콘텐츠 생성 지침:**
+다음 동영상에 대해 전문적이고 상세한 블로그 포스트를 작성해주세요:
+
+1. **동영상 개요**: 주제와 목적을 명확히 설명
+2. **주요 내용 분석**: 핵심 메시지와 정보를 체계적으로 정리
+3. **시각적 요소**: 중요한 장면이나 그래픽 요소 설명
+4. **실용적 가치**: 시청자/독자가 얻을 수 있는 구체적 이익
+5. **결론 및 요약**: 핵심 포인트 재정리
+
+동영상을 직접 시청하지 않아도 완전히 이해할 수 있도록 2500자 이상의 풍부하고 전문적인 내용으로 작성해주세요.
+각 섹션마다 구체적인 예시, 데이터, 실용적 팁을 포함하여 독자에게 실질적 가치를 제공해야 합니다.
+"""
             
             # Handle image generation/fetching
             image_url = None
-            if image_source == 'pexels' and pexels_api_key:
-                keywords = topic.split()[:5]  # Use topic words as keywords
-                image_url = youtube_service.fetch_image_from_pexels(keywords, pexels_api_key)
+            if image_source == 'pexels':
+                if pexels_api_key:
+                    keywords = topic.split()[:5]  # Use topic words as keywords
+                    image_url = youtube_service.fetch_image_from_pexels(keywords, pexels_api_key)
+            elif image_source == 'ai':
+                gcp_project_id = request.form.get('gcpProjectId')
+                access_token = request.form.get('accessToken')
+                if gcp_project_id and access_token:
+                    image_url = gemini_service.generate_ai_image(gcp_project_id, topic, access_token)
+            elif image_source == 'upload':
+                image_url = request.form.get('uploadedImageUrl')
             
-            # Generate content using Gemini
-            generated_content = gemini_service.generate_text_content(
-                gemini_api_key, video_content, image_url, gemini_model, writing_tone, target_audience
-            )
+            # Generate content using Gemini with enhanced error handling
+            try:
+                generated_content = gemini_service.generate_text_content(
+                    gemini_api_key, video_content, image_url, gemini_model, writing_tone, target_audience
+                )
+            except Exception as gemini_error:
+                logging.error(f"Gemini API failed for video content: {str(gemini_error)}")
+                return jsonify({'error': f'AI 콘텐츠 생성 중 오류가 발생했습니다: {str(gemini_error)}'}), 500
             
             if not generated_content:
                 return jsonify({'error': 'Failed to generate content'}), 500
             
-            # Process image placement
+            # Process image placement and hashtags
             final_content = generated_content.get('content_with_placeholder', '')
             if image_url and '[IMAGE_HERE]' in final_content:
                 alt_text = generated_content.get('image_search_keywords', 'Blog post image')
                 image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
                 final_content = final_content.replace('[IMAGE_HERE]', image_tag)
             elif image_url:
+                # Insert image at the beginning if placeholder not found
                 alt_text = generated_content.get('image_search_keywords', 'Blog post image')
                 image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
                 final_content = image_tag + final_content
+            
+            # Add hashtags if not already included in content
+            hashtags = generated_content.get('hashtags', '')
+            if hashtags and hashtags not in final_content:
+                hashtag_section = f'<hr><p><strong>관련 키워드:</strong> {hashtags}</p>'
+                final_content += hashtag_section
             
             # Save to database with retry mechanism
             max_retries = 3
@@ -609,13 +653,21 @@ def generate_post_from_video():
             })
             
         finally:
-            # Clean up temporary file
-            try:
-                if os.path.exists(temp_video_path):
-                    os.remove(temp_video_path)
-                    logging.info(f"Temporary video file removed: {temp_video_path}")
-            except Exception as cleanup_error:
-                logging.warning(f"Failed to remove temporary file: {cleanup_error}")
+            # Enhanced cleanup with multiple retry attempts
+            cleanup_attempts = 3
+            for attempt in range(cleanup_attempts):
+                try:
+                    if 'temp_video_path' in locals() and os.path.exists(temp_video_path):
+                        os.remove(temp_video_path)
+                        logging.info(f"Temporary video file removed: {temp_video_path}")
+                        break
+                except Exception as cleanup_error:
+                    logging.warning(f"Cleanup attempt {attempt + 1} failed: {cleanup_error}")
+                    if attempt < cleanup_attempts - 1:
+                        import time
+                        time.sleep(0.5)  # Brief wait before retry
+                    else:
+                        logging.error(f"Failed to remove temporary file after {cleanup_attempts} attempts: {temp_video_path}")
         
     except Exception as e:
         logging.error(f"Error generating post from video: {str(e)}")

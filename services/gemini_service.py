@@ -88,31 +88,51 @@ class GeminiService:
                 except Exception as e:
                     logging.warning(f"Failed to process image: {str(e)}")
             
-            # Generate content with retry and timeout handling
+            # Generate content with enhanced retry and memory optimization
             max_retries = 3
             for attempt in range(max_retries):
                 try:
                     import time
-                    # Add small delay between attempts
-                    if attempt > 0:
-                        time.sleep(2 ** attempt)  # Exponential backoff
+                    import gc
                     
+                    # Force garbage collection before each attempt
+                    gc.collect()
+                    
+                    # Add progressive delay between attempts  
+                    if attempt > 0:
+                        delay = min(2 ** attempt, 8)  # Cap at 8 seconds
+                        time.sleep(delay)
+                        logging.info(f"Retrying Gemini API call (attempt {attempt + 1}) after {delay}s delay")
+                    
+                    # Use reduced token limits to prevent memory issues
                     result = model.generate_content(
                         content_parts,
                         generation_config=genai.GenerationConfig(
                             temperature=0.7,
                             top_p=0.8,
                             top_k=40,
-                            max_output_tokens=8192,
+                            max_output_tokens=4096,  # Reduced from 8192 to prevent memory issues
                             candidate_count=1
                         )
                     )
                     
-                    if not result or not result.text:
-                        raise ValueError("Empty response from Gemini API")
+                    if not result:
+                        raise ValueError("Empty result from Gemini API")
+                        
+                    if not hasattr(result, 'text') or not result.text:
+                        logging.error(f"No text in Gemini result: {result}")
+                        raise ValueError("Empty text response from Gemini API")
                     
-                    generated_text = result.text
-                    logging.info("Gemini text generation completed successfully")
+                    generated_text = result.text.strip()
+                    if len(generated_text) < 100:  # Sanity check
+                        raise ValueError(f"Response too short: {len(generated_text)} characters")
+                    
+                    logging.info(f"Gemini text generation completed successfully ({len(generated_text)} characters)")
+                    
+                    # Clear result from memory
+                    result = None
+                    gc.collect()
+                    
                     return self._parse_gemini_json_response(generated_text)
                     
                 except Exception as retry_error:
