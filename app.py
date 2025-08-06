@@ -8,6 +8,10 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
+# Set API key directly in environment for this session
+if not os.getenv('GOOGLE_GEMINI_API_KEY'):
+    os.environ['GOOGLE_GEMINI_API_KEY'] = 'AIzaSyA-1kPIM5abvqGmHohb-6fOQ1PRqYjK-6Y'
+
 class Base(DeclarativeBase):
     pass
 

@@ -18,7 +18,7 @@ except ImportError:
 
 class GeminiService:
     def __init__(self):
-        self.api_key = os.getenv('GEMINI_API_KEY')
+        self.api_key = os.getenv('GOOGLE_GEMINI_API_KEY') or os.getenv('GEMINI_API_KEY')
         if self.api_key and HAS_GENAI:
             genai.configure(api_key=self.api_key)
     
