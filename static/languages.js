@@ -124,7 +124,34 @@ const translations = {
         geminiApiKey: "Gemini API 키",
         googleClientId: "Google Client ID",
         blogId: "블로그 ID",
-        blogAddress: "블로그 주소"
+        blogAddress: "블로그 주소",
+        
+        // Responsibility warning
+        responsibilityTitle: "⚠️ 책임감 있는 사용 가이드",
+        responsibilityText1: "본 프로그램은 콘텐츠 제작을 돕는",
+        responsibilityTool: "'도구'",
+        responsibilityText2: "이며, 생성된 콘텐츠의 저작권 및 각종 정책 준수에 대한",
+        responsibilityFinal: "최종 책임은 사용자에게 있습니다.",
+        responsibilityText3: "AI 생성 및 YouTube 변환 콘텐츠를 그대로 사용할 경우, Google 검색 스팸 정책, 애드센스 정책, 저작권법 등에 위배되어 불이익을 받을 수 있습니다.",
+        responsibilityRecommended: "권장 사용법:",
+        responsibilityText4: "생성된 콘텐츠는",
+        responsibilityDraft: "'초안'",
+        responsibilityText5: "으로만 활용하세요. 자신의 지식, 경험, 의견을 충분히 추가하여 독창적인 게시물로 재창조하는 것이 중요합니다.",
+        
+        // Gemini model options
+        geminiSeries25: "Gemini 2.5 Series (멀티모달 텍스트 출력)",
+        geminiSeries20: "Gemini 2.0 Series (멀티모달 텍스트 출력)",
+        geminiSeries15: "Gemini 1.5 Series (안정 버전)",
+        geminiSeries10: "Gemini 1.0 Series",
+        geminiSpecialPurpose: "특수 목적 모델 (블로그 생성 불가)",
+        geminiDeprecated: "지원 중단된 모델",
+        
+        // Chat messages
+        chatWelcome1: "안녕하세요! AI 자동 블로깅 스튜디오입니다.",
+        chatWelcome2: "아래 입력창에 포스팅할 주제, YouTube URL을 입력하거나, 오른쪽 '콘텐츠 소스'에서 동영상 파일을 선택한 후 전송 버튼(➤)을 누르세요.",
+        chatWelcome3: "아이디어가 필요하시면 '주제 탐색' 모드를 켜고 대화를 시작할 수 있습니다.",
+        topicDiscovery: "주제 탐색",
+        chatInputPlaceholder: "여기에 포스팅 주제 또는 YouTube URL을 입력하세요..."
     },
     
     en: {
@@ -251,7 +278,34 @@ const translations = {
         geminiApiKey: "Gemini API Key",
         googleClientId: "Google Client ID",
         blogId: "Blog ID",
-        blogAddress: "Blog Address"
+        blogAddress: "Blog Address",
+        
+        // Responsibility warning
+        responsibilityTitle: "⚠️ Responsible Usage Guide",
+        responsibilityText1: "This program is a",
+        responsibilityTool: "'tool'",
+        responsibilityText2: "to help create content, and the",
+        responsibilityFinal: "final responsibility for copyright and policy compliance of generated content lies with the user.",
+        responsibilityText3: "Using AI-generated and YouTube-converted content as-is may violate Google search spam policies, AdSense policies, copyright laws, etc., and may result in penalties.",
+        responsibilityRecommended: "Recommended usage:",
+        responsibilityText4: "Use generated content only as a",
+        responsibilityDraft: "'draft'",
+        responsibilityText5: ". It's important to add your own knowledge, experience, and opinions to recreate it as original content.",
+        
+        // Gemini model options
+        geminiSeries25: "Gemini 2.5 Series (Multimodal text output)",
+        geminiSeries20: "Gemini 2.0 Series (Multimodal text output)",
+        geminiSeries15: "Gemini 1.5 Series (Stable version)",
+        geminiSeries10: "Gemini 1.0 Series",
+        geminiSpecialPurpose: "Special purpose models (Cannot generate blogs)",
+        geminiDeprecated: "Deprecated models",
+        
+        // Chat messages
+        chatWelcome1: "Hello! This is AI Auto-Blogging Studio.",
+        chatWelcome2: "Enter a posting topic or YouTube URL in the input field below, or select a video file from 'Content Source' on the right and press the send button (➤).",
+        chatWelcome3: "If you need ideas, you can turn on 'Topic Discovery' mode and start a conversation.",
+        topicDiscovery: "Topic Discovery",
+        chatInputPlaceholder: "Enter your posting topic or YouTube URL here..."
     },
     
     vi: {
@@ -379,7 +433,34 @@ const translations = {
         geminiApiKey: "Khóa API Gemini",
         googleClientId: "Google Client ID",
         blogId: "ID Blog",
-        blogAddress: "Địa chỉ Blog"
+        blogAddress: "Địa chỉ Blog",
+        
+        // Responsibility warning
+        responsibilityTitle: "⚠️ Hướng dẫn Sử dụng Có trách nhiệm",
+        responsibilityText1: "Chương trình này là một",
+        responsibilityTool: "'công cụ'",
+        responsibilityText2: "để hỗ trợ tạo nội dung, và",
+        responsibilityFinal: "trách nhiệm cuối cùng về bản quyền và tuân thủ chính sách của nội dung được tạo thuộc về người dùng.",
+        responsibilityText3: "Sử dụng nội dung được tạo bởi AI và chuyển đổi từ YouTube nguyên bản có thể vi phạm chính sách spam tìm kiếm Google, chính sách AdSense, luật bản quyền, v.v., và có thể dẫn đến hình phạt.",
+        responsibilityRecommended: "Cách sử dụng được khuyến nghị:",
+        responsibilityText4: "Chỉ sử dụng nội dung được tạo làm",
+        responsibilityDraft: "'bản thảo'",
+        responsibilityText5: ". Điều quan trọng là thêm kiến thức, kinh nghiệm và ý kiến của riêng bạn để tái tạo thành nội dung gốc.",
+        
+        // Gemini model options
+        geminiSeries25: "Gemini 2.5 Series (Đầu ra văn bản đa phương thức)",
+        geminiSeries20: "Gemini 2.0 Series (Đầu ra văn bản đa phương thức)",
+        geminiSeries15: "Gemini 1.5 Series (Phiên bản ổn định)",
+        geminiSeries10: "Gemini 1.0 Series",
+        geminiSpecialPurpose: "Mô hình mục đích đặc biệt (Không thể tạo blog)",
+        geminiDeprecated: "Mô hình đã ngừng hỗ trợ",
+        
+        // Chat messages
+        chatWelcome1: "Xin chào! Đây là AI Auto-Blogging Studio.",
+        chatWelcome2: "Nhập chủ đề bài viết hoặc URL YouTube vào ô nhập bên dưới, hoặc chọn tệp video từ 'Nguồn Nội dung' bên phải và nhấn nút gửi (➤).",
+        chatWelcome3: "Nếu bạn cần ý tưởng, bạn có thể bật chế độ 'Khám phá Chủ đề' và bắt đầu cuộc trò chuyện.",
+        topicDiscovery: "Khám phá Chủ đề",
+        chatInputPlaceholder: "Nhập chủ đề bài viết hoặc URL YouTube của bạn ở đây..."
     }
 };
 
@@ -397,7 +478,11 @@ function changeLanguage(lang) {
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
         if (translation[key]) {
-            element.textContent = translation[key];
+            if (element.tagName === 'OPTGROUP') {
+                element.label = translation[key];
+            } else {
+                element.textContent = translation[key];
+            }
         }
     });
     
