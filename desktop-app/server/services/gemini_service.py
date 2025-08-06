@@ -2,17 +2,23 @@ import logging
 import json
 import os
 import requests
-import google.generativeai as genai
+try:
+    import google.generativeai as genai
+except ImportError:
+    genai = None
 
 class GeminiService:
     def __init__(self):
         self.api_key = os.getenv('GEMINI_API_KEY')
-        if self.api_key:
+        if self.api_key and genai:
             genai.configure(api_key=self.api_key)
     
     def generate_text_content(self, api_key, topic, image_url=None, model_name='gemini-1.5-pro-latest', tone='친근한', audience=''):
         """Generate blog content using Gemini API"""
         try:
+            if not genai:
+                raise ValueError("Google Generative AI library not available")
+                
             # Use provided API key or fallback to environment
             effective_api_key = api_key or self.api_key
             if not effective_api_key:
@@ -91,13 +97,13 @@ class GeminiService:
                     
                     result = model.generate_content(
                         content_parts,
-                        generation_config={
-                            'temperature': 0.7,
-                            'top_p': 0.8,
-                            'top_k': 40,
-                            'max_output_tokens': 8192,
-                            'candidate_count': 1
-                        }
+                        generation_config=genai.GenerationConfig(
+                            temperature=0.7,
+                            top_p=0.8,
+                            top_k=40,
+                            max_output_tokens=8192,
+                            candidate_count=1
+                        )
                     )
                     
                     if not result or not result.text:
@@ -121,17 +127,26 @@ class GeminiService:
     def _data_uri_to_generative_part(self, uri):
         """Convert data URI to Gemini generative part"""
         import re
+        import base64
         match = re.match(r'^data:(.+);base64,(.+)$', uri)
         if not match:
             raise ValueError('Invalid data URI format')
         
-        mime_type, data = match.groups()
-        return {
-            'inline_data': {
+        mime_type, base64_data = match.groups()
+        # Decode base64 data to bytes
+        image_data = base64.b64decode(base64_data)
+        
+        # Return proper Part object for Gemini
+        if genai and hasattr(genai, 'types'):
+            return genai.types.BlobDict({
                 'mime_type': mime_type,
-                'data': data
+                'data': image_data
+            })
+        else:
+            return {
+                'mime_type': mime_type,
+                'data': image_data
             }
-        }
     
     def _parse_gemini_json_response(self, raw_text):
         """Parse JSON response from Gemini output"""

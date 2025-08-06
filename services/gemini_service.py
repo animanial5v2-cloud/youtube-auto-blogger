@@ -2,17 +2,23 @@ import logging
 import json
 import os
 import requests
-import google.generativeai as genai
+try:
+    import google.generativeai as genai
+except ImportError:
+    genai = None
 
 class GeminiService:
     def __init__(self):
         self.api_key = os.getenv('GEMINI_API_KEY')
-        if self.api_key:
+        if self.api_key and genai:
             genai.configure(api_key=self.api_key)
     
     def generate_text_content(self, api_key, topic, image_url=None, model_name='gemini-1.5-pro-latest', tone='친근한', audience=''):
         """Generate blog content using Gemini API"""
         try:
+            if not genai:
+                raise ValueError("Google Generative AI library not available")
+                
             # Use provided API key or fallback to environment
             effective_api_key = api_key or self.api_key
             if not effective_api_key:
@@ -131,10 +137,16 @@ class GeminiService:
         image_data = base64.b64decode(base64_data)
         
         # Return proper Part object for Gemini
-        return genai.types.BlobDict({
-            'mime_type': mime_type,
-            'data': image_data
-        })
+        if genai and hasattr(genai, 'types'):
+            return genai.types.BlobDict({
+                'mime_type': mime_type,
+                'data': image_data
+            })
+        else:
+            return {
+                'mime_type': mime_type,
+                'data': image_data
+            }
     
     def _parse_gemini_json_response(self, raw_text):
         """Parse JSON response from Gemini output"""
