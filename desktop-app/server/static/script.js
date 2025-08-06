@@ -539,21 +539,23 @@ document.addEventListener('DOMContentLoaded', () => {
             endpoint = '/generate-post-from-youtube';
             requestBody = { urls: [topicOrUrl], youtubeSourceType };
         } else {
-            endpoint = '/generate-post';
-            requestBody = { topic: topicOrUrl };
+            endpoint = '/api/generate';
+            requestBody = { input: topicOrUrl };
         }
 
         const commonData = {
-            apiKey: apiKeyInput.value.trim(),
-            modelName: geminiModelSelect.value,
-            imageSource: imageSource,
-            aiImageModel: aiImageModelSelect.value,
-            gcpProjectId: gcpProjectIdInput.value.trim(),
-            pexelsApiKey: pexelsApiKeyInput.value.trim(),
+            settings: {
+                apiKey: apiKeyInput.value.trim(),
+                geminiModel: geminiModelSelect.value,
+                imageSource: imageSource,
+                aiImageModel: aiImageModelSelect.value,
+                gcpProjectId: gcpProjectIdInput.value.trim(),
+                pexelsApiKey: pexelsApiKeyInput.value.trim(),
+                writingTone: writingToneSelect.value,
+                targetAudience: targetAudienceInput.value.trim()
+            },
             accessToken: accessToken,
-            tone: writingToneSelect.value,
-            audience: targetAudienceInput.value.trim(),
-            uploadedImageUri: (imageSource === 'upload' && userImageUpload.files[0]) ? imagePreview.src : null
+            uploadedImageUrl: (imageSource === 'upload' && userImageUpload.files[0]) ? imagePreview.src : null
         };
 
         if (requestBody) { // JSON request
