@@ -42,6 +42,29 @@ const translations = {
         googleClientId: "Google Client ID",
         blogId: "블로그 ID",
         
+        // Content Settings Summary
+        contentSettingsSummary: "콘텐츠 설정 요약",
+        contentSource: "콘텐츠 소스",
+        notSpecified: "지정되지 않음",
+        
+        // Final prompt
+        finalPrompt: "최종 프롬프트 (선택적 편집)",
+        
+        // Placeholders
+        aiContentGeneration: "AI 콘텐츠 생성",
+        bloggerAccess: "Blogger 접근",
+        bloggerBlogId: "Blogger 블로그 ID (숫자)",
+        bloggerBlogAddress: "https://yourblog.blogspot.com",
+        enterYourBlogTopic: "블로그 주제를 입력하세요...",
+        aiDetailedInstructions: "AI에게 전달할 상세한 지시사항을 입력하세요...",
+        finalAiInstructions: "AI에게 전달할 최종 지시사항...",
+        connectGoogleAccount: "블로그 게시를 위해 Google 계정을 연결하세요",
+        loginRequired: "로그인이 필요합니다",
+        reviewSettingsCreate: "설정을 검토하고 블로그 콘텐츠를 생성하세요",
+        customizeContentStyle: "콘텐츠 스타일과 독자층을 맞춤 설정하세요",
+        itBeginners: "예: IT 초보자",
+        configureAiConnections: "AI와 블로그 연결을 구성하세요",
+        
         // Buttons
         start: "시작",
         stop: "정지",
@@ -106,6 +129,29 @@ const translations = {
         geminiApiKey: "Gemini API Key",
         googleClientId: "Google Client ID",
         blogId: "Blog ID",
+        
+        // Content Settings Summary
+        contentSettingsSummary: "Content Settings Summary",
+        contentSource: "Content Source",
+        notSpecified: "Not specified",
+        
+        // Final prompt
+        finalPrompt: "Final Prompt (optional edit)",
+        
+        // Placeholders
+        aiContentGeneration: "AI content generation",
+        bloggerAccess: "Blogger access",
+        bloggerBlogId: "Blogger blog ID (numbers)",
+        bloggerBlogAddress: "https://yourblog.blogspot.com",
+        enterYourBlogTopic: "Enter your blog topic...",
+        aiDetailedInstructions: "Enter detailed instructions for AI...",
+        finalAiInstructions: "Final instructions for AI...",
+        connectGoogleAccount: "Connect your Google account for blog publishing",
+        loginRequired: "Login required",
+        reviewSettingsCreate: "Review settings and create your blog content",
+        customizeContentStyle: "Customize your content style and audience",
+        itBeginners: "e.g., IT beginners",
+        configureAiConnections: "Configure your AI and blog connections",
         
         // Buttons
         start: "Start",

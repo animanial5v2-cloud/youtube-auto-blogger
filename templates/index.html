@@ -159,27 +159,27 @@
                     <!-- 스크린 1: API 설정 -->
                     <div id="screen-api-settings" class="mobile-screen active">
                         <div class="screen-header">
-                            <h2 class="screen-title" data-i18n="apiKey">Khóa API bắt buộc</h2>
-                            <p class="screen-subtitle" data-i18n="configureAiConnections">Cấu hình AI và kết nối blog của bạn</p>
+                            <h2 class="screen-title" data-i18n="apiKey">필수 API 키</h2>
+                            <p class="screen-subtitle" data-i18n="configureAiConnections">AI와 블로그 연결을 구성하세요</p>
                         </div>
                         <div class="screen-content">
                             <div class="form-group">
-                                <label data-i18n="geminiApiKey">Khóa API Gemini</label>
-                                <input type="password" id="mobileApiKey" data-i18n-placeholder="aiContentGeneration" placeholder="Tạo nội dung AI">
+                                <label data-i18n="geminiApiKey">Gemini API 키</label>
+                                <input type="password" id="mobileApiKey" data-i18n-placeholder="aiContentGeneration" placeholder="AI 콘텐츠 생성">
                             </div>
                             
                             <div class="form-group">
-                                <label data-i18n="googleClientId">ID Khách hàng Google</label>
-                                <input type="text" id="mobileClientId" data-i18n-placeholder="bloggerAccess" placeholder="Truy cập Blogger">
+                                <label data-i18n="googleClientId">Google Client ID</label>
+                                <input type="text" id="mobileClientId" data-i18n-placeholder="bloggerAccess" placeholder="Blogger 접근">
                             </div>
                             
                             <div class="form-group">
-                                <label data-i18n="blogId">ID Blog</label>
-                                <input type="text" id="mobileBlogId" data-i18n-placeholder="bloggerBlogId" placeholder="ID blog Blogger (số)">
+                                <label data-i18n="blogId">블로그 ID</label>
+                                <input type="text" id="mobileBlogId" data-i18n-placeholder="bloggerBlogId" placeholder="Blogger 블로그 ID (숫자)">
                             </div>
                             
                             <div class="form-group">
-                                <label data-i18n="blogAddress">Địa chỉ Blog</label>
+                                <label data-i18n="blogAddress">블로그 주소</label>
                                 <input type="text" id="mobileBlogAddress" data-i18n-placeholder="bloggerBlogAddress" placeholder="https://yourblog.blogspot.com">
                             </div>
                         </div>
@@ -188,17 +188,17 @@
                     <!-- 스크린 2: Google 로그인 -->
                     <div id="screen-login" class="mobile-screen">
                         <div class="screen-header">
-                            <h2 class="screen-title" data-i18n="authentication">Xác thực</h2>
-                            <p class="screen-subtitle" data-i18n="connectGoogleAccount">Kết nối tài khoản Google của bạn để xuất bản blog</p>
+                            <h2 class="screen-title" data-i18n="authentication">인증</h2>
+                            <p class="screen-subtitle" data-i18n="connectGoogleAccount">블로그 게시를 위해 Google 계정을 연결하세요</p>
                         </div>
                         <div class="screen-content">
                             <div class="form-group">
                                 <div id="mobileAuthStatus" class="auth-status-mobile" data-i18n="loginRequired">
-                                    Yêu cầu đăng nhập
+                                    로그인이 필요합니다
                                 </div>
                                 
                                 <button id="mobileLoginBtn" class="mobile-auth-btn" data-i18n="login">
-                                    Đăng nhập
+                                    로그인
                                 </button>
                             </div>
                         </div>
@@ -207,23 +207,23 @@
                     <!-- 스크린 3: 콘텐츠 소스 -->
                     <div id="screen-content-source" class="mobile-screen">
                         <div class="screen-header">
-                            <h2 class="screen-title" data-i18n="contentInput">Nguồn nội dung</h2>
-                            <p class="screen-subtitle" data-i18n="contentInputSubtitle">Chọn phương pháp tạo nội dung</p>
+                            <h2 class="screen-title" data-i18n="contentInput">콘텐츠 소스</h2>
+                            <p class="screen-subtitle" data-i18n="contentInputSubtitle">콘텐츠 생성 방법을 선택하세요</p>
                         </div>
                         <div class="screen-content">
                             <div class="form-group">
-                                <label data-i18n="youtubeUrl">URL YouTube</label>
+                                <label data-i18n="youtubeUrl">YouTube URL</label>
                                 <input type="text" id="mobileYoutubeUrl" placeholder="https://www.youtube.com/watch?v=...">
                             </div>
                             
                             <div class="form-group">
-                                <label data-i18n="topicInput">Nhập chủ đề</label>
-                                <textarea id="mobileTopicInput" data-i18n-placeholder="enterYourBlogTopic" placeholder="Nhập chủ đề blog của bạn..." rows="4"></textarea>
+                                <label data-i18n="topicInput">주제 입력</label>
+                                <textarea id="mobileTopicInput" data-i18n-placeholder="enterYourBlogTopic" placeholder="블로그 주제를 입력하세요..." rows="4"></textarea>
                             </div>
                             
                             <div class="form-group">
-                                <label data-i18n="promptInput">Nhập prompt</label>
-                                <textarea id="mobilePromptInput" data-i18n-placeholder="aiDetailedInstructions" placeholder="Nhập hướng dẫn chi tiết cho AI..." rows="3"></textarea>
+                                <label data-i18n="promptInput">프롬프트 입력</label>
+                                <textarea id="mobilePromptInput" data-i18n-placeholder="aiDetailedInstructions" placeholder="AI에게 전달할 상세한 지시사항을 입력하세요..." rows="3"></textarea>
                             </div>
                         </div>
                     </div>
@@ -231,24 +231,24 @@
                     <!-- 스크린 4: 글쓰기 설정 -->
                     <div id="screen-writing-settings" class="mobile-screen">
                         <div class="screen-header">
-                            <h2 class="screen-title" data-i18n="writingTone">Giọng điệu & Phong cách viết</h2>
-                            <p class="screen-subtitle" data-i18n="customizeContentStyle">Tùy chỉnh phong cách nội dung và đối tượng của bạn</p>
+                            <h2 class="screen-title" data-i18n="writingTone">글쓰기 톤 & 스타일</h2>
+                            <p class="screen-subtitle" data-i18n="customizeContentStyle">콘텐츠 스타일과 독자층을 맞춤 설정하세요</p>
                         </div>
                         <div class="screen-content">
                             <div class="form-group">
-                                <label data-i18n="writingTone">Giọng điệu & Phong cách viết</label>
+                                <label data-i18n="writingTone">글쓰기 톤 & 스타일</label>
                                 <select id="mobileWritingTone">
-                                    <option value="friendly" data-i18n-option="friendly">Thân thiện</option>
-                                    <option value="professional" data-i18n-option="professional">Chuyên nghiệp</option>
-                                    <option value="casual" data-i18n-option="casual">Thoải mái</option>
-                                    <option value="formal" data-i18n-option="formal">Trang trọng</option>
-                                    <option value="humorous" data-i18n-option="humorous">Hài hước</option>
+                                    <option value="friendly" data-i18n-option="friendly">친근한</option>
+                                    <option value="professional" data-i18n-option="professional">전문적인</option>
+                                    <option value="casual" data-i18n-option="casual">캐주얼한</option>
+                                    <option value="formal" data-i18n-option="formal">격식있는</option>
+                                    <option value="humorous" data-i18n-option="humorous">유머러스한</option>
                                 </select>
                             </div>
                             
                             <div class="form-group">
-                                <label data-i18n="targetAudience">Đối tượng mục tiêu</label>
-                                <input type="text" id="mobileTargetAudience" data-i18n-placeholder="itBeginners" placeholder="ví dụ: Người mới bắt đầu IT">
+                                <label data-i18n="targetAudience">타겟 독자층</label>
+                                <input type="text" id="mobileTargetAudience" data-i18n-placeholder="itBeginners" placeholder="예: IT 초보자">
                             </div>
                         </div>
                     </div>
@@ -256,36 +256,36 @@
                     <!-- 스크린 5: 생성하기 -->
                     <div id="screen-generate" class="mobile-screen">
                         <div class="screen-header">
-                            <h2 class="screen-title" data-i18n="generatePost">Tạo bài viết</h2>
-                            <p class="screen-subtitle" data-i18n="reviewSettingsCreate">Xem lại cài đặt và tạo nội dung blog của bạn</p>
+                            <h2 class="screen-title" data-i18n="generatePost">포스트 생성</h2>
+                            <p class="screen-subtitle" data-i18n="reviewSettingsCreate">설정을 검토하고 블로그 콘텐츠를 생성하세요</p>
                         </div>
                         <div class="screen-content">
                             <!-- 설정 요약 섹션 -->
                             <div class="generation-summary" style="margin-bottom: 20px; padding: 15px; background: #2a2a2a; border-radius: 10px; border: 1px solid #333;">
-                                <h4 style="color: white; margin: 0 0 10px 0; font-size: 0.9rem;" data-i18n="contentSettingsSummary">Tóm tắt cài đặt nội dung</h4>
+                                <h4 style="color: white; margin: 0 0 10px 0; font-size: 0.9rem;" data-i18n="contentSettingsSummary">콘텐츠 설정 요약</h4>
                                 <div id="summaryContent" style="color: #cccccc; font-size: 0.8rem; line-height: 1.4;">
-                                    <div><strong data-i18n="contentSource">Nguồn nội dung:</strong> <span id="summarySource">-</span></div>
-                                    <div><strong data-i18n="writingTone">Giọng điệu viết:</strong> <span id="summaryTone">-</span></div>
-                                    <div><strong data-i18n="targetAudience">Đối tượng mục tiêu:</strong> <span id="summaryAudience">-</span></div>
+                                    <div><strong data-i18n="contentSource">콘텐츠 소스:</strong> <span id="summarySource">-</span></div>
+                                    <div><strong data-i18n="writingTone">글쓰기 톤:</strong> <span id="summaryTone">-</span></div>
+                                    <div><strong data-i18n="targetAudience">타겟 독자층:</strong> <span id="summaryAudience">-</span></div>
                                 </div>
                             </div>
                             
                             <!-- 프롬프트 최종 확인/수정 -->
                             <div class="form-group">
-                                <label data-i18n="finalPrompt">Prompt cuối cùng (tùy chọn chỉnh sửa)</label>
-                                <textarea id="finalPromptInput" data-i18n-placeholder="finalAiInstructions" placeholder="Hướng dẫn cuối cùng cho AI..." rows="4" style="font-size: 14px;"></textarea>
+                                <label data-i18n="finalPrompt">최종 프롬프트 (선택적 편집)</label>
+                                <textarea id="finalPromptInput" data-i18n-placeholder="finalAiInstructions" placeholder="AI에게 전달할 최종 지시사항..." rows="4" style="font-size: 14px;"></textarea>
                             </div>
                             
                             <!-- 생성 버튼 -->
                             <div class="form-group">
                                 <button id="mobileGenerateBtn" class="mobile-auth-btn" data-i18n="generatePost">
-                                    🚀 Tạo bài viết
+                                    🚀 포스트 생성
                                 </button>
                             </div>
                             
                             <!-- 생성 상태 -->
                             <div id="mobileGenerationStatus" class="auth-status-mobile" style="display: none;" data-i18n="ready">
-                                Sẵn sàng
+                                준비 완료
                             </div>
                             
                             <!-- 진행 상황 표시 -->
@@ -293,7 +293,7 @@
                                 <div style="background: #333; border-radius: 10px; overflow: hidden; height: 8px;">
                                     <div id="progressBar" style="background: #6366f1; height: 100%; width: 0%; transition: width 0.3s ease;"></div>
                                 </div>
-                                <div id="progressText" style="color: #888; font-size: 0.8rem; margin-top: 5px; text-align: center;">Đang khởi tạo...</div>
+                                <div id="progressText" style="color: #888; font-size: 0.8rem; margin-top: 5px; text-align: center;">초기화 중...</div>
                             </div>
                         </div>
                     </div>
