@@ -2,6 +2,7 @@ import logging
 import json
 import os
 import requests
+import gc
 try:
     import google.generativeai as genai
     from google.generativeai import types
@@ -82,10 +83,28 @@ class GeminiService:
             content_parts = [prompt]
             
             # Add image if provided
-            if image_url:
+            if image_url and types:
                 try:
-                    # Convert data URI to generative part 
-                    image_part = self._data_uri_to_generative_part(image_url)
+                    if image_url.startswith('data:'):
+                        # Handle data URI
+                        import base64
+                        header, data = image_url.split(',', 1)
+                        mime_type = header.split(';')[0].split(':')[1]
+                        image_data = base64.b64decode(data)
+                        image_part = types.BlobDict(
+                            mime_type=mime_type,
+                            data=image_data
+                        )
+                    else:
+                        # Handle regular URL
+                        image_response = requests.get(image_url)
+                        if image_response.status_code == 200:
+                            image_part = types.BlobDict(
+                                mime_type='image/jpeg',
+                                data=image_response.content
+                            )
+                        else:
+                            raise ValueError(f"Failed to fetch image: {image_response.status_code}")
                     content_parts.append(image_part)
                 except Exception as e:
                     logging.warning(f"Failed to process image: {str(e)}")
@@ -117,16 +136,19 @@ class GeminiService:
                     signal.alarm(30)
                     
                     try:
-                        result = model.generate_content(
-                            content_parts,
-                            generation_config=genai.GenerationConfig(
-                                temperature=0.7,
-                                top_p=0.8,
-                                top_k=40,
-                                max_output_tokens=3072,  # Further reduced for stability
-                                candidate_count=1
+                        if genai:
+                            result = model.generate_content(
+                                content_parts,
+                                generation_config=genai.GenerationConfig(
+                                    temperature=0.7,
+                                    top_p=0.8,
+                                    top_k=40,
+                                    max_output_tokens=3072,  # Further reduced for stability
+                                    candidate_count=1
+                                )
                             )
-                        )
+                        else:
+                            raise ValueError("Google Generative AI library not available")
                     finally:
                         signal.alarm(0)  # Cancel timeout
                     

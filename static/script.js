@@ -323,6 +323,15 @@ document.addEventListener('DOMContentLoaded', () => {
         videoFileName.textContent = file.name;
         videoFileInfo.classList.remove('hidden');
         updateTopicDiscoveryModeUI();
+        
+        // Auto-trigger video processing for blog post generation
+        if (accessToken && !isTopicDiscoveryMode) {
+            setTimeout(() => {
+                if (confirm('동영상이 선택되었습니다. 바로 블로그 포스팅을 생성하시겠습니까?')) {
+                    handleChatSubmit(new Event('submit'));
+                }
+            }, 100);
+        }
     }
 
     function handleRemoveVideo() {
@@ -376,6 +385,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 authStatus.textContent = '✅ 로그인 성공';
                 if(loginBtnText) loginBtnText.textContent = 'Google 로그아웃';
                 setChatInputEnabled(true);
+                // Reset content source to default (URL/text)
+                const urlRadio = document.querySelector('input[name="youtubeSourceType"][value="url"]');
+                if (urlRadio) {
+                    urlRadio.checked = true;
+                    handleYoutubeSourceTypeChange();
+                }
                 break;
             case 'logged_out':
                 authStatus.classList.add('error');
