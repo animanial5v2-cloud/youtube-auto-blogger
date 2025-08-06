@@ -21,10 +21,15 @@ class OpenAIService:
 톤: {tone}
 독자: {audience or '일반 대중'}
 
-다음 JSON 형식으로만 응답해주세요:
+반드시 아래 JSON 형식으로만 응답하세요. 구조는 다음과 같이:
+1. 제목 (h1 태그)
+2. 간단한 소개 설명 (1-2문단)
+3. [IMAGE_HERE] 플레이스홀더 (이미지 위치)
+4. 본문 내용 (상세 설명과 하위 섹션들)
+
 {{
   "title": "매력적인 블로그 제목",
-  "content_with_placeholder": "HTML 태그로 구조화된 블로그 글 내용 (최소 1500자, [IMAGE_HERE] 플레이스홀더 포함)",
+  "content_with_placeholder": "<h1>제목</h1><p>간단한 소개 설명</p>[IMAGE_HERE]<h2>본문 시작</h2><p>상세 내용...</p>",
   "summary": "1-2문장 요약",
   "image_search_keywords": "영어 키워드 3개, 쉼표로 구분",
   "hashtags": "#키워드1 #키워드2 #키워드3"
