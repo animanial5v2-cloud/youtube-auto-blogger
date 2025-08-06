@@ -40,6 +40,53 @@ def get_or_create_user(session_id=None):
     
     return user
 
+def process_image_placement(content, image_url, alt_text="Blog post image"):
+    """Unified image processing for consistent placement across all posting methods"""
+    if not image_url:
+        return content
+    
+    # Standard image tag with consistent styling
+    image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
+    
+    # First try to replace placeholder
+    if '[IMAGE_HERE]' in content:
+        return content.replace('[IMAGE_HERE]', image_tag)
+    
+    # If no placeholder found, insert after first paragraph (after opening <p> tag closes)
+    import re
+    # Look for first closing </p> tag and insert image after it
+    first_p_match = re.search(r'</p>', content)
+    if first_p_match:
+        insert_pos = first_p_match.end()
+        return content[:insert_pos] + '\n' + image_tag + '\n' + content[insert_pos:]
+    
+    # Fallback: insert at beginning
+    return image_tag + '\n' + content
+
+def generate_content_with_fallback(api_key, content_input, image_url, model_name, tone, audience):
+    """Unified content generation with OpenAI fallback for consistent quality"""
+    try:
+        # Try Gemini first
+        generated_content = gemini_service.generate_text_content(
+            api_key, content_input, image_url, model_name, tone, audience
+        )
+        if generated_content:
+            return generated_content
+    except Exception as gemini_error:
+        logging.warning(f"Gemini failed, trying OpenAI fallback: {str(gemini_error)}")
+        
+    # Fallback to OpenAI
+    try:
+        generated_content = openai_service.generate_text_content(
+            None, content_input, image_url, model_name, tone, audience
+        )
+        if generated_content:
+            return generated_content
+    except Exception as openai_error:
+        logging.error(f"Both AI services failed: Gemini: {str(gemini_error)}, OpenAI: {str(openai_error)}")
+    
+    raise ValueError("AI 콘텐츠 생성에 실패했습니다. 잠시 후 다시 시도해주세요.")
+
 @app.route('/')
 def index():
     """Main application page"""
@@ -184,48 +231,18 @@ def generate_blog_post():
         elif image_source == 'upload':
             image_url = data.get('uploadedImageUrl')
         
-        # Try Gemini first, fallback to OpenAI if it fails
-        logging.info("Generating content with AI...")
-        generated_content = None
-        
-        try:
-            generated_content = gemini_service.generate_text_content(
-                gemini_api_key, content_text, image_url, gemini_model, writing_tone, target_audience
-            )
-            logging.info("Content generated successfully with Gemini")
-        except Exception as gemini_error:
-            logging.warning(f"Gemini failed, trying OpenAI: {str(gemini_error)}")
-            try:
-                # Fallback to OpenAI
-                openai_key = settings.get('openaiKey') or os.getenv('OPENAI_API_KEY')
-                if openai_key:
-                    generated_content = openai_service.generate_text_content(
-                        api_key=openai_key,
-                        topic=content_text,
-                        tone=writing_tone,
-                        audience=target_audience
-                    )
-                    logging.info("Content generated successfully with OpenAI")
-                else:
-                    raise ValueError("OpenAI API 키가 필요합니다")
-            except Exception as openai_error:
-                logging.error(f"Both AI services failed: Gemini: {gemini_error}, OpenAI: {openai_error}")
-                raise ValueError("AI 콘텐츠 생성에 실패했습니다. API 키를 확인해주세요.")
+        # Generate content using unified system with fallback
+        generated_content = generate_content_with_fallback(
+            gemini_api_key, content_text, image_url, gemini_model, writing_tone, target_audience
+        )
         
         if not generated_content:
             return jsonify({'error': 'Failed to generate content'}), 500
         
-        # Process image placement
+        # Process image placement using unified function
         final_content = generated_content.get('content_with_placeholder', '')
-        if image_url and '[IMAGE_HERE]' in final_content:
-            alt_text = generated_content.get('image_search_keywords', 'Blog post image')
-            image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
-            final_content = final_content.replace('[IMAGE_HERE]', image_tag)
-        elif image_url:
-            # Insert image at the beginning if placeholder not found
-            alt_text = generated_content.get('image_search_keywords', 'Blog post image')
-            image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
-            final_content = image_tag + final_content
+        alt_text = generated_content.get('image_search_keywords', 'Blog post image')
+        final_content = process_image_placement(final_content, image_url, alt_text)
         
         # Save to database
         blog_post = BlogPost()
@@ -361,24 +378,18 @@ def generate_post_from_youtube():
             keywords = transcript.split()[:10]  # Use first 10 words as keywords
             image_url = youtube_service.fetch_image_from_pexels(keywords, pexels_api_key)
         
-        # Generate content using Gemini
-        generated_content = gemini_service.generate_text_content(
+        # Generate content using unified system with fallback
+        generated_content = generate_content_with_fallback(
             gemini_api_key, transcript, image_url, gemini_model, writing_tone, target_audience
         )
         
         if not generated_content:
             return jsonify({'error': 'Failed to generate content'}), 500
         
-        # Process image placement
+        # Process image placement using unified function
         final_content = generated_content.get('content_with_placeholder', '')
-        if image_url and '[IMAGE_HERE]' in final_content:
-            alt_text = generated_content.get('image_search_keywords', 'Blog post image')
-            image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
-            final_content = final_content.replace('[IMAGE_HERE]', image_tag)
-        elif image_url:
-            alt_text = generated_content.get('image_search_keywords', 'Blog post image')
-            image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
-            final_content = image_tag + final_content
+        alt_text = generated_content.get('image_search_keywords', 'Blog post image')
+        final_content = process_image_placement(final_content, image_url, alt_text)
         
         # Save to database with retry mechanism
         max_retries = 3
@@ -461,25 +472,18 @@ def generate_post():
         elif image_source == 'upload':
             image_url = data.get('uploadedImageUrl')
         
-        # Generate content using Gemini
-        generated_content = gemini_service.generate_text_content(
+        # Generate content using unified system with fallback
+        generated_content = generate_content_with_fallback(
             gemini_api_key, topic, image_url, gemini_model, writing_tone, target_audience
         )
         
         if not generated_content:
             return jsonify({'error': 'Failed to generate content'}), 500
         
-        # Process image placement
+        # Process image placement using unified function
         final_content = generated_content.get('content_with_placeholder', '')
-        if image_url and '[IMAGE_HERE]' in final_content:
-            alt_text = generated_content.get('image_search_keywords', 'Blog post image')
-            image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
-            final_content = final_content.replace('[IMAGE_HERE]', image_tag)
-        elif image_url:
-            # Insert image at the beginning if placeholder not found
-            alt_text = generated_content.get('image_search_keywords', 'Blog post image')
-            image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
-            final_content = image_tag + final_content
+        alt_text = generated_content.get('image_search_keywords', 'Blog post image')
+        final_content = process_image_placement(final_content, image_url, alt_text)
         
         # Save to database with retry mechanism
         max_retries = 3
@@ -620,36 +624,27 @@ def generate_post_from_video():
             gc.collect()  # Free memory before API call
             
             try:
-                generated_content = gemini_service.generate_text_content(
+                # Generate content using unified system with fallback
+                generated_content = generate_content_with_fallback(
                     gemini_api_key, video_content, image_url, gemini_model, writing_tone, target_audience
                 )
                 
                 if not generated_content:
                     raise ValueError("AI가 빈 응답을 반환했습니다")
                     
-            except Exception as gemini_error:
-                logging.error(f"Gemini API failed for video content: {str(gemini_error)}")
-                error_message = str(gemini_error)
+            except Exception as ai_error:
+                logging.error(f"AI content generation failed for video: {str(ai_error)}")
+                error_message = str(ai_error)
                 
                 if "timeout" in error_message.lower() or "지연" in error_message:
                     return jsonify({'error': '서버 연결이 지연되고 있습니다. 파일 크기를 줄이거나 잠시 후 다시 시도해주세요.'}), 503
                 else:
                     return jsonify({'error': f'AI 콘텐츠 생성 중 오류가 발생했습니다: {error_message}'}), 500
             
-            if not generated_content:
-                return jsonify({'error': 'Failed to generate content'}), 500
-            
-            # Process image placement and hashtags
+            # Process image placement using unified function
             final_content = generated_content.get('content_with_placeholder', '')
-            if image_url and '[IMAGE_HERE]' in final_content:
-                alt_text = generated_content.get('image_search_keywords', 'Blog post image')
-                image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
-                final_content = final_content.replace('[IMAGE_HERE]', image_tag)
-            elif image_url:
-                # Insert image at the beginning if placeholder not found
-                alt_text = generated_content.get('image_search_keywords', 'Blog post image')
-                image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
-                final_content = image_tag + final_content
+            alt_text = generated_content.get('image_search_keywords', 'Blog post image')
+            final_content = process_image_placement(final_content, image_url, alt_text)
             
             # Add hashtags if not already included in content
             hashtags = generated_content.get('hashtags', '')
