@@ -179,16 +179,28 @@ class GeminiService:
         cleaned_text = re.sub(r'```(?:json)?\s*', '', raw_text)
         cleaned_text = re.sub(r'\s*```', '', cleaned_text)
         
-        # Find JSON object boundaries
-        json_start = cleaned_text.find('{')
-        json_end = cleaned_text.rfind('}')
+        # Find JSON object boundaries - look for complete JSON
+        import re
+        json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', cleaned_text, re.DOTALL)
         
-        if json_start == -1 or json_end == -1 or json_end < json_start:
+        if not json_match:
             logging.error("No valid JSON object found in Gemini response")
             logging.error(f"Raw response: {raw_text[:500]}...")
-            raise ValueError("AI response does not contain valid JSON")
+            
+            # Extract title and create fallback structure
+            lines = raw_text.split('\n')
+            title_line = next((line.strip() for line in lines if line.strip() and len(line.strip()) > 10), "AI 생성 블로그 포스트")
+            content_lines = [line for line in lines if line.strip() and not line.startswith('```')]
+            content = '\n'.join(content_lines[:20])  # First 20 meaningful lines
+            
+            return {
+                'title': title_line[:100],
+                'content_with_placeholder': f"<h2>{title_line}</h2>\n<p>{content}</p>\n[IMAGE_HERE]",
+                'summary': title_line,
+                'image_search_keywords': "blog, content, article"
+            }
         
-        json_string = cleaned_text[json_start:json_end + 1]
+        json_string = json_match.group(0)
         
         try:
             parsed = json.loads(json_string)
