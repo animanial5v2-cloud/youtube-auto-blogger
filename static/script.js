@@ -508,12 +508,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('응답을 읽는 중 오류가 발생했습니다. 네트워크 상태를 확인해주세요.');
             }
         }
-        const aiResponseHtml = `
-            <p>${escapeHtml(data.reply).replace(/\n/g, '<br>')}</p>
-            <div class="topic-suggestion-actions">
-                <button class="button-secondary post-from-topic-btn" data-topic="${escapeHtml(data.reply)}">✅ 이 내용으로 포스팅하기</button>
-            </div>
-        `;
+        // Parse multiple topic suggestions for AI discovery mode
+        let aiResponseHtml;
+        if (isTopicDiscoveryMode && data.reply.includes('1. **') && data.reply.includes('2. **')) {
+            // Multiple topic suggestions detected
+            const suggestions = parseTopicSuggestions(data.reply);
+            aiResponseHtml = `
+                <div class="topic-suggestions-container">
+                    <p class="topic-instruction">🎯 <strong>AI가 추천한 주제들입니다. 원하는 주제를 선택해서 포스팅하세요:</strong></p>
+                    ${suggestions.map((suggestion, index) => `
+                        <div class="topic-suggestion-item">
+                            <h4>${suggestion.title}</h4>
+                            <p class="topic-description">${suggestion.description}</p>
+                            <button class="button-primary post-from-topic-btn" data-topic="${escapeHtml(suggestion.title + ' - ' + suggestion.description)}">
+                                📝 이 주제로 포스팅하기
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } else {
+            // Single response or regular conversation
+            aiResponseHtml = `
+                <p>${escapeHtml(data.reply).replace(/\n/g, '<br>')}</p>
+                ${isTopicDiscoveryMode ? `
+                    <div class="topic-suggestion-actions">
+                        <button class="button-secondary post-from-topic-btn" data-topic="${escapeHtml(data.reply)}">✅ 이 내용으로 포스팅하기</button>
+                    </div>
+                ` : ''}
+            `;
+        }
         thinkingMessage.querySelector('.chat-bubble').innerHTML = aiResponseHtml;
     }
 
