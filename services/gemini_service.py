@@ -22,7 +22,7 @@ class GeminiService:
         if self.api_key and HAS_GENAI:
             genai.configure(api_key=self.api_key)
     
-    def generate_text_content(self, api_key, topic, image_url=None, model_name='gemini-1.5-pro-latest', tone='친근한', audience=''):
+    def generate_text_content(self, api_key, topic, image_url=None, model_name='gemini-1.5-pro', tone='친근한', audience=''):
         """Generate blog content using Gemini API"""
         try:
             if not HAS_GENAI:
