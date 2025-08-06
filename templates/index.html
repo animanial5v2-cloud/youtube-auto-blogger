@@ -151,6 +151,15 @@
             <div class="mobile-screens" style="display: none;">
                 <!-- 왼쪽 네비게이션 바 -->
                 <div class="mobile-nav-sidebar">
+                    <!-- 언어 선택 -->
+                    <div class="mobile-language-selector">
+                        <select id="mobileLangSelect" class="mobile-lang-select">
+                            <option value="ko">한국어</option>
+                            <option value="en">English</option>
+                            <option value="vi">Tiếng Việt</option>
+                        </select>
+                    </div>
+                    
                     <button class="mobile-nav-item active" onclick="showMobileScreen('api-settings')" title="API 설정">
                         🔑
                     </button>
@@ -221,8 +230,8 @@
                     <!-- 스크린 3: 콘텐츠 소스 -->
                     <div id="screen-content-source" class="mobile-screen">
                         <div class="screen-header">
-                            <h2 class="screen-title" data-i18n="contentInput">Content Source</h2>
-                            <p class="screen-subtitle">Choose your content generation method</p>
+                            <h2 class="screen-title" data-i18n="contentInput">콘텐츠 소스</h2>
+                            <p class="screen-subtitle" data-i18n="contentInputSubtitle">콘텐츠 생성 방법을 선택하세요</p>
                         </div>
                         <div class="screen-content">
                             <div class="form-group">
@@ -231,8 +240,13 @@
                             </div>
                             
                             <div class="form-group">
-                                <label data-i18n="topicInput">Topic Input</label>
-                                <textarea id="mobileTopicInput" placeholder="Enter your blog topic here..." rows="4"></textarea>
+                                <label data-i18n="topicInput">주제 입력</label>
+                                <textarea id="mobileTopicInput" placeholder="블로그 주제를 입력하세요..." rows="4"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label data-i18n="promptInput">프롬프트 입력</label>
+                                <textarea id="mobilePromptInput" placeholder="AI에게 전달할 상세한 지시사항을 입력하세요..." rows="3"></textarea>
                             </div>
                         </div>
                     </div>

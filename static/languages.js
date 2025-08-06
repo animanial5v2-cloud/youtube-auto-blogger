@@ -1,5 +1,5 @@
-// 다국어 지원
-const languages = {
+// 다국어 지원 시스템
+const translations = {
     ko: {
         // Header
         title: "AI Blogging Studio",
@@ -29,10 +29,18 @@ const languages = {
         logout: "로그아웃",
         
         // Content input
-        contentInput: "콘텐츠 입력",
+        contentInput: "콘텐츠 소스",
+        contentInputSubtitle: "콘텐츠 생성 방법을 선택하세요",
         youtubeUrl: "YouTube URL",
         topicInput: "주제 입력",
+        promptInput: "프롬프트 입력",
         generatePost: "포스트 생성",
+        
+        // API Settings
+        apiKey: "필수 API 키",
+        geminiApiKey: "Gemini API 키",
+        googleClientId: "Google Client ID",
+        blogId: "블로그 ID",
         
         // Buttons
         start: "시작",
@@ -41,6 +49,7 @@ const languages = {
         preview: "미리보기",
         publish: "발행",
         save: "저장",
+        next: "다음",
         
         // Status messages
         ready: "준비 완료",
@@ -56,111 +65,13 @@ const languages = {
         humorous: "유머러스한"
     },
     
-    vi: {
-        // Header
-        title: "AI Blogging Studio",
-        
-        // Sidebar sections
-        postingHistory: "Lịch sử đăng bài",
-        noHistoryRecords: "Không có bản ghi nào.",
-        
-        // Settings
-        contentGeneration: "Tạo nội dung (Gemini)",
-        geminiModel: "Mô hình Gemini",
-        writingTone: "Giọng điệu & Phong cách viết",
-        targetAudience: "Đối tượng mục tiêu",
-        
-        // API Settings
-        apiKey: "Khóa API bắt buộc",
-        geminiApiKey: "Khóa API Gemini",
-        googleClientId: "ID Khách hàng Google",
-        blogId: "ID Blog",
-        
-        // Platform settings
-        platformSettings: "Cài đặt nền tảng",
-        platform: "Nền tảng",
-        
-        // Image settings
-        imageSettings: "Cài đặt hình ảnh",
-        imageSource: "Nguồn hình ảnh",
-        
-        // Authentication
-        authentication: "Xác thực",
-        login: "Đăng nhập",
-        logout: "Đăng xuất",
-        
-        // Content input
-        contentInput: "Nhập nội dung",
-        youtubeUrl: "URL YouTube",
-        topicInput: "Nhập chủ đề",
-        generatePost: "Tạo bài viết",
-        
-        // Buttons
-        start: "Bắt đầu",
-        stop: "Dừng",
-        clear: "Xóa",
-        preview: "Xem trước",
-        publish: "Xuất bản",
-        save: "Lưu",
-        next: "Tiếp theo",
-        
-        // Status messages
-        ready: "Sẵn sàng",
-        generating: "Đang tạo...",
-        completed: "Hoàn thành",
-        error: "Lỗi",
-        
-        // Writing tones
-        friendly: "Thân thiện",
-        professional: "Chuyên nghiệp",
-        casual: "Thoải mái",
-        formal: "Trang trọng",
-        humorous: "Hài hước"
-        
-        // Image settings
-        imageSettings: "Cài đặt hình ảnh",
-        imageSource: "Nguồn hình ảnh",
-        
-        // Authentication
-        authentication: "Xác thực",
-        login: "Đăng nhập",
-        logout: "Đăng xuất",
-        
-        // Content input
-        contentInput: "Nhập nội dung",
-        youtubeUrl: "URL YouTube",
-        topicInput: "Nhập chủ đề",
-        generatePost: "Tạo bài viết",
-        
-        // Buttons
-        start: "Bắt đầu",
-        stop: "Dừng",
-        clear: "Xóa",
-        preview: "Xem trước",
-        publish: "Xuất bản",
-        save: "Lưu",
-        
-        // Status messages
-        ready: "Sẵn sàng",
-        generating: "Đang tạo...",
-        completed: "Hoàn thành",
-        error: "Lỗi",
-        
-        // Writing tones
-        friendly: "Thân thiện",
-        professional: "Chuyên nghiệp",
-        casual: "Thoải mái",
-        formal: "Trang trọng",
-        humorous: "Hài hước"
-    },
-    
     en: {
         // Header
         title: "AI Blogging Studio",
         
         // Sidebar sections
         postingHistory: "Posting History",
-        noHistoryRecords: "No records available.",
+        noHistoryRecords: "No records found.",
         
         // Settings
         contentGeneration: "Content Generation (Gemini)",
@@ -173,12 +84,6 @@ const languages = {
         platform: "Platform",
         blogAddress: "Blog Address",
         
-        // API Settings
-        apiKey: "Required API Key",
-        geminiApiKey: "Gemini API Key",
-        googleClientId: "Google Client ID",
-        blogId: "Blog ID",
-        
         // Image settings
         imageSettings: "Image Settings",
         imageSource: "Image Source",
@@ -189,10 +94,18 @@ const languages = {
         logout: "Logout",
         
         // Content input
-        contentInput: "Content Input",
+        contentInput: "Content Source",
+        contentInputSubtitle: "Choose your content generation method",
         youtubeUrl: "YouTube URL",
         topicInput: "Topic Input",
+        promptInput: "Prompt Input",
         generatePost: "Generate Post",
+        
+        // API Settings
+        apiKey: "Required API Keys",
+        geminiApiKey: "Gemini API Key",
+        googleClientId: "Google Client ID",
+        blogId: "Blog ID",
         
         // Buttons
         start: "Start",
@@ -215,85 +128,110 @@ const languages = {
         casual: "Casual",
         formal: "Formal",
         humorous: "Humorous"
+    },
+    
+    vi: {
+        // Header
+        title: "AI Blogging Studio",
+        
+        // Sidebar sections
+        postingHistory: "Lịch sử đăng bài",
+        noHistoryRecords: "Không có bản ghi nào.",
+        
+        // Settings
+        contentGeneration: "Tạo nội dung (Gemini)",
+        geminiModel: "Mô hình Gemini",
+        writingTone: "Giọng điệu & Phong cách viết",
+        targetAudience: "Đối tượng mục tiêu",
+        
+        // Platform settings
+        platformSettings: "Cài đặt nền tảng",
+        platform: "Nền tảng",
+        blogAddress: "Địa chỉ Blog",
+        
+        // Image settings
+        imageSettings: "Cài đặt hình ảnh",
+        imageSource: "Nguồn hình ảnh",
+        
+        // Authentication
+        authentication: "Xác thực",
+        login: "Đăng nhập",
+        logout: "Đăng xuất",
+        
+        // Content input
+        contentInput: "Nguồn nội dung",
+        contentInputSubtitle: "Chọn phương pháp tạo nội dung",
+        youtubeUrl: "URL YouTube",
+        topicInput: "Nhập chủ đề",
+        promptInput: "Nhập prompt",
+        generatePost: "Tạo bài viết",
+        
+        // API Settings
+        apiKey: "Khóa API bắt buộc",
+        geminiApiKey: "Khóa API Gemini",
+        googleClientId: "ID Khách hàng Google",
+        blogId: "ID Blog",
+        
+        // Buttons
+        start: "Bắt đầu",
+        stop: "Dừng",
+        clear: "Xóa",
+        preview: "Xem trước",
+        publish: "Xuất bản",
+        save: "Lưu",
+        next: "Tiếp theo",
+        
+        // Status messages
+        ready: "Sẵn sàng",
+        generating: "Đang tạo...",
+        completed: "Hoàn thành",
+        error: "Lỗi",
+        
+        // Writing tones
+        friendly: "Thân thiện",
+        professional: "Chuyên nghiệp",
+        casual: "Thoải mái",
+        formal: "Trang trọng",
+        humorous: "Hài hước"
     }
 };
 
 // 언어 변경 함수
 function changeLanguage(lang) {
-    console.log('언어 변경 시도:', lang);
-    
-    // DOM이 완전히 로드되기를 기다림
-    if (document.readyState !== 'complete') {
-        setTimeout(() => changeLanguage(lang), 100);
+    const translation = translations[lang];
+    if (!translation) {
+        console.error('Language not supported:', lang);
         return;
     }
     
-    const elements = document.querySelectorAll('[data-i18n]');
-    console.log('번역할 요소 개수:', elements.length);
+    console.log('언어 변경:', lang);
     
-    elements.forEach(element => {
+    // data-i18n 속성을 가진 모든 요소 번역
+    document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
-        if (languages[lang] && languages[lang][key]) {
-            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                element.placeholder = languages[lang][key];
-            } else {
-                // textContent 대신 innerHTML을 사용하여 더 확실한 변경
-                element.innerHTML = languages[lang][key];
-            }
-            console.log('번역:', key, '→', languages[lang][key]);
-            
-            // 스타일 강제 업데이트
-            element.style.display = 'none';
-            element.offsetHeight; // reflow 강제 발생
-            element.style.display = '';
-        } else {
-            console.warn('번역 키 누락:', key, 'for language:', lang);
+        if (translation[key]) {
+            element.textContent = translation[key];
         }
     });
     
-    // 선택 옵션들 번역
-    const optionElements = document.querySelectorAll('[data-i18n-option]');
-    optionElements.forEach(element => {
-        const key = element.getAttribute('data-i18n-option');
-        if (languages[lang] && languages[lang][key]) {
-            element.textContent = languages[lang][key];
+    // data-i18n-option 속성을 가진 option 요소들 번역
+    document.querySelectorAll('option[data-i18n-option]').forEach(option => {
+        const key = option.getAttribute('data-i18n-option');
+        if (translation[key]) {
+            option.textContent = translation[key];
         }
     });
     
-    // 모바일 화면 제목들도 번역
-    const mobileTitles = document.querySelectorAll('.screen-title');
-    mobileTitles.forEach(title => {
-        const screenId = title.closest('.mobile-screen')?.id;
-        if (screenId) {
-            switch(screenId) {
-                case 'screen-api-settings':
-                    title.textContent = lang === 'vi' ? 'Cài đặt API' : 'API 설정';
-                    break;
-                case 'screen-login':
-                    title.textContent = lang === 'vi' ? 'Đăng nhập Google' : 'Google 로그인';
-                    break;
-                case 'screen-content-source':
-                    title.textContent = lang === 'vi' ? 'Nguồn nội dung' : '콘텐츠 소스';
-                    break;
-                case 'screen-content-input':
-                    title.textContent = lang === 'vi' ? 'Nhập nội dung' : '콘텐츠 입력';
-                    break;
-                case 'screen-writing-settings':
-                    title.textContent = lang === 'vi' ? 'Cài đặt viết' : '글쓰기 설정';
-                    break;
-                case 'screen-platform-settings':
-                    title.textContent = lang === 'vi' ? 'Cài đặt nền tảng' : '플랫폼 설정';
-                    break;
-                case 'screen-generate':
-                    title.textContent = lang === 'vi' ? 'Tạo bài viết' : '생성하기';
-                    break;
-            }
+    // placeholder 번역 (data-i18n-placeholder 속성 추가 시)
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        if (translation[key]) {
+            element.placeholder = translation[key];
         }
     });
     
     // 현재 언어 저장
     localStorage.setItem('selectedLanguage', lang);
-    console.log('언어 변경 완료:', lang);
     
     // 변경 완료 이벤트 발생
     document.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
