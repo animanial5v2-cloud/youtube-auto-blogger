@@ -68,9 +68,74 @@ body {
 
 .app-container {
     display: grid;
-    grid-template-columns: 300px 1fr 350px;
+    grid-template-columns: minmax(250px, 300px) 1fr minmax(300px, 350px);
     height: 100vh;
     gap: 0;
+}
+
+@media (max-width: 1200px) {
+    .app-container {
+        grid-template-columns: 200px 1fr 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .sidebar-left {
+        order: 1;
+        height: auto;
+        max-height: 30vh;
+        overflow-y: auto;
+        padding: calc(var(--spacing-unit) * 1.5);
+    }
+    
+    .main-content {
+        order: 2;
+        flex: 1;
+        min-height: 0;
+        padding: calc(var(--spacing-unit) * 1.5);
+    }
+    
+    .sidebar-right {
+        order: 3;
+        height: auto;
+        max-height: 40vh;
+        overflow-y: auto;
+        padding: calc(var(--spacing-unit) * 1.5);
+    }
+    
+    /* 모바일에서 폰트 크기와 버튼 크기 조정 */
+    h1 { font-size: 1.2rem; }
+    h2 { font-size: 1rem; }
+    h3 { font-size: 0.85rem; }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 16px; /* iOS에서 줌 방지 */
+        padding: calc(var(--spacing-unit) * 1.2);
+        min-height: 44px; /* 터치 친화적 크기 */
+    }
+    
+    .button, .button-primary, .button-secondary {
+        min-height: 44px;
+        font-size: 1rem;
+        padding: calc(var(--spacing-unit) * 1.2) calc(var(--spacing-unit) * 2);
+    }
+    
+    .chat-form input {
+        font-size: 16px;
+        min-height: 44px;
+    }
+    
+    .chat-form button {
+        min-width: 44px;
+        min-height: 44px;
+    }
 }
 
 .sidebar-left, .main-content, .sidebar-right {
@@ -764,12 +829,7 @@ input:focus, select:focus, textarea:focus {
     --warning-color: #FF8C00;
 }
 
-/* Responsive design */
-@media (max-width: 1200px) {
-    .app-container {
-        grid-template-columns: 250px 1fr 300px;
-    }
-}
+/* 기존 중복 미디어 쿼리 제거됨 */
 
 /* Manual Guide Styles */
 .manual-guide {
@@ -814,55 +874,8 @@ input:focus, select:focus, textarea:focus {
 
 /* === TABLET OPTIMIZATION === */
 @media (max-width: 1024px) and (min-width: 769px) {
-    /* Tablet headers removed */
-    
     .app-container {
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        overflow: hidden;
-    }
-    
-    .sidebar-left { 
-        display: none; 
-    }
-    
-    .main-content {
-        flex: 1;
-        padding: calc(var(--spacing-unit) * 1.5);
-        overflow-y: auto;
-        background-color: var(--bg-color);
-        min-height: 0;
-    }
-    
-    .sidebar-right {
-        flex-shrink: 0;
-        padding: calc(var(--spacing-unit) * 1.5);
-        max-height: 40vh;
-        overflow-y: auto;
-        border-top: 2px solid var(--border-color);
-        background: var(--surface-color);
-        transition: max-height 0.3s ease, padding 0.3s ease;
-    }
-    
-    .sidebar-right.collapsed {
-        max-height: 0;
-        padding: 0 calc(var(--spacing-unit) * 1.5);
-        overflow: hidden;
-    }
-    
-    /* 설정 그룹 태블릿 최적화 */
-    .settings-group {
-        margin-bottom: calc(var(--spacing-unit) * 1.8);
-    }
-    
-    .settings-group h3 {
-        font-size: 1.05rem;
-        margin-bottom: calc(var(--spacing-unit) * 1);
-    }
-    
-    .form-group {
-        margin-bottom: calc(var(--spacing-unit) * 1.2);
+        grid-template-columns: 180px 1fr 220px;
     }
     
     .form-group input,
@@ -880,32 +893,7 @@ input:focus, select:focus, textarea:focus {
     }
 }
 
-/* === MOBILE RESPONSIVENESS === */
-@media (max-width: 768px) {
-    .app-container {
-        flex-direction: column;
-        height: 100vh;
-    }
-    
-    .sidebar-left {
-        width: 100%;
-        height: auto;
-        max-height: 40vh;
-        overflow-y: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--border-color);
-    }
-    
-    .main-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-    }
-    
-    .sidebar-right {
-        display: none;
-    }
+/* 기존 모바일 스타일이 위의 새로운 미디어 쿼리로 대체됨 */
     
     /* 모바일 멀티 스크린 인터페이스 */
     .mobile-screens {
