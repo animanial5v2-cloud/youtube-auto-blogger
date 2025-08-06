@@ -127,30 +127,18 @@ class GeminiService:
                         time.sleep(delay)
                         logging.info(f"Retrying Gemini API call (attempt {attempt + 1}) after {delay}s delay")
                     
-                    # Use reduced token limits and timeout to prevent memory issues
-                    def timeout_handler(signum, frame):
-                        raise TimeoutError("Gemini API call timed out")
-                    
-                    # Set timeout for API call (30 seconds)
-                    signal.signal(signal.SIGALRM, timeout_handler)
-                    signal.alarm(30)
-                    
-                    try:
-                        if HAS_GENAI:
-                            result = model.generate_content(
-                                content_parts,
-                                generation_config=genai.GenerationConfig(
-                                    temperature=0.7,
-                                    top_p=0.8,
-                                    top_k=40,
-                                    max_output_tokens=3072,
-                                    candidate_count=1
-                                )
+                    # Use minimal configuration to prevent memory issues
+                    if HAS_GENAI:
+                        result = model.generate_content(
+                            content_parts,
+                            generation_config=genai.GenerationConfig(
+                                temperature=0.7,
+                                max_output_tokens=2048,  # Reduced from 3072
+                                candidate_count=1
                             )
-                        else:
-                            raise ValueError("Google Generative AI library not available")
-                    finally:
-                        signal.alarm(0)  # Cancel timeout
+                        )
+                    else:
+                        raise ValueError("Google Generative AI library not available")
                     
                     if not result:
                         raise ValueError("Empty result from Gemini API")
