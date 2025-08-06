@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const geminiModelSelect = document.getElementById('geminiModel');
     const modelCompatibilityWarning = document.getElementById('modelCompatibilityWarning');
     const writingToneSelect = document.getElementById('writingTone');
-    const targetAudienceInput = document.getElementById('targetAudience');
+    const targetAudienceSelect = document.getElementById('targetAudience');
     const imageSourceRadios = document.querySelectorAll('input[name="imageSource"]');
     const pexelsConfig = document.getElementById('pexelsConfig');
     const pexelsApiKeyInput = document.getElementById('pexelsApiKey');
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gcpProjectId: gcpProjectIdInput,
         geminiModel: geminiModelSelect,
         writingTone: writingToneSelect,
-        targetAudience: targetAudienceInput,
+        targetAudience: targetAudienceSelect,
         aiImageModel: aiImageModelSelect,
         previewBeforePost: {
             get: () => previewBeforePostCheckbox.checked,
@@ -471,7 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
             message: userInput,
             modelName: geminiModelSelect.value,
             tone: writingToneSelect.value,
-            audience: targetAudienceInput.value.trim()
+            audience: targetAudienceSelect.value.trim()
         };
 
         const response = await fetch('/chat-for-topic', {
@@ -591,7 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
             pexelsApiKey: pexelsApiKeyInput.value.trim(),
             accessToken: accessToken,
             tone: writingToneSelect.value,
-            audience: targetAudienceInput.value.trim(),
+            audience: targetAudienceSelect.value.trim(),
             uploadedImageUri: (imageSource === 'upload' && userImageUpload.files[0]) ? imagePreview.src : null
         };
 
@@ -778,7 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 message: keyword + " (다른 관점의 새로운 주제 추천)",
                 modelName: geminiModelSelect.value,
                 tone: writingToneSelect.value,
-                audience: targetAudienceInput.value.trim()
+                audience: targetAudienceSelect.value.trim()
             };
 
             const response = await fetch('/chat-for-topic', {
@@ -1033,7 +1033,7 @@ document.addEventListener('DOMContentLoaded', () => {
             pexelsApiKey: pexelsApiKeyInput.value.trim(),
             accessToken: accessToken,
             tone: writingToneSelect.value,
-            audience: targetAudienceInput.value.trim(),
+            audience: targetAudienceSelect.value.trim(),
             uploadedImageUri: null // Image upload is not supported in queue mode
         };
         
