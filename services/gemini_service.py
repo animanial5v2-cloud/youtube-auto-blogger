@@ -178,29 +178,33 @@ class GeminiService:
         import re
         cleaned_text = re.sub(r'```(?:json)?\s*', '', raw_text)
         cleaned_text = re.sub(r'\s*```', '', cleaned_text)
+        cleaned_text = cleaned_text.strip()
         
-        # Find JSON object boundaries - look for complete JSON
-        import re
-        json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', cleaned_text, re.DOTALL)
-        
-        if not json_match:
-            logging.error("No valid JSON object found in Gemini response")
+        # Try to find JSON by looking for opening and closing braces
+        start_idx = cleaned_text.find('{')
+        if start_idx == -1:
+            logging.error("No opening brace found in response")
             logging.error(f"Raw response: {raw_text[:500]}...")
-            
-            # Extract title and create fallback structure
-            lines = raw_text.split('\n')
-            title_line = next((line.strip() for line in lines if line.strip() and len(line.strip()) > 10), "AI 생성 블로그 포스트")
-            content_lines = [line for line in lines if line.strip() and not line.startswith('```')]
-            content = '\n'.join(content_lines[:20])  # First 20 meaningful lines
-            
-            return {
-                'title': title_line[:100],
-                'content_with_placeholder': f"<h2>{title_line}</h2>\n<p>{content}</p>\n[IMAGE_HERE]",
-                'summary': title_line,
-                'image_search_keywords': "blog, content, article"
-            }
+            return self._create_fallback_response(raw_text)
         
-        json_string = json_match.group(0)
+        # Find matching closing brace
+        brace_count = 0
+        end_idx = -1
+        for i in range(start_idx, len(cleaned_text)):
+            if cleaned_text[i] == '{':
+                brace_count += 1
+            elif cleaned_text[i] == '}':
+                brace_count -= 1
+                if brace_count == 0:
+                    end_idx = i
+                    break
+        
+        if end_idx == -1:
+            logging.error("No matching closing brace found")
+            logging.error(f"Raw response: {raw_text[:500]}...")
+            return self._create_fallback_response(raw_text)
+        
+        json_string = cleaned_text[start_idx:end_idx + 1]
         
         try:
             parsed = json.loads(json_string)
@@ -223,20 +227,23 @@ class GeminiService:
             
             return parsed
         except json.JSONDecodeError as e:
-            logging.error(f"JSON parsing failed: {str(e)}")
-            logging.error(f"Extracted JSON string: {json_string}")
-            
-            # Fallback: create basic content structure from raw response
-            logging.info("Creating fallback content structure")
-            lines = raw_text.split('\n')
-            title = next((line.strip() for line in lines if line.strip() and len(line.strip()) > 10), "AI 생성 블로그 포스트")
-            
-            return {
-                'title': title[:100],  # Limit title length
-                'content_with_placeholder': f"<h2>{title}</h2>\n<p>{raw_text}</p>\n[IMAGE_HERE]",
-                'summary': title,
-                'image_search_keywords': "blog, content, article"
-            }
+            logging.error(f"JSON decode error: {str(e)}")
+            logging.error(f"Attempted to parse: {json_string[:300]}...")
+            return self._create_fallback_response(raw_text)
+    
+    def _create_fallback_response(self, raw_text):
+        """Create fallback response when JSON parsing fails"""
+        lines = raw_text.split('\n')
+        title_line = next((line.strip() for line in lines if line.strip() and len(line.strip()) > 10), "AI 생성 블로그 포스트")
+        content_lines = [line for line in lines if line.strip() and not line.startswith('```')]
+        content = '\n'.join(content_lines[:20])  # First 20 meaningful lines
+        
+        return {
+            'title': title_line[:100],
+            'content_with_placeholder': f"<h2>{title_line}</h2>\n<p>{content}</p>\n[IMAGE_HERE]",
+            'summary': title_line,
+            'image_search_keywords': "blog, content, article"
+        }
     
     def generate_ai_image(self, project_id, topic, access_token):
         """Generate AI image using Google Imagen 2"""
