@@ -406,7 +406,12 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (enabled) {
             updateTopicDiscoveryModeUI();
         } else {
-            chatInput.placeholder = "API 키를 입력하고 Google 인증을 완료해주세요.";
+            // Check if we have Google auth status
+            if (accessToken) {
+                chatInput.placeholder = "Gemini API 키를 입력해주세요.";
+            } else {
+                chatInput.placeholder = "API 키를 입력하고 Google 인증을 완료해주세요.";
+            }
         }
         
         startLoopBtn.disabled = !enabled;
@@ -446,7 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error("Chat Submit Error:", error);
-            addChatMessage('ai', `❌ 오류 발생: ${error.message}`, true);
+            addChatMessage('ai', `😔 앗, 문제가 생겼어요: ${error.message}`, true);
         } finally {
             isGenerating = false;
             setChatInputEnabled(true);
@@ -465,8 +470,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`Gemini API 오류 (${response.status}): ${errorData.error || '알 수 없는 오류'}`);
+            let errorMessage;
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.error || 'AI와 대화하는 중에 문제가 발생했습니다.';
+            } catch (jsonError) {
+                errorMessage = `서버 연결에 문제가 발생했습니다 (${response.status})`;
+            }
+            throw new Error(errorMessage);
         }
 
         const data = await response.json();
@@ -480,7 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handlePostGeneration(topicOrUrl) {
-        const thinkingMessage = addChatMessage('ai', `AI가 콘텐츠를 생성하고 있습니다: "${topicOrUrl.substring(0, 50)}..."`);
+        const thinkingMessage = addChatMessage('ai', `🤖 AI가 열심히 콘텐츠를 만들고 있어요: "${topicOrUrl.substring(0, 50)}..."`);
         
         const youtubeSourceType = document.querySelector('input[name="youtubeSourceType"]:checked').value;
         const videoFile = userVideoUpload.files[0];
@@ -532,13 +543,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const response = await fetch(endpoint, fetchOptions);
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`백엔드 서버 오류 (${response.status}): ${errorData.error || '알 수 없는 오류'}`);
+            let errorMessage;
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.error || '알 수 없는 오류가 발생했습니다.';
+            } catch (jsonError) {
+                // HTML 응답인 경우 (404 등)
+                const text = await response.text();
+                if (response.status === 404) {
+                    errorMessage = '요청한 기능을 찾을 수 없습니다. 서버 상태를 확인해주세요.';
+                } else {
+                    errorMessage = `서버 연결 문제가 발생했습니다 (${response.status})`;
+                }
+                console.error('Server response:', text);
+            }
+            throw new Error(errorMessage);
         }
 
         const data = await response.json();
         if (!data.title || !data.body) {
-             throw new Error("콘텐츠는 받았지만 제목/본문이 비어있습니다.");
+             throw new Error("AI가 콘텐츠를 만들었지만 내용이 비어있네요. 다시 시도해보세요.");
         }
         
         thinkingMessage.remove(); // Remove "thinking" message
