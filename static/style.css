@@ -361,7 +361,11 @@ input:focus, select:focus, textarea:focus {
     color: white;
     border-color: var(--primary-color);
 }
-#topicDiscoveryBtn span {
+#topicDiscoveryBtn .ai-icon {
+    display: block;
+}
+
+#topicDiscoveryBtn span:not(.ai-icon) {
     display: none;
 }
 
