@@ -406,7 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (enabled) {
             updateTopicDiscoveryModeUI();
         } else {
-            chatInput.placeholder = "먼저 로그인하고 설정을 완료해주세요.";
+            chatInput.placeholder = "API 키를 입력하고 Google 인증을 완료해주세요.";
         }
         
         startLoopBtn.disabled = !enabled;

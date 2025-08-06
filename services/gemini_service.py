@@ -80,16 +80,43 @@ class GeminiService:
                 except Exception as e:
                     logging.warning(f"Failed to process image: {str(e)}")
             
-            # Generate content
-            result = model.generate_content(content_parts)
-            generated_text = result.text
-            
-            logging.info("Gemini text generation completed successfully")
-            return self._parse_gemini_json_response(generated_text)
-            
+            # Generate content with retry and timeout handling
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    import time
+                    # Add small delay between attempts
+                    if attempt > 0:
+                        time.sleep(2 ** attempt)  # Exponential backoff
+                    
+                    result = model.generate_content(
+                        content_parts,
+                        generation_config={
+                            'temperature': 0.7,
+                            'top_p': 0.8,
+                            'top_k': 40,
+                            'max_output_tokens': 8192,
+                            'candidate_count': 1
+                        }
+                    )
+                    
+                    if not result or not result.text:
+                        raise ValueError("Empty response from Gemini API")
+                    
+                    generated_text = result.text
+                    logging.info("Gemini text generation completed successfully")
+                    return self._parse_gemini_json_response(generated_text)
+                    
+                except Exception as retry_error:
+                    logging.warning(f"Gemini API attempt {attempt + 1} failed: {str(retry_error)}")
+                    if attempt == max_retries - 1:
+                        # Last attempt, raise the error
+                        logging.error(f"All Gemini API attempts failed: {str(retry_error)}")
+                        raise ValueError(f"Gemini API 연결에 실패했습니다. API 키를 확인해주세요. 오류: {str(retry_error)}")
+                    
         except Exception as e:
             logging.error(f"Gemini API error: {str(e)}")
-            raise
+            raise ValueError(f"AI 콘텐츠 생성에 실패했습니다. API 키와 인터넷 연결을 확인해주세요.")
     
     def _data_uri_to_generative_part(self, uri):
         """Convert data URI to Gemini generative part"""
@@ -124,12 +151,38 @@ class GeminiService:
         try:
             parsed = json.loads(json_string)
             logging.info("JSON parsing successful")
+            
+            # Validate required fields
+            if not parsed.get('title') or not parsed.get('content_with_placeholder'):
+                logging.warning("Missing required fields in AI response")
+                # Create fallback content if fields are missing
+                if not parsed.get('title'):
+                    parsed['title'] = "AI 생성 블로그 포스트"
+                if not parsed.get('content_with_placeholder'):
+                    parsed['content_with_placeholder'] = raw_text.replace(json_string, '').strip()
+                    if not parsed['content_with_placeholder']:
+                        parsed['content_with_placeholder'] = "AI가 생성한 콘텐츠입니다."
+                if not parsed.get('summary'):
+                    parsed['summary'] = parsed['title']
+                if not parsed.get('image_search_keywords'):
+                    parsed['image_search_keywords'] = "blog, content, article"
+            
             return parsed
         except json.JSONDecodeError as e:
             logging.error(f"JSON parsing failed: {str(e)}")
             logging.error(f"Extracted JSON string: {json_string}")
-            logging.error(f"Raw response: {raw_text}")
-            raise ValueError("AI response is not valid JSON format")
+            
+            # Fallback: create basic content structure from raw response
+            logging.info("Creating fallback content structure")
+            lines = raw_text.split('\n')
+            title = next((line.strip() for line in lines if line.strip() and len(line.strip()) > 10), "AI 생성 블로그 포스트")
+            
+            return {
+                'title': title[:100],  # Limit title length
+                'content_with_placeholder': f"<h2>{title}</h2>\n<p>{raw_text}</p>\n[IMAGE_HERE]",
+                'summary': title,
+                'image_search_keywords': "blog, content, article"
+            }
     
     def generate_ai_image(self, project_id, topic, access_token):
         """Generate AI image using Google Imagen 2"""
