@@ -5,7 +5,7 @@ import requests
 
 class OpenAIService:
     def __init__(self):
-        self.api_key = os.getenv('OPENAI_API_KEY')
+        self.api_key = os.getenv('OPENAI_API_KEY') or 'S7a7shjluIEyZweFJ3WHV7T2I2hrUv1lX4fwdtCZ4YhwsHqmZ0V9RghC'
         self.base_url = "https://api.openai.com/v1/chat/completions"
     
     def generate_text_content(self, api_key, topic, image_url=None, model_name='gpt-3.5-turbo', tone='친근한', audience=''):
