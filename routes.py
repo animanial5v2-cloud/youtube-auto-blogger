@@ -417,9 +417,17 @@ def generate_post():
         
         # Handle image generation/fetching
         image_url = None
-        if image_source == 'pexels' and pexels_api_key:
-            keywords = topic.split()[:5]  # Use first 5 words as keywords
-            image_url = youtube_service.fetch_image_from_pexels(keywords, pexels_api_key)
+        if image_source == 'pexels':
+            if pexels_api_key:
+                keywords = topic.split()[:5]  # Use first 5 words as keywords
+                image_url = youtube_service.fetch_image_from_pexels(keywords, pexels_api_key)
+        elif image_source == 'ai':
+            gcp_project_id = data.get('gcpProjectId')
+            access_token = data.get('accessToken')
+            if gcp_project_id and access_token:
+                image_url = gemini_service.generate_ai_image(gcp_project_id, topic, access_token)
+        elif image_source == 'upload':
+            image_url = data.get('uploadedImageUrl')
         
         # Generate content using Gemini
         generated_content = gemini_service.generate_text_content(
@@ -436,6 +444,7 @@ def generate_post():
             image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
             final_content = final_content.replace('[IMAGE_HERE]', image_tag)
         elif image_url:
+            # Insert image at the beginning if placeholder not found
             alt_text = generated_content.get('image_search_keywords', 'Blog post image')
             image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
             final_content = image_tag + final_content
