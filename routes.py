@@ -6,6 +6,7 @@ from app import app, db
 from models import User, BlogPost, PostQueue
 from services.youtube_service import YouTubeService
 from services.gemini_service import GeminiService
+from services.openai_service import OpenAIService
 from services.blogger_service import BloggerService
 from services.wordpress_service import WordPressService
 from services.tistory_service import TistoryService
@@ -16,6 +17,7 @@ import uuid
 # Initialize services
 youtube_service = YouTubeService()
 gemini_service = GeminiService()
+openai_service = OpenAIService()
 blogger_service = BloggerService()
 wordpress_service = WordPressService()
 tistory_service = TistoryService()
@@ -180,11 +182,33 @@ def generate_blog_post():
         elif image_source == 'upload':
             image_url = data.get('uploadedImageUrl')
         
-        # Generate content using Gemini
-        logging.info("Generating content with Gemini...")
-        generated_content = gemini_service.generate_text_content(
-            gemini_api_key, content_text, image_url, gemini_model, writing_tone, target_audience
-        )
+        # Try Gemini first, fallback to OpenAI if it fails
+        logging.info("Generating content with AI...")
+        generated_content = None
+        
+        try:
+            generated_content = gemini_service.generate_text_content(
+                gemini_api_key, content_text, image_url, gemini_model, writing_tone, target_audience
+            )
+            logging.info("Content generated successfully with Gemini")
+        except Exception as gemini_error:
+            logging.warning(f"Gemini failed, trying OpenAI: {str(gemini_error)}")
+            try:
+                # Fallback to OpenAI
+                openai_key = settings.get('openaiKey') or os.getenv('OPENAI_API_KEY')
+                if openai_key:
+                    generated_content = openai_service.generate_text_content(
+                        api_key=openai_key,
+                        topic=content_text,
+                        tone=writing_tone,
+                        audience=target_audience
+                    )
+                    logging.info("Content generated successfully with OpenAI")
+                else:
+                    raise ValueError("OpenAI API 키가 필요합니다")
+            except Exception as openai_error:
+                logging.error(f"Both AI services failed: Gemini: {gemini_error}, OpenAI: {openai_error}")
+                raise ValueError("AI 콘텐츠 생성에 실패했습니다. API 키를 확인해주세요.")
         
         if not generated_content:
             return jsonify({'error': 'Failed to generate content'}), 500
