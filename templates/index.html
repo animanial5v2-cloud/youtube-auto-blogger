@@ -257,17 +257,43 @@
                     <div id="screen-generate" class="mobile-screen">
                         <div class="screen-header">
                             <h2 class="screen-title" data-i18n="generatePost">Generate Post</h2>
-                            <p class="screen-subtitle">Create and publish your blog content</p>
+                            <p class="screen-subtitle">Review settings and create your blog content</p>
                         </div>
                         <div class="screen-content">
+                            <!-- 설정 요약 섹션 -->
+                            <div class="generation-summary" style="margin-bottom: 20px; padding: 15px; background: #2a2a2a; border-radius: 10px; border: 1px solid #333;">
+                                <h4 style="color: white; margin: 0 0 10px 0; font-size: 0.9rem;">Content Settings Summary</h4>
+                                <div id="summaryContent" style="color: #cccccc; font-size: 0.8rem; line-height: 1.4;">
+                                    <div><strong>Content Source:</strong> <span id="summarySource">-</span></div>
+                                    <div><strong>Writing Tone:</strong> <span id="summaryTone">-</span></div>
+                                    <div><strong>Target Audience:</strong> <span id="summaryAudience">-</span></div>
+                                </div>
+                            </div>
+                            
+                            <!-- 프롬프트 최종 확인/수정 -->
+                            <div class="form-group">
+                                <label data-i18n="promptInput">Final Prompt (optional edit)</label>
+                                <textarea id="finalPromptInput" placeholder="AI에게 전달할 최종 지시사항..." rows="4" style="font-size: 14px;"></textarea>
+                            </div>
+                            
+                            <!-- 생성 버튼 -->
                             <div class="form-group">
                                 <button id="mobileGenerateBtn" class="mobile-auth-btn" data-i18n="generatePost">
-                                    Generate Blog Post
+                                    🚀 Generate Blog Post
                                 </button>
                             </div>
                             
+                            <!-- 생성 상태 -->
                             <div id="mobileGenerationStatus" class="auth-status-mobile" style="display: none;">
                                 Ready to generate
+                            </div>
+                            
+                            <!-- 진행 상황 표시 -->
+                            <div id="generationProgress" style="display: none; margin-top: 15px;">
+                                <div style="background: #333; border-radius: 10px; overflow: hidden; height: 8px;">
+                                    <div id="progressBar" style="background: #6366f1; height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+                                </div>
+                                <div id="progressText" style="color: #888; font-size: 0.8rem; margin-top: 5px; text-align: center;">Initializing...</div>
                             </div>
                         </div>
                     </div>

@@ -38,7 +38,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.classList.add('active');
             }
         });
+        
+        // 생성 화면에 도달하면 설정 요약 업데이트
+        if (screenId === 'generate') {
+            updateGenerationSummary();
+        }
     };
+    
+    // 생성 화면 설정 요약 업데이트 함수
+    function updateGenerationSummary() {
+        const summarySource = document.getElementById('summarySource');
+        const summaryTone = document.getElementById('summaryTone'); 
+        const summaryAudience = document.getElementById('summaryAudience');
+        const finalPromptInput = document.getElementById('finalPromptInput');
+        
+        // 콘텐츠 소스 확인
+        const youtubeUrl = document.getElementById('mobileYoutubeUrl')?.value.trim();
+        const topicInput = document.getElementById('mobileTopicInput')?.value.trim(); 
+        const promptInput = document.getElementById('mobilePromptInput')?.value.trim();
+        
+        let contentSource = 'Not specified';
+        if (youtubeUrl) {
+            contentSource = `YouTube: ${youtubeUrl.substring(0, 50)}...`;
+        } else if (topicInput) {
+            contentSource = `Topic: ${topicInput.substring(0, 50)}...`;
+        } else if (promptInput) {
+            contentSource = `Custom Prompt: ${promptInput.substring(0, 50)}...`;
+        }
+        
+        // 글쓰기 톤 확인
+        const writingTone = document.getElementById('mobileWritingTone')?.value || 'Not selected';
+        
+        // 타겟 독자 확인  
+        const targetAudience = document.getElementById('mobileTargetAudience')?.value.trim() || 'Not specified';
+        
+        // 요약 업데이트
+        if (summarySource) summarySource.textContent = contentSource;
+        if (summaryTone) summaryTone.textContent = writingTone;
+        if (summaryAudience) summaryAudience.textContent = targetAudience;
+        
+        // 최종 프롬프트에 기존 프롬프트 입력 복사
+        if (finalPromptInput && promptInput) {
+            finalPromptInput.value = promptInput;
+        }
+    }
     
     // --- GLOBAL STATE & CONFIG ---
     const GOOGLE_API_SCOPES = 'https://www.googleapis.com/auth/blogger https://www.googleapis.com/auth/cloud-platform';
@@ -1286,6 +1329,141 @@ function updateMobileAuthStatus() {
     checkLoginStatus();
 }
 
+// 모바일에서 콘텐츠 생성 처리
+async function handleMobileGenerate() {
+    if (isGenerating) return;
+    
+    const progressDiv = document.getElementById('generationProgress');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const statusDiv = document.getElementById('mobileGenerationStatus');
+    
+    try {
+        setGeneratingState(true);
+        
+        // 프로그레스 표시
+        if (progressDiv) progressDiv.style.display = 'block';
+        if (progressBar) progressBar.style.width = '10%';
+        if (progressText) progressText.textContent = 'Collecting inputs...';
+        
+        // 모바일 입력값 수집
+        const settings = {
+            apiKey: document.getElementById('mobileApiKey')?.value.trim(),
+            clientId: document.getElementById('mobileClientId')?.value.trim(),
+            blogId: document.getElementById('mobileBlogId')?.value.trim(),
+            blogAddress: document.getElementById('mobileBlogAddress')?.value.trim(),
+            geminiModel: 'gemini-1.5-pro',
+            writingTone: document.getElementById('mobileWritingTone')?.value || 'friendly',
+            targetAudience: document.getElementById('mobileTargetAudience')?.value.trim() || 'general'
+        };
+        
+        // 콘텐츠 소스 확인
+        const youtubeUrl = document.getElementById('mobileYoutubeUrl')?.value.trim();
+        const topicInput = document.getElementById('mobileTopicInput')?.value.trim();
+        const promptInput = document.getElementById('finalPromptInput')?.value.trim() || 
+                          document.getElementById('mobilePromptInput')?.value.trim();
+        
+        let input = '';
+        if (youtubeUrl) {
+            input = youtubeUrl;
+        } else if (topicInput) {
+            input = topicInput;
+        } else if (promptInput) {
+            input = promptInput;
+        } else {
+            throw new Error('Please provide content source (YouTube URL, topic, or prompt)');
+        }
+        
+        if (progressBar) progressBar.style.width = '30%';
+        if (progressText) progressText.textContent = 'Generating content...';
+        
+        // API 호출
+        const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                input: input,
+                settings: settings,
+                accessToken: accessToken
+            })
+        });
+        
+        if (progressBar) progressBar.style.width = '70%';
+        if (progressText) progressText.textContent = 'Processing response...';
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Generation failed');
+        }
+        
+        if (progressBar) progressBar.style.width = '100%';
+        if (progressText) progressText.textContent = 'Complete!';
+        
+        // 성공 메시지 표시
+        if (statusDiv) {
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = `
+                <div style="color: #4ade80; font-weight: 500;">✅ Blog post generated successfully!</div>
+                <div style="font-size: 0.8rem; margin-top: 5px; color: #888;">
+                    Title: ${data.title || 'Generated Post'}<br>
+                    Status: ${data.blogger_url ? 'Published' : 'Generated'}
+                </div>
+            `;
+        }
+        
+        // 기록 업데이트
+        if (data.post_id) {
+            await loadHistory();
+        }
+        
+    } catch (error) {
+        console.error('Mobile generation error:', error);
+        
+        if (statusDiv) {
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = `
+                <div style="color: #ef4444; font-weight: 500;">❌ Error: ${error.message}</div>
+                <div style="font-size: 0.8rem; margin-top: 5px; color: #888;">
+                    Please check your settings and try again.
+                </div>
+            `;
+        }
+        
+        if (progressText) progressText.textContent = 'Error occurred';
+    } finally {
+        setGeneratingState(false);
+        
+        // 프로그레스 숨기기 (3초 후)
+        setTimeout(() => {
+            if (progressDiv) progressDiv.style.display = 'none';
+            if (progressBar) progressBar.style.width = '0%';
+        }, 3000);
+    }
+}
+
+// 모바일 인터페이스 이벤트 리스너 추가
+document.addEventListener('DOMContentLoaded', () => {
+    // 모바일 생성 버튼 이벤트 리스너
+    const mobileGenerateBtn = document.getElementById('mobileGenerateBtn');
+    if (mobileGenerateBtn) {
+        mobileGenerateBtn.addEventListener('click', handleMobileGenerate);
+    }
+    
+    // 모바일 로그인 버튼 이벤트 리스너  
+    const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+    if (mobileLoginBtn) {
+        mobileLoginBtn.addEventListener('click', () => {
+            if (accessToken) {
+                signOut();
+            } else {
+                getToken();
+            }
+        });
+    }
+});
+
 // 전역 함수로 만들기
 window.showScreen = showScreen;
 window.updateMobileAuthStatus = updateMobileAuthStatus;
+window.handleMobileGenerate = handleMobileGenerate;
