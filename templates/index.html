@@ -346,11 +346,45 @@
                     </div>
                 </div>
             </div>
+            <!-- Desktop Content Input Panel -->
+            <div id="desktopContentPanel" class="content-input-panel">
+                <div class="panel-header">
+                    <h3 data-i18n="contentInput">콘텐츠 입력</h3>
+                </div>
+                
+                <div class="input-sections">
+                    <!-- YouTube URL Section -->
+                    <div class="input-section">
+                        <label for="desktopYoutubeUrl" data-i18n="youtubeUrl">YouTube URL</label>
+                        <input type="text" id="desktopYoutubeUrl" data-i18n-placeholder="youtubeUrlPlaceholder" placeholder="https://www.youtube.com/watch?v=..." />
+                    </div>
+                    
+                    <!-- Topic Input Section -->
+                    <div class="input-section">
+                        <label for="desktopTopicInput" data-i18n="topicInput">주제 입력</label>
+                        <textarea id="desktopTopicInput" data-i18n-placeholder="enterYourBlogTopic" placeholder="블로그 주제를 입력하세요..." rows="3"></textarea>
+                    </div>
+                    
+                    <!-- AI Prompt Section -->
+                    <div class="input-section">
+                        <label for="desktopPromptInput" data-i18n="promptInput">AI 프롬프트</label>
+                        <textarea id="desktopPromptInput" data-i18n-placeholder="aiDetailedInstructions" placeholder="AI에게 전달할 상세한 지시사항을 입력하세요..." rows="4"></textarea>
+                    </div>
+                    
+                    <!-- Generate Button -->
+                    <div class="input-section">
+                        <button id="desktopGenerateBtn" class="generate-btn" data-i18n="generatePost">
+                            🚀 포스트 생성
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div id="chatContainer" class="chat-container">
                 <div class="chat-message ai">
                     <div class="chat-bubble">
                         <p data-i18n="chatWelcome1">안녕하세요! AI 자동 블로깅 스튜디오입니다.</p>
-                        <p><strong data-i18n="chatWelcome2">아래 입력창에 포스팅할 주제, YouTube URL을 입력하거나, 오른쪽 '콘텐츠 소스'에서 동영상 파일을 선택한 후 전송 버튼(➤)을 누르세요.</strong></p>
+                        <p><strong data-i18n="chatWelcome2">위 입력 패널에서 콘텐츠를 입력하거나, 아래 채팅창에서 대화로 블로그를 생성하세요.</strong></p>
                         <p data-i18n="chatWelcome3">아이디어가 필요하시면 '주제 탐색' 모드를 켜고 대화를 시작할 수 있습니다.</p>
                     </div>
                 </div>
