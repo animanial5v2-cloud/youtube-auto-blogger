@@ -151,7 +151,10 @@ const translations = {
         chatWelcome2: "아래 입력창에 포스팅할 주제, YouTube URL을 입력하거나, 오른쪽 '콘텐츠 소스'에서 동영상 파일을 선택한 후 전송 버튼(➤)을 누르세요.",
         chatWelcome3: "아이디어가 필요하시면 '주제 탐색' 모드를 켜고 대화를 시작할 수 있습니다.",
         topicDiscovery: "주제 탐색",
-        chatInputPlaceholder: "여기에 포스팅 주제 또는 YouTube URL을 입력하세요..."
+        chatInputPlaceholder: "여기에 포스팅 주제 또는 YouTube URL을 입력하세요...",
+        
+        // No records message
+        noRecords: "기록이 없습니다."
     },
     
     en: {
@@ -305,7 +308,10 @@ const translations = {
         chatWelcome2: "Enter a posting topic or YouTube URL in the input field below, or select a video file from 'Content Source' on the right and press the send button (➤).",
         chatWelcome3: "If you need ideas, you can turn on 'Topic Discovery' mode and start a conversation.",
         topicDiscovery: "Topic Discovery",
-        chatInputPlaceholder: "Enter your posting topic or YouTube URL here..."
+        chatInputPlaceholder: "Enter your posting topic or YouTube URL here...",
+        
+        // No records message
+        noRecords: "No records available."
     },
     
     vi: {
@@ -460,7 +466,10 @@ const translations = {
         chatWelcome2: "Nhập chủ đề bài viết hoặc URL YouTube vào ô nhập bên dưới, hoặc chọn tệp video từ 'Nguồn Nội dung' bên phải và nhấn nút gửi (➤).",
         chatWelcome3: "Nếu bạn cần ý tưởng, bạn có thể bật chế độ 'Khám phá Chủ đề' và bắt đầu cuộc trò chuyện.",
         topicDiscovery: "Khám phá Chủ đề",
-        chatInputPlaceholder: "Nhập chủ đề bài viết hoặc URL YouTube của bạn ở đây..."
+        chatInputPlaceholder: "Nhập chủ đề bài viết hoặc URL YouTube của bạn ở đây...",
+        
+        // No records message
+        noRecords: "Không có bản ghi nào."
     }
 };
 

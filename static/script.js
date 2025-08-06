@@ -372,8 +372,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (postingHistory.length === 0) {
             const placeholder = document.createElement('li');
             placeholder.className = 'history-placeholder';
+            placeholder.setAttribute('data-i18n', 'noRecords');
             placeholder.textContent = '기록이 없습니다.';
             historyList.appendChild(placeholder);
+            
+            // 현재 언어에 맞게 텍스트 업데이트
+            if (typeof changeLanguage === 'function') {
+                const currentLang = localStorage.getItem('selectedLanguage') || 'ko';
+                const translation = translations[currentLang];
+                if (translation && translation.noRecords) {
+                    placeholder.textContent = translation.noRecords;
+                }
+            }
             return;
         }
         
