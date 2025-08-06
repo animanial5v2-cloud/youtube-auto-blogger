@@ -12,30 +12,7 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Tablet Header -->
-        <div class="tablet-header" style="display: none;">
-            <h1 class="tablet-title">AI Blogging Studio</h1>
-            <div class="tablet-controls">
-                <button id="sidebarToggleBtn" class="sidebar-toggle-btn">설정 접기/펼치기</button>
-                <select id="tabletLangSelect" class="language-select">
-                    <option value="ko">한국어</option>
-                    <option value="vi">Tiếng Việt</option>
-                    <option value="en">English</option>
-                </select>
-            </div>
-        </div>
-        
-        <!-- Mobile Header -->
-        <div class="mobile-header" style="display: none;">
-            <h1 class="mobile-title">AI Blogging Studio</h1>
-            <div class="mobile-language-floating">
-                <select id="mobileLangSelect" class="language-select">
-                    <option value="ko">한국어</option>
-                    <option value="vi">Tiếng Việt</option>
-                    <option value="en">English</option>
-                </select>
-            </div>
-        </div>
+        <!-- Headers removed - all controls moved to left navigation -->
         
         <!-- Left Sidebar -->
         <aside class="sidebar-left">
@@ -297,84 +274,7 @@
                 </div>
             </div>
 
-                <!-- 스크린 3: 콘텐츠 소스 선택 -->
-                <div id="screen-content-source" class="mobile-screen">
-                    <h2 class="screen-title">콘텐츠 소스</h2>
-                    <div class="screen-content">
-                        <h3>어떤 방식으로 콘텐츠를 만들까요?</h3>
-                        <div class="form-group">
-                            <label>콘텐츠 타입</label>
-                            <select id="mobileContentType">
-                                <option value="youtube">YouTube 동영상</option>
-                                <option value="topic">주제 입력</option>
-                                <option value="file">파일 업로드</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mobile-nav-buttons">
-                        <button class="mobile-nav-btn" onclick="showScreen('login')">이전</button>
-                        <button class="mobile-nav-btn primary" onclick="showScreen('content-input')">다음</button>
-                    </div>
-                </div>
-
-                <!-- 스크린 4: 콘텐츠 입력 -->
-                <div id="screen-content-input" class="mobile-screen">
-                    <h2 class="screen-title">콘텐츠 입력</h2>
-                    <div class="screen-content">
-                        <div id="mobileYoutubeInput">
-                            <h3>YouTube URL</h3>
-                            <div class="form-group">
-                                <label>YouTube 링크를 입력하세요</label>
-                                <input type="url" id="mobileYoutubeUrl" placeholder="https://youtube.com/watch?v=...">
-                            </div>
-                        </div>
-                        
-                        <div id="mobileTopicInput" style="display: none;">
-                            <h3>블로그 주제</h3>
-                            <div class="form-group">
-                                <label>작성할 주제를 입력하세요</label>
-                                <textarea id="mobileTopicText" placeholder="블로그에 쓰고 싶은 주제를 입력하세요"></textarea>
-                            </div>
-                        </div>
-                        
-                        <div id="mobileFileInput" style="display: none;">
-                            <h3>파일 업로드</h3>
-                            <div class="form-group">
-                                <label>파일을 선택하세요</label>
-                                <input type="file" id="mobileFileUpload" accept=".txt,.pdf,.docx">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mobile-nav-buttons">
-                        <button class="mobile-nav-btn" onclick="showScreen('content-source')">이전</button>
-                        <button class="mobile-nav-btn primary" onclick="showScreen('writing-settings')">다음</button>
-                    </div>
-                </div>
-
-                <!-- 스크린 5: 글쓰기 설정 -->
-                <div id="screen-writing-settings" class="mobile-screen">
-                    <h2 class="screen-title">글쓰기 설정</h2>
-                    <div class="screen-content">
-                        <h3>글쓰기 스타일</h3>
-                        <div class="form-group">
-                            <label>톤 앤 매너</label>
-                            <select id="mobileWritingTone">
-                                <option value="friendly">친근한</option>
-                                <option value="professional">전문적인</option>
-                                <option value="casual">캐주얼한</option>
-                                <option value="formal">격식있는</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>타겟 독자</label>
-                            <input type="text" id="mobileTargetAudience" placeholder="예: IT 비전공자, 대학생, 직장인">
-                        </div>
-                    </div>
-                    <div class="mobile-nav-buttons">
-                        <button class="mobile-nav-btn" onclick="showScreen('content-input')">이전</button>
-                        <button class="mobile-nav-btn primary" onclick="showScreen('platform-settings')">다음</button>
-                    </div>
+                <!-- Cleaned up structure -->
                 </div>
 
                 <!-- 스크린 6: 플랫폼 설정 -->

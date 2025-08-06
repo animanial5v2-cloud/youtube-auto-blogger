@@ -788,46 +788,7 @@ input:focus, select:focus, textarea:focus {
 
 /* === TABLET OPTIMIZATION === */
 @media (max-width: 1024px) and (min-width: 769px) {
-    .tablet-header {
-        display: flex !important;
-        justify-content: space-between;
-        align-items: center;
-        padding: calc(var(--spacing-unit) * 1.5);
-        background: var(--surface-color);
-        border-bottom: 2px solid var(--border-color);
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
-    
-    .tablet-title {
-        font-size: 1.3rem;
-        font-weight: 600;
-        color: var(--text-color);
-        margin: 0;
-    }
-    
-    .tablet-controls {
-        display: flex;
-        gap: calc(var(--spacing-unit) * 1);
-        align-items: center;
-    }
-    
-    .sidebar-toggle-btn {
-        padding: calc(var(--spacing-unit) * 0.8) calc(var(--spacing-unit) * 1.2);
-        background: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 0.95rem;
-        cursor: pointer;
-        min-height: 40px;
-        font-weight: 500;
-    }
-    
-    .sidebar-toggle-btn:hover {
-        background: var(--primary-hover);
-    }
+    /* Tablet headers removed */
     
     .app-container {
         display: flex;
@@ -895,41 +856,7 @@ input:focus, select:focus, textarea:focus {
 
 /* === MOBILE RESPONSIVENESS === */
 @media (max-width: 768px) {
-    .mobile-header {
-        display: flex !important;
-        justify-content: center;
-        align-items: center;
-        padding: calc(var(--spacing-unit) * 2);
-        background: #1a1a1a;
-        color: white;
-        flex-shrink: 0;
-        min-height: 70px;
-        position: relative;
-    }
-    
-    .mobile-title {
-        font-size: 1.3rem;
-        font-weight: 600;
-        margin: 0;
-        text-align: center;
-    }
-    
-    /* 언어 선택 - 우상단 고정 */
-    .mobile-language-floating {
-        position: absolute;
-        top: 50%;
-        right: calc(var(--spacing-unit) * 2);
-        transform: translateY(-50%);
-    }
-    
-    .mobile-language-floating select {
-        background: rgba(255,255,255,0.9);
-        border: 1px solid rgba(255,255,255,0.3);
-        border-radius: 6px;
-        padding: calc(var(--spacing-unit) * 0.6) calc(var(--spacing-unit) * 0.8);
-        font-size: 14px;
-        backdrop-filter: blur(10px);
-    }
+    /* Mobile headers removed */
     
     .app-container {
         display: flex;
