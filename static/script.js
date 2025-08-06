@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const videoFileName = document.getElementById('videoFileName');
     const removeVideoBtn = document.getElementById('removeVideoBtn');
     const previewBeforePostCheckbox = document.getElementById('previewBeforePost');
-    const postAsDraftCheckbox = document.getElementById('postAsDraft');
+    // postAsDraft checkbox removed
 
     // Automation & PC Control
     const loopIntervalSelect = document.getElementById('loopInterval');
@@ -172,10 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
             get: () => previewBeforePostCheckbox.checked,
             set: (value) => { previewBeforePostCheckbox.checked = value; }
         },
-        postAsDraft: {
-            get: () => postAsDraftCheckbox.checked,
-            set: (value) => { postAsDraftCheckbox.checked = value; }
-        },
+
     };
 
     function saveSettings() {
@@ -676,10 +673,8 @@ document.addEventListener('DOMContentLoaded', () => {
         thinkingMessage.remove(); // Remove "thinking" message
 
         if (!previewBeforePostCheckbox.checked && !loopIntervalId) {
-            const isDraft = postAsDraftCheckbox.checked;
-            const actionText = isDraft ? "초안으로 즉시 저장합니다" : "즉시 발행합니다";
-            addChatMessage('ai', `✅ '발행 전 미리보기' 기능이 꺼져있습니다. "${data.title}" 포스트를 생성하여 ${actionText}...`, true);
-            await postToBloggerAndHandleResult(data.title, data.body, isDraft);
+            addChatMessage('ai', `✅ '발행 전 미리보기' 기능이 꺼져있습니다. "${data.title}" 포스트를 생성하여 즉시 발행합니다...`, true);
+            await postToBloggerAndHandleResult(data.title, data.body, false);
         } else {
             const contentId = `content-${Date.now()}`;
             generatedContentStore[contentId] = { title: data.title, body: data.body };
@@ -894,17 +889,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const title = previewTitleInput.value;
         const content = previewBodyTextarea.value;
-        const isDraft = postAsDraftCheckbox.checked;
 
         approvePostBtn.disabled = true;
         approvePostBtn.textContent = '포스팅 중...';
 
         try {
-            await postToBloggerAndHandleResult(title, content, isDraft);
+            await postToBloggerAndHandleResult(title, content, false);
         } finally {
             previewModal.classList.add('hidden');
             approvePostBtn.disabled = false;
-            approvePostBtn.textContent = '승인 및 포스팅';
+            approvePostBtn.textContent = '승인 및 공개 포스팅';
             delete generatedContentStore[contentId];
         }
     }
@@ -1005,7 +999,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const generatedData = await generatePostFromQueueItem(itemToProcess);
             if (generatedData) {
-                await postToBloggerAndHandleResult(generatedData.title, generatedData.body, postAsDraftCheckbox.checked);
+                await postToBloggerAndHandleResult(generatedData.title, generatedData.body, false);
             }
         } catch (error) {
             console.error("Queue Processing Error:", error);
