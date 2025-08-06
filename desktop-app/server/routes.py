@@ -245,24 +245,37 @@ def chat_for_topic():
         if not api_key:
             return jsonify({'error': 'Gemini API key is required'}), 400
         
-        # Use gemini service for topic discovery chat
+        # Use gemini service for topic discovery chat with optimized configuration
         try:
             import google.generativeai as genai
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-1.5-pro-latest')
             
-            prompt = f"""당신은 창의적인 블로그 주제 컨설턴트입니다. 사용자의 질문에 대해 구체적이고 실용적인 블로그 주제를 제안해주세요.
-
-사용자 질문: "{message}"
-
-아래 형식으로 응답해주세요:
-- 구체적이고 검색 친화적인 주제 제안
-- 해당 주제가 왜 좋은지 간단한 설명
-- SEO 관점에서의 키워드 포함 권장사항
-
-응답은 자연스러운 한국어로 작성하되, 바로 블로그 포스팅 생성에 활용할 수 있을 정도로 구체적이어야 합니다."""
+            # Use lighter model for topic discovery to reduce memory usage
+            model = genai.GenerativeModel('gemini-1.5-flash-latest')
             
-            result = model.generate_content(prompt)
+            # Shorter, optimized prompt to reduce token usage
+            prompt = f"""블로그 주제 컨설턴트로서 다음 질문에 대해 3가지 구체적인 주제를 제안해주세요:
+
+질문: "{message}"
+
+형식:
+1. [구체적 주제명] - 간단한 이유
+2. [구체적 주제명] - 간단한 이유  
+3. [구체적 주제명] - 간단한 이유
+
+각 제안은 SEO 친화적이고 바로 포스팅 가능해야 합니다."""
+            
+            # Configure generation with limits to prevent memory issues
+            generation_config = genai.types.GenerationConfig(
+                max_output_tokens=1000,
+                temperature=0.7,
+                top_p=0.8,
+            )
+            
+            result = model.generate_content(
+                prompt,
+                generation_config=generation_config
+            )
             
             if result and result.text:
                 return jsonify({'reply': result.text})
