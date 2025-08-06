@@ -31,7 +31,8 @@ def get_or_create_user(session_id=None):
     
     user = User.query.filter_by(id=session_id).first()
     if not user:
-        user = User(id=session_id)
+        user = User()
+        user.id = session_id
         db.session.add(user)
         db.session.commit()
     
@@ -55,6 +56,8 @@ def handle_settings():
         user.settings = data
         db.session.commit()
         return jsonify({'status': 'success'})
+    
+    return jsonify({'error': 'Method not allowed'}), 405
 
 @app.route('/api/history')
 def get_history():
@@ -199,19 +202,18 @@ def generate_blog_post():
             final_content = image_tag + final_content
         
         # Save to database
-        blog_post = BlogPost(
-            user_id=user.id,
-            title=generated_content.get('title', 'Untitled Post'),
-            content=final_content,
-            summary=generated_content.get('summary', ''),
-            source_type=source_type,
-            source_url=source_url,
-            gemini_model=gemini_model,
-            writing_tone=writing_tone,
-            target_audience=target_audience,
-            image_source=image_source,
-            image_url=image_url
-        )
+        blog_post = BlogPost()
+        blog_post.user_id = user.id
+        blog_post.title = generated_content.get('title', 'Untitled Post')
+        blog_post.content = final_content
+        blog_post.summary = generated_content.get('summary', '')
+        blog_post.source_type = source_type
+        blog_post.source_url = source_url
+        blog_post.gemini_model = gemini_model
+        blog_post.writing_tone = writing_tone
+        blog_post.target_audience = target_audience
+        blog_post.image_source = image_source
+        blog_post.image_url = image_url
         
         db.session.add(blog_post)
         db.session.commit()
@@ -232,6 +234,7 @@ def generate_blog_post():
 @app.route('/api/publish', methods=['POST'])
 def publish_to_platform():
     """Publish generated post to selected platform"""
+    platform = 'unknown'  # Initialize platform variable
     try:
         user = get_or_create_user()
         data = request.get_json()
@@ -330,7 +333,8 @@ def publish_to_platform():
             return jsonify({'error': f'Failed to publish to {platform}'}), 500
             
     except Exception as e:
-        logging.error(f"Error publishing to {platform if 'platform' in locals() else 'unknown platform'}: {str(e)}")
+        platform_name = platform if 'platform' in locals() and platform else 'unknown platform'
+        logging.error(f"Error publishing to {platform_name}: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/queue', methods=['GET', 'POST'])
@@ -355,10 +359,9 @@ def handle_queue():
         if not topic_or_url:
             return jsonify({'error': 'Topic or URL is required'}), 400
         
-        queue_item = PostQueue(
-            user_id=user.id,
-            topic_or_url=topic_or_url
-        )
+        queue_item = PostQueue()
+        queue_item.user_id = user.id
+        queue_item.topic_or_url = topic_or_url
         
         db.session.add(queue_item)
         db.session.commit()
@@ -367,6 +370,8 @@ def handle_queue():
             'status': 'success',
             'queue_id': queue_item.id
         })
+    
+    return jsonify({'error': 'Method not allowed'}), 405
 
 @app.route('/api/queue/<queue_id>', methods=['DELETE'])
 def delete_queue_item(queue_id):
