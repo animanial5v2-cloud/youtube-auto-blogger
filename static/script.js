@@ -525,6 +525,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             </button>
                         </div>
                     `).join('')}
+                    <div class="topic-re-search-section">
+                        <p class="re-search-instruction">💡 <strong>마음에 드는 주제가 없나요?</strong></p>
+                        <button class="button-secondary topic-re-search-btn" data-keyword="${escapeHtml(userInput)}">
+                            🔄 다른 주제 추천받기
+                        </button>
+                        <p class="re-search-help-text">같은 키워드로 새로운 주제들을 다시 검색합니다</p>
+                    </div>
                 </div>
             `;
         } else {
@@ -534,7 +541,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${isTopicDiscoveryMode ? `
                     <div class="topic-suggestion-actions">
                         <button class="button-secondary post-from-topic-btn" data-topic="${escapeHtml(data.reply)}">✅ 이 내용으로 포스팅하기</button>
+                        <button class="button-secondary topic-re-search-btn" data-keyword="${escapeHtml(userInput)}">🔄 다른 주제 추천받기</button>
                     </div>
+                    <p class="re-search-help-text">같은 키워드로 새로운 주제들을 다시 검색합니다</p>
                 ` : ''}
             `;
         }
@@ -685,6 +694,9 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleTopicDiscoveryMode();
             chatInput.focus();
             addChatMessage('ai', `<strong>'${topic.substring(0, 50)}...'</strong> 주제로 포스팅을 준비합니다. 내용을 확인하고 전송 버튼을 누르세요.`, true);
+        } else if (event.target.classList.contains('topic-re-search-btn')) {
+            const keyword = event.target.dataset.keyword;
+            handleTopicReSearch(keyword);
         }
     }
 
@@ -710,6 +722,118 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         return true;
+    }
+
+    function parseTopicSuggestions(text) {
+        const topics = [];
+        const lines = text.split('\n');
+        let currentTopic = null;
+        
+        for (const line of lines) {
+            const trimmed = line.trim();
+            
+            // Check if this is a numbered topic (1. **title**, 2. **title**, etc.)
+            const topicMatch = trimmed.match(/^\d+\.\s*\*\*(.+?)\*\*/);
+            if (topicMatch) {
+                if (currentTopic) {
+                    topics.push(currentTopic);
+                }
+                currentTopic = {
+                    title: topicMatch[1],
+                    description: ''
+                };
+            } else if (currentTopic && trimmed && !trimmed.startsWith('#')) {
+                // Add to description if we have a current topic and it's not empty/header
+                if (currentTopic.description) {
+                    currentTopic.description += ' ';
+                }
+                currentTopic.description += trimmed;
+            }
+        }
+        
+        // Add the last topic
+        if (currentTopic) {
+            topics.push(currentTopic);
+        }
+        
+        return topics;
+    }
+    
+    async function handleTopicReSearch(keyword) {
+        if (isGenerating) return;
+        
+        isGenerating = true;
+        setChatInputEnabled(false);
+        
+        try {
+            const thinkingMessage = addChatMessage('ai', '새로운 주제들을 찾고 있습니다...');
+            const requestBody = { 
+                apiKey: apiKeyInput.value.trim(), 
+                message: keyword + " (다른 관점의 새로운 주제 추천)"
+            };
+
+            const response = await fetch('/chat-for-topic', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                let errorMessage;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.error || '새 주제 검색 중 문제가 발생했습니다.';
+                } catch (jsonError) {
+                    errorMessage = `서버 연결에 문제가 발생했습니다 (${response.status})`;
+                }
+                throw new Error(errorMessage);
+            }
+
+            const data = await response.json();
+            
+            // Parse and display new topic suggestions
+            let aiResponseHtml;
+            if (data.reply.includes('1. **') && data.reply.includes('2. **')) {
+                const suggestions = parseTopicSuggestions(data.reply);
+                aiResponseHtml = `
+                    <div class="topic-suggestions-container">
+                        <p class="topic-instruction">🎯 <strong>새로운 주제 추천입니다. 원하는 주제를 선택해서 포스팅하세요:</strong></p>
+                        ${suggestions.map((suggestion, index) => `
+                            <div class="topic-suggestion-item">
+                                <h4>${suggestion.title}</h4>
+                                <p class="topic-description">${suggestion.description}</p>
+                                <button class="button-primary post-from-topic-btn" data-topic="${escapeHtml(suggestion.title + ' - ' + suggestion.description)}">
+                                    📝 이 주제로 포스팅하기
+                                </button>
+                            </div>
+                        `).join('')}
+                        <div class="topic-re-search-section">
+                            <p class="re-search-instruction">💡 <strong>마음에 드는 주제가 없나요?</strong></p>
+                            <button class="button-secondary topic-re-search-btn" data-keyword="${escapeHtml(keyword)}">
+                                🔄 다른 주제 추천받기
+                            </button>
+                            <p class="re-search-help-text">같은 키워드로 새로운 주제들을 다시 검색합니다</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                aiResponseHtml = `
+                    <p>${escapeHtml(data.reply).replace(/\n/g, '<br>')}</p>
+                    <div class="topic-suggestion-actions">
+                        <button class="button-secondary post-from-topic-btn" data-topic="${escapeHtml(data.reply)}">✅ 이 내용으로 포스팅하기</button>
+                        <button class="button-secondary topic-re-search-btn" data-keyword="${escapeHtml(keyword)}">🔄 다른 주제 추천받기</button>
+                    </div>
+                `;
+            }
+            thinkingMessage.querySelector('.chat-bubble').innerHTML = aiResponseHtml;
+            
+        } catch (error) {
+            console.error("Topic Re-search Error:", error);
+            addChatMessage('ai', `😔 새 주제 검색 중 문제가 생겼어요: ${error.message}`, true);
+        } finally {
+            isGenerating = false;
+            setChatInputEnabled(true);
+        }
     }
 
     function toggleTopicDiscoveryMode() {
