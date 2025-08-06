@@ -607,7 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
             accessToken: accessToken,
             tone: writingToneSelect.value,
             audience: targetAudienceSelect.value.trim(),
-            uploadedImageUri: (imageSource === 'upload' && userImageUpload.files[0]) ? imagePreview.src : null
+            uploadedImageUrl: (imageSource === 'upload' && userImageUpload.files[0]) ? imagePreview.src : null
         };
 
         if (requestBody) { // JSON request
@@ -1049,7 +1049,7 @@ document.addEventListener('DOMContentLoaded', () => {
             accessToken: accessToken,
             tone: writingToneSelect.value,
             audience: targetAudienceSelect.value.trim(),
-            uploadedImageUri: null // Image upload is not supported in queue mode
+            uploadedImageUrl: null // Image upload is not supported in queue mode
         };
         
         Object.assign(requestBody, commonData);
