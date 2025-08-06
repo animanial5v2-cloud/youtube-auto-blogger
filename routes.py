@@ -289,22 +289,38 @@ def generate_post_from_youtube():
             image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
             final_content = image_tag + final_content
         
-        # Save to database
-        blog_post = BlogPost()
-        blog_post.user_id = user.id
-        blog_post.title = generated_content.get('title', 'Untitled Post')
-        blog_post.content = final_content
-        blog_post.summary = generated_content.get('summary', '')
-        blog_post.source_type = "youtube"
-        blog_post.source_url = youtube_url
-        blog_post.gemini_model = gemini_model
-        blog_post.writing_tone = writing_tone
-        blog_post.target_audience = target_audience
-        blog_post.image_source = image_source
-        blog_post.image_url = image_url
-        
-        db.session.add(blog_post)
-        db.session.commit()
+        # Save to database with retry mechanism
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                blog_post = BlogPost()
+                blog_post.user_id = user.id
+                blog_post.title = generated_content.get('title', 'Untitled Post')
+                blog_post.content = final_content
+                blog_post.summary = generated_content.get('summary', '')
+                blog_post.source_type = "youtube"
+                blog_post.source_url = youtube_url
+                blog_post.gemini_model = gemini_model
+                blog_post.writing_tone = writing_tone
+                blog_post.target_audience = target_audience
+                blog_post.image_source = image_source
+                blog_post.image_url = image_url
+                
+                db.session.add(blog_post)
+                db.session.commit()
+                break  # Success, exit retry loop
+                
+            except Exception as db_error:
+                logging.warning(f"Database save attempt {attempt + 1} failed: {str(db_error)}")
+                db.session.rollback()
+                
+                if attempt == max_retries - 1:
+                    # Last attempt failed, raise the error
+                    raise db_error
+                else:
+                    # Retry after a short delay
+                    import time
+                    time.sleep(1)
         
         return jsonify({
             'title': blog_post.title,
@@ -365,22 +381,38 @@ def generate_post():
             image_tag = f'<img src="{image_url}" alt="{alt_text}" style="width:100%; height:auto; border-radius:8px; margin: 1em 0;">'
             final_content = image_tag + final_content
         
-        # Save to database
-        blog_post = BlogPost()
-        blog_post.user_id = user.id
-        blog_post.title = generated_content.get('title', 'Untitled Post')
-        blog_post.content = final_content
-        blog_post.summary = generated_content.get('summary', '')
-        blog_post.source_type = "topic"
-        blog_post.source_url = None
-        blog_post.gemini_model = gemini_model
-        blog_post.writing_tone = writing_tone
-        blog_post.target_audience = target_audience
-        blog_post.image_source = image_source
-        blog_post.image_url = image_url
-        
-        db.session.add(blog_post)
-        db.session.commit()
+        # Save to database with retry mechanism
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                blog_post = BlogPost()
+                blog_post.user_id = user.id
+                blog_post.title = generated_content.get('title', 'Untitled Post')
+                blog_post.content = final_content
+                blog_post.summary = generated_content.get('summary', '')
+                blog_post.source_type = "topic"
+                blog_post.source_url = None
+                blog_post.gemini_model = gemini_model
+                blog_post.writing_tone = writing_tone
+                blog_post.target_audience = target_audience
+                blog_post.image_source = image_source
+                blog_post.image_url = image_url
+                
+                db.session.add(blog_post)
+                db.session.commit()
+                break  # Success, exit retry loop
+                
+            except Exception as db_error:
+                logging.warning(f"Database save attempt {attempt + 1} failed: {str(db_error)}")
+                db.session.rollback()
+                
+                if attempt == max_retries - 1:
+                    # Last attempt failed, raise the error
+                    raise db_error
+                else:
+                    # Retry after a short delay
+                    import time
+                    time.sleep(1)
         
         return jsonify({
             'title': blog_post.title,
