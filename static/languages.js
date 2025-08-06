@@ -85,7 +85,46 @@ const translations = {
         professional: "전문적인",
         casual: "캐주얼한",
         formal: "격식있는",
-        humorous: "유머러스한"
+        humorous: "유머러스한",
+        
+        // Desktop sidebar sections
+        runSettings: "Run Settings",
+        apiSettings: "API 설정",
+        imageSettings: "이미지 설정",
+        imageSource: "이미지 소스",
+        contentSource: "콘텐츠 소스",
+        postingOptions: "포스팅 옵션",
+        automation: "자동화 & PC 제어",
+        
+        // Settings descriptions
+        requiredSettings: "필수 설정",
+        blogAutoGeneration: "블로그 자동 생성을 위해 필요한 API 키들을 입력하세요",
+        geminiApiKeyLink: "Gemini API 키 발급받기",
+        googleClientIdLink: "Google Client ID 발급받기",
+        bloggerIdDescription: "Blogger 블로그 ID는 블로그 설정에서 확인 가능합니다",
+        
+        // Placeholders
+        geminiApiKeyPlaceholder: "Gemini API 키 (AI 콘텐츠 생성용)",
+        googleOauthPlaceholder: "Google OAuth Client ID (Blogger 접근용)",
+        bloggerIdPlaceholder: "Blogger 블로그 ID (숫자)",
+        blogAddressPlaceholder: "https://yourblog.blogspot.com",
+        bloggerIdHelp: "블로그 관리 → 설정 → 기본 → 블로그 ID에서 확인 가능",
+        blogAddressHelp: "본인의 Blogger 블로그 주소를 입력하세요",
+        
+        // Google login
+        googleLogin: "Google 로그인",
+        
+        // Clear history
+        clearAllHistory: "기록 전체 삭제",
+        
+        // Target audience placeholder
+        targetAudiencePlaceholder: "예: IT 비전공자",
+        
+        // Additional labels
+        geminiApiKey: "Gemini API 키",
+        googleClientId: "Google Client ID",
+        blogId: "블로그 ID",
+        blogAddress: "블로그 주소"
     },
     
     en: {
@@ -173,7 +212,46 @@ const translations = {
         professional: "Professional",
         casual: "Casual",
         formal: "Formal",
-        humorous: "Humorous"
+        humorous: "Humorous",
+        
+        // Desktop sidebar sections
+        runSettings: "Run Settings",
+        apiSettings: "API Settings",
+        imageSettings: "Image Settings",
+        imageSource: "Image Source",
+        contentSource: "Content Source",
+        postingOptions: "Posting Options",
+        automation: "Automation & PC Control",
+        
+        // Settings descriptions
+        requiredSettings: "Required Settings",
+        blogAutoGeneration: "Enter the required API keys for automatic blog generation",
+        geminiApiKeyLink: "Get Gemini API Key",
+        googleClientIdLink: "Get Google Client ID",
+        bloggerIdDescription: "Blogger blog ID can be found in blog settings",
+        
+        // Placeholders
+        geminiApiKeyPlaceholder: "Gemini API Key (for AI content generation)",
+        googleOauthPlaceholder: "Google OAuth Client ID (for Blogger access)",
+        bloggerIdPlaceholder: "Blogger blog ID (numbers)",
+        blogAddressPlaceholder: "https://yourblog.blogspot.com",
+        bloggerIdHelp: "Check in Blog Management → Settings → Basic → Blog ID",
+        blogAddressHelp: "Enter your Blogger blog address",
+        
+        // Google login
+        googleLogin: "Google Login",
+        
+        // Clear history
+        clearAllHistory: "Clear All History",
+        
+        // Target audience placeholder
+        targetAudiencePlaceholder: "e.g., Non-IT people",
+        
+        // Additional labels
+        geminiApiKey: "Gemini API Key",
+        googleClientId: "Google Client ID",
+        blogId: "Blog ID",
+        blogAddress: "Blog Address"
     },
     
     vi: {
@@ -262,7 +340,46 @@ const translations = {
         professional: "Chuyên nghiệp",
         casual: "Thoải mái",
         formal: "Trang trọng",
-        humorous: "Hài hước"
+        humorous: "Hài hước",
+        
+        // Desktop sidebar sections
+        runSettings: "Cài đặt Chạy",
+        apiSettings: "Cài đặt API",
+        imageSettings: "Cài đặt Hình ảnh",
+        imageSource: "Nguồn Hình ảnh",
+        contentSource: "Nguồn Nội dung",
+        postingOptions: "Tùy chọn Đăng bài",
+        automation: "Tự động hóa & Điều khiển PC",
+        
+        // Settings descriptions
+        requiredSettings: "Cài đặt Bắt buộc",
+        blogAutoGeneration: "Nhập các khóa API cần thiết để tự động tạo blog",
+        geminiApiKeyLink: "Nhận Khóa API Gemini",
+        googleClientIdLink: "Nhận Google Client ID",
+        bloggerIdDescription: "ID blog Blogger có thể tìm thấy trong cài đặt blog",
+        
+        // Placeholders
+        geminiApiKeyPlaceholder: "Khóa API Gemini (để tạo nội dung AI)",
+        googleOauthPlaceholder: "Google OAuth Client ID (để truy cập Blogger)",
+        bloggerIdPlaceholder: "ID blog Blogger (số)",
+        blogAddressPlaceholder: "https://yourblog.blogspot.com",
+        bloggerIdHelp: "Kiểm tra trong Quản lý Blog → Cài đặt → Cơ bản → ID Blog",
+        blogAddressHelp: "Nhập địa chỉ blog Blogger của bạn",
+        
+        // Google login
+        googleLogin: "Đăng nhập Google",
+        
+        // Clear history
+        clearAllHistory: "Xóa Tất cả Lịch sử",
+        
+        // Target audience placeholder
+        targetAudiencePlaceholder: "ví dụ: Người không chuyên IT",
+        
+        // Additional labels
+        geminiApiKey: "Khóa API Gemini",
+        googleClientId: "Google Client ID",
+        blogId: "ID Blog",
+        blogAddress: "Địa chỉ Blog"
     }
 };
 
