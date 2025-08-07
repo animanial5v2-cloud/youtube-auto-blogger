@@ -36,36 +36,30 @@ class YouTubeService:
                 if video_id:
                     logging.info(f"Attempting transcript extraction for video ID: {video_id}")
                     
-                    # Try multiple languages with proper method calls
-                    languages = ['ko', 'en', 'auto']
-                    for lang in languages:
+                    # Create API instance
+                    api = YouTubeTranscriptApi()
+                    
+                    # Try multiple language approaches
+                    try:
+                        # First try Korean
+                        transcript_data = api.get_transcript(video_id, languages=['ko'])
+                        transcript_text = ' '.join([item['text'] for item in transcript_data])
+                        logging.info(f"Successfully extracted Korean transcript, length: {len(transcript_text)}")
+                    except:
                         try:
-                            # Use list_transcripts to get available transcripts first
-                            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-                            
-                            # Try to get transcript in preferred language
-                            if lang == 'auto':
-                                # Get any available transcript
-                                try:
-                                    transcript = transcript_list.find_transcript(['ko'])
-                                except:
-                                    try:
-                                        transcript = transcript_list.find_transcript(['en'])
-                                    except:
-                                        transcript = transcript_list.find_generated_transcript(['ko'])
-                            else:
-                                transcript = transcript_list.find_transcript([lang])
-                            
-                            transcript_data = transcript.fetch()
+                            # Try English
+                            transcript_data = api.get_transcript(video_id, languages=['en'])
                             transcript_text = ' '.join([item['text'] for item in transcript_data])
-                            
-                            if transcript_text and len(transcript_text.strip()) > 50:
-                                logging.info(f"Successfully extracted transcript in language: {lang}, length: {len(transcript_text)}")
-                                break
-                            
-                        except Exception as lang_error:
-                            logging.warning(f"Failed to get transcript in {lang}: {str(lang_error)}")
-                            continue
+                            logging.info(f"Successfully extracted English transcript, length: {len(transcript_text)}")
+                        except:
+                            try:
+                                # Try any available language
+                                transcript_data = api.get_transcript(video_id)
+                                transcript_text = ' '.join([item['text'] for item in transcript_data])
+                                logging.info(f"Successfully extracted transcript (auto language), length: {len(transcript_text)}")
+                            except Exception as final_error:
+                                logging.warning(f"All transcript extraction attempts failed: {str(final_error)}")
+                                transcript_text = None
                             
             except ImportError:
                 logging.warning("youtube-transcript-api not available, trying alternative methods")

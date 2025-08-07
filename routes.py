@@ -959,6 +959,111 @@ def delete_queue_item(queue_id):
     
     return jsonify({'status': 'success'})
 
+@app.route('/api/batch-process', methods=['POST'])
+def batch_process():
+    """Process multiple URLs or topics in batch"""
+    try:
+        user = get_or_create_user()
+        data = request.get_json()
+        
+        urls = data.get('urls', [])
+        topics = data.get('topics', [])
+        items = urls + topics
+        
+        if not items:
+            return jsonify({'error': 'URLs or topics are required'}), 400
+        
+        # Extract settings
+        gemini_api_key = data.get('apiKey', '').strip() or os.getenv('GOOGLE_API_KEY') or os.getenv('GEMINI_API_KEY')
+        gemini_model = data.get('modelName', 'gemini-1.5-pro')
+        writing_tone = data.get('tone', '친근한 (Friendly)')
+        target_audience = data.get('audience', '')
+        image_source = data.get('imageSource', 'none')
+        pexels_api_key = data.get('pexelsApiKey', '').strip()
+        ai_engine = data.get('aiEngine', 'gemini')
+        gptoss_endpoint = data.get('gptossEndpoint', '').strip()
+        gptoss_api_key = data.get('gptossApiKey', '').strip()
+        
+        # Validate AI engine requirements
+        if ai_engine == 'gemini' and not gemini_api_key:
+            return jsonify({'error': 'Gemini API key is required'}), 400
+        elif ai_engine == 'gptoss' and not gptoss_endpoint:
+            return jsonify({'error': 'GPT-OSS endpoint is required'}), 400
+        
+        processed_items = []
+        
+        for item in items:
+            try:
+                # Check if it's a YouTube URL
+                is_youtube = 'youtube.com/watch' in item or 'youtu.be/' in item
+                
+                if is_youtube:
+                    # Extract transcript
+                    try:
+                        transcript = youtube_service.extract_transcript(item, {})
+                        if not transcript:
+                            transcript = f"YouTube video analysis: {item}"
+                    except Exception as e:
+                        logging.warning(f"Transcript extraction failed for {item}: {str(e)}")
+                        transcript = f"YouTube video analysis: {item}"
+                else:
+                    # Use as topic
+                    transcript = item
+                
+                # Generate content
+                generated_content = generate_content_with_fallback(
+                    gemini_api_key, transcript, None, gemini_model, writing_tone, target_audience, ai_engine, gptoss_endpoint or gptoss_api_key
+                )
+                
+                if generated_content:
+                    # Save to database
+                    blog_post = BlogPost()
+                    blog_post.user_id = user.id
+                    blog_post.title = generated_content.get('title', 'Untitled Post')
+                    blog_post.content = generated_content.get('content', '')
+                    blog_post.summary = generated_content.get('summary', '')
+                    blog_post.source_type = "youtube" if is_youtube else "topic"
+                    blog_post.source_url = item if is_youtube else None
+                    blog_post.gemini_model = gemini_model
+                    blog_post.writing_tone = writing_tone
+                    blog_post.target_audience = target_audience
+                    blog_post.image_source = image_source
+                    
+                    db.session.add(blog_post)
+                    db.session.commit()
+                    
+                    processed_items.append({
+                        'item': item,
+                        'status': 'success',
+                        'title': blog_post.title,
+                        'post_id': blog_post.id
+                    })
+                else:
+                    processed_items.append({
+                        'item': item,
+                        'status': 'error',
+                        'error': 'Failed to generate content'
+                    })
+                    
+            except Exception as item_error:
+                logging.error(f"Error processing item {item}: {str(item_error)}")
+                processed_items.append({
+                    'item': item,
+                    'status': 'error',
+                    'error': str(item_error)
+                })
+        
+        return jsonify({
+            'status': 'completed',
+            'processed_count': len([item for item in processed_items if item['status'] == 'success']),
+            'total_count': len(items),
+            'items': processed_items
+        })
+        
+    except Exception as e:
+        logging.error(f"Batch processing error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': 'Not found'}), 404
