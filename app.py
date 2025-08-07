@@ -27,9 +27,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "postgres
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
-    "pool_timeout": 20,
-    "pool_size": 10,
-    "max_overflow": 20,
+    "pool_timeout": 30,
+    "pool_size": 20,
+    "max_overflow": 40,
     "connect_args": {
         "connect_timeout": 30,
         "sslmode": "prefer"

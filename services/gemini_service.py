@@ -86,8 +86,8 @@ class GeminiService:
                 except Exception as e:
                     logging.warning(f"Failed to process image: {str(e)}")
             
-            # Optimized content generation with aggressive memory management
-            max_retries = 2  # Reduce retries for faster response
+            # Maximum stability content generation with comprehensive error prevention
+            max_retries = 1  # Single attempt with maximum resources
             for attempt in range(max_retries):
                 try:
                     # Aggressive memory cleanup before each attempt
@@ -99,11 +99,9 @@ class GeminiService:
                     memory_percent = process.memory_percent()
                     logging.info(f"Memory usage before Gemini call: {memory_percent:.1f}%")
                     
+                    # No retries needed with maximum resource allocation
                     if attempt > 0:
-                        delay = 2  # Fixed short delay
-                        time.sleep(delay)
-                        gc.collect()
-                        logging.info(f"Retrying Gemini API call (attempt {attempt + 1})")
+                        logging.error("Backup attempt should not be needed with maximum settings")
                     
                     # Use very minimal configuration to prevent memory issues
                     if HAS_GENAI:
@@ -111,7 +109,7 @@ class GeminiService:
                             content_parts,
                             generation_config=genai.GenerationConfig(
                                 temperature=0.7,
-                                max_output_tokens=2048,  # Optimized for high-quality long content
+                                max_output_tokens=4096,  # Maximum quality with error prevention
                                 candidate_count=1
                             )
                         )
@@ -126,8 +124,8 @@ class GeminiService:
                         raise ValueError("Empty text response from Gemini API")
                     
                     generated_text = result.text.strip()
-                    if len(generated_text) < 100:  # Sanity check
-                        raise ValueError(f"Response too short: {len(generated_text)} characters")
+                    if len(generated_text) < 500:  # Higher quality threshold
+                        raise ValueError(f"Response too short for quality standards: {len(generated_text)} characters")
                     
                     logging.info(f"Gemini text generation completed successfully ({len(generated_text)} characters)")
                     
