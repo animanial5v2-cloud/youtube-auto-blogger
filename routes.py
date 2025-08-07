@@ -52,12 +52,19 @@ def process_image_placement(content, image_url, alt_text="Blog post image"):
     if '[IMAGE_HERE]' in content:
         return content.replace('[IMAGE_HERE]', image_tag)
     
-    # If no placeholder found, insert after first paragraph (after opening <p> tag closes)
+    # If no placeholder found, insert after first paragraph or h1 tag
     import re
-    # Look for first closing </p> tag and insert image after it
+    
+    # Try to insert after first </p> tag
     first_p_match = re.search(r'</p>', content)
     if first_p_match:
         insert_pos = first_p_match.end()
+        return content[:insert_pos] + '\n' + image_tag + '\n' + content[insert_pos:]
+    
+    # Try to insert after first </h1> tag  
+    first_h1_match = re.search(r'</h1>', content)
+    if first_h1_match:
+        insert_pos = first_h1_match.end()
         return content[:insert_pos] + '\n' + image_tag + '\n' + content[insert_pos:]
     
     # Fallback: insert at beginning
@@ -75,17 +82,16 @@ def generate_content_with_fallback(api_key, content_input, image_url, model_name
     except Exception as gemini_error:
         logging.warning(f"Gemini failed, trying OpenAI fallback: {str(gemini_error)}")
         
-    # Fallback to OpenAI
-    try:
-        generated_content = openai_service.generate_text_content(
-            None, content_input, image_url, model_name, tone, audience
-        )
-        if generated_content:
-            return generated_content
-    except Exception as openai_error:
-        logging.error(f"Both AI services failed: Gemini: {str(gemini_error)}, OpenAI: {str(openai_error)}")
-    
-    raise ValueError("AI 콘텐츠 생성에 실패했습니다. 잠시 후 다시 시도해주세요.")
+        # Fallback to OpenAI
+        try:
+            generated_content = openai_service.generate_text_content(
+                None, content_input, image_url, model_name, tone, audience
+            )
+            if generated_content:
+                return generated_content
+        except Exception as openai_error:
+            logging.error(f"Both AI services failed: Gemini: {str(gemini_error)}, OpenAI: {str(openai_error)}")
+            raise ValueError("AI 콘텐츠 생성에 실패했습니다. 잠시 후 다시 시도해주세요.")
 
 @app.route('/')
 def index():

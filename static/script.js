@@ -321,13 +321,9 @@ document.addEventListener('DOMContentLoaded', () => {
         videoFileInfo.classList.remove('hidden');
         updateTopicDiscoveryModeUI();
         
-        // Auto-trigger video processing for blog post generation
+        // Remove auto-trigger for video processing - respect preview settings
         if (accessToken && !isTopicDiscoveryMode) {
-            setTimeout(() => {
-                if (confirm('동영상이 선택되었습니다. 바로 블로그 포스팅을 생성하시겠습니까?')) {
-                    handleChatSubmit(new Event('submit'));
-                }
-            }, 100);
+            addChatMessage('ai', '📹 동영상이 업로드되었습니다. 주제를 입력하고 전송 버튼을 눌러 포스팅을 생성해주세요.', true);
         }
     }
 
@@ -895,6 +891,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             await postToBloggerAndHandleResult(title, content, false);
+            
+            // If this was a queue item, continue to next item
+            if (contentId.startsWith('queue-content-') && loopIntervalId) {
+                currentQueueIndex++; // Move to next queue item
+            }
         } finally {
             previewModal.classList.add('hidden');
             approvePostBtn.disabled = false;
@@ -999,7 +1000,27 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const generatedData = await generatePostFromQueueItem(itemToProcess);
             if (generatedData) {
-                await postToBloggerAndHandleResult(generatedData.title, generatedData.body, false);
+                // Check preview setting for queue items too
+                if (previewBeforePostCheckbox.checked) {
+                    const contentId = `queue-content-${Date.now()}`;
+                    generatedContentStore[contentId] = { title: generatedData.title, body: generatedData.body };
+                    const previewText = generatedData.body.replace(/<[^>]+>/g, '').substring(0, 200);
+                    const aiResponseHtml = `
+                        <p>✅ 큐 아이템 ${currentQueueIndex + 1}/${postQueue.length} 포스트가 생성되었습니다.</p>
+                        <div class="generated-post-container">
+                            <h3>${generatedData.title}</h3>
+                            <div class="generated-post-body-preview">${previewText}...</div>
+                            <div class="generated-post-actions">
+                                <button class="button-primary show-preview-btn" data-content-id="${contentId}">미리보기 및 포스팅</button>
+                            </div>
+                        </div>
+                    `;
+                    addChatMessage('ai', aiResponseHtml, true);
+                    // Don't post automatically in queue mode when preview is enabled
+                    // Continue to next item only after manual approval
+                } else {
+                    await postToBloggerAndHandleResult(generatedData.title, generatedData.body, false);
+                }
             }
         } catch (error) {
             console.error("Queue Processing Error:", error);
