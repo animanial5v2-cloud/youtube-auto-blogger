@@ -428,15 +428,18 @@ def generate_post_from_youtube():
                     import time
                     time.sleep(1)
         
-        return jsonify({
-            'title': blog_post.title,
-            'body': blog_post.content,
-            'summary': blog_post.summary,
-            'hashtags': generated_content.get('hashtags', ''),
-            'keywords': generated_content.get('image_search_keywords', ''),
-            'post_id': blog_post.id,
-            'created_at': blog_post.created_at.isoformat()
-        })
+        # Return response data with proper error handling
+        response_data = {
+            'title': blog_post.title if blog_post else 'Untitled Post',
+            'body': blog_post.content if blog_post else '',
+            'summary': blog_post.summary if blog_post else '',
+            'hashtags': generated_content.get('hashtags', '') if generated_content else '',
+            'keywords': generated_content.get('image_search_keywords', '') if generated_content else '',
+            'post_id': blog_post.id if blog_post else None,
+            'created_at': blog_post.created_at.isoformat() if blog_post and blog_post.created_at else ''
+        }
+        
+        return jsonify(response_data)
         
     except Exception as e:
         logging.error(f"Error generating post from YouTube: {str(e)}")
@@ -520,16 +523,19 @@ def generate_post():
                     import time
                     time.sleep(1)
         
-        return jsonify({
-            'title': blog_post.title,
-            'body': blog_post.content,
-            'content': blog_post.content,  # Alias for compatibility
-            'summary': blog_post.summary,
-            'hashtags': generated_content.get('hashtags', ''),
-            'keywords': generated_content.get('image_search_keywords', ''),
-            'post_id': blog_post.id,
-            'created_at': blog_post.created_at.isoformat()
-        })
+        # Return response data with proper error handling
+        response_data = {
+            'title': blog_post.title if blog_post else 'Untitled Post',
+            'body': blog_post.content if blog_post else '',
+            'content': blog_post.content if blog_post else '',  # Alias for compatibility
+            'summary': blog_post.summary if blog_post else '',
+            'hashtags': generated_content.get('hashtags', '') if generated_content else '',
+            'keywords': generated_content.get('image_search_keywords', '') if generated_content else '',
+            'post_id': blog_post.id if blog_post else None,
+            'created_at': blog_post.created_at.isoformat() if blog_post and blog_post.created_at else ''
+        }
+        
+        return jsonify(response_data)
         
     except Exception as e:
         logging.error(f"Error generating post from topic: {str(e)}")
@@ -688,15 +694,18 @@ def generate_post_from_video():
                         import time
                         time.sleep(1)
             
-            return jsonify({
-                'title': blog_post.title,
-                'body': blog_post.content,
-                'summary': blog_post.summary,
-                'hashtags': generated_content.get('hashtags', ''),
-                'keywords': generated_content.get('image_search_keywords', ''),
-                'post_id': blog_post.id,
-                'created_at': blog_post.created_at.isoformat()
-            })
+            # Return response data with proper error handling
+            response_data = {
+                'title': blog_post.title if blog_post else 'Untitled Post',
+                'body': blog_post.content if blog_post else '',
+                'summary': blog_post.summary if blog_post else '',
+                'hashtags': generated_content.get('hashtags', '') if generated_content else '',
+                'keywords': generated_content.get('image_search_keywords', '') if generated_content else '',
+                'post_id': blog_post.id if blog_post else None,
+                'created_at': blog_post.created_at.isoformat() if blog_post and blog_post.created_at else ''
+            }
+            
+            return jsonify(response_data)
             
         finally:
             # Enhanced cleanup with multiple retry attempts
