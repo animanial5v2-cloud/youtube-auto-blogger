@@ -1276,7 +1276,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setChatInputEnabled(false);
     checkModelCompatibility();
 
-    // --- REPLIT CONSOLE ADJUSTMENT ---
+    // --- REPLIT CONSOLE ADJUSTMENT AND RESPONSIVE FIXES ---
     function adjustForReplitConsole() {
         // Detect Replit environment and adjust UI accordingly
         const isReplit = window.location.hostname.includes('replit.app') || 
@@ -1310,5 +1310,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 subtree: true
             });
         }
+        
+        // Force responsive layout on narrow screens
+        forceResponsiveLayout();
+    }
+    
+    function forceResponsiveLayout() {
+        function checkAndApplyLayout() {
+            const container = document.querySelector('.app-container');
+            if (!container) return;
+            
+            const screenWidth = window.innerWidth;
+            
+            if (screenWidth <= 900) {
+                // Force mobile layout
+                container.style.display = 'grid';
+                container.style.gridTemplateColumns = '1fr';
+                container.style.gridTemplateRows = 'auto 1fr auto';
+                
+                const sidebar_left = document.querySelector('.sidebar-left');
+                const main_content = document.querySelector('.main-content');
+                const sidebar_right = document.querySelector('.sidebar-right');
+                
+                if (sidebar_left) {
+                    sidebar_left.style.order = '0';
+                    sidebar_left.style.height = 'auto';
+                    sidebar_left.style.maxHeight = 'none';
+                    sidebar_left.style.borderBottom = '1px solid var(--border-color)';
+                }
+                
+                if (main_content) {
+                    main_content.style.order = '1';
+                    main_content.style.minHeight = '50vh';
+                }
+                
+                if (sidebar_right) {
+                    sidebar_right.style.order = '2';
+                    sidebar_right.style.height = 'auto';
+                    sidebar_right.style.maxHeight = 'none';
+                    sidebar_right.style.borderTop = '1px solid var(--border-color)';
+                }
+            }
+        }
+        
+        // Apply on load and resize
+        checkAndApplyLayout();
+        window.addEventListener('resize', checkAndApplyLayout);
     }
 });
