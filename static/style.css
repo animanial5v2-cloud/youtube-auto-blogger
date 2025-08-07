@@ -993,11 +993,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     background: var(--text-secondary);
 }
 
-/* Console overlay protection for Replit preview */
-body.replit-preview {
-    padding-bottom: 60px !important;
-}
-
+/* Minimal console overlay protection - only when needed */
 iframe[src*="console"],
 iframe[src*="webview-console"] {
     position: fixed !important;
@@ -1005,24 +1001,11 @@ iframe[src*="webview-console"] {
     left: 0 !important;
     right: 0 !important;
     z-index: 9999 !important;
-    max-height: 40vh !important;
-}
-
-/* Ensure main content doesn't get hidden behind console */
-.app-container {
-    margin-bottom: 60px;
+    max-height: 30vh !important;
 }
 
 /* Enhanced mobile and tablet responsive adjustments */
 @media (max-width: 768px) {
-    body.replit-preview {
-        padding-bottom: 80px !important;
-    }
-    
-    .app-container {
-        margin-bottom: 80px;
-    }
-    
     .sidebar-left, .main-content, .sidebar-right {
         height: auto;
         min-height: auto;

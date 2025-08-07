@@ -1298,8 +1298,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             node.style.bottom = '0';
                             node.style.maxHeight = '40vh';
                             
-                            // Add extra padding to body
-                            document.body.style.paddingBottom = '70px';
+                            // Minimal adjustment to prevent overlap
+                            document.body.style.marginBottom = '20px';
                         }
                     });
                 });
