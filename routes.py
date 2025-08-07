@@ -273,6 +273,8 @@ def generate_blog_post():
             'title': blog_post.title,
             'content': blog_post.content,
             'summary': blog_post.summary,
+            'hashtags': generated_content.get('hashtags', ''),
+            'keywords': generated_content.get('image_search_keywords', ''),
             'created_at': blog_post.created_at.isoformat()
         })
         
@@ -434,6 +436,8 @@ def generate_post_from_youtube():
             'title': blog_post.title,
             'body': blog_post.content,
             'summary': blog_post.summary,
+            'hashtags': generated_content.get('hashtags', ''),
+            'keywords': generated_content.get('image_search_keywords', ''),
             'post_id': blog_post.id,
             'created_at': blog_post.created_at.isoformat()
         })
@@ -529,6 +533,8 @@ def generate_post():
             'body': blog_post.content,
             'content': blog_post.content,  # Alias for compatibility
             'summary': blog_post.summary,
+            'hashtags': generated_content.get('hashtags', ''),
+            'keywords': generated_content.get('image_search_keywords', ''),
             'post_id': blog_post.id,
             'created_at': blog_post.created_at.isoformat()
         })
@@ -693,6 +699,8 @@ def generate_post_from_video():
                 'title': blog_post.title,
                 'body': blog_post.content,
                 'summary': blog_post.summary,
+                'hashtags': generated_content.get('hashtags', ''),
+                'keywords': generated_content.get('image_search_keywords', ''),
                 'post_id': blog_post.id,
                 'created_at': blog_post.created_at.isoformat()
             })

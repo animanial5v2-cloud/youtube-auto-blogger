@@ -666,6 +666,15 @@ document.addEventListener('DOMContentLoaded', () => {
              throw new Error("AI가 콘텐츠를 만들었지만 내용이 비어있네요. 다시 시도해보세요.");
         }
         
+        // Show hashtags/keywords if available
+        let additionalInfo = '';
+        if (data.hashtags) {
+            additionalInfo += `<br><strong>해시태그:</strong> ${data.hashtags}`;
+        }
+        if (data.keywords) {
+            additionalInfo += `<br><strong>키워드:</strong> ${data.keywords}`;
+        }
+        
         thinkingMessage.remove(); // Remove "thinking" message
 
         // Check preview setting consistently for all posting methods
@@ -675,7 +684,7 @@ document.addEventListener('DOMContentLoaded', () => {
             generatedContentStore[contentId] = { title: data.title, body: data.body };
             const previewText = data.body.replace(/<[^>]+>/g, '').substring(0, 200);
             const aiResponseHtml = `
-                <p>✅ 포스트 초안이 생성되었습니다.</p>
+                <p>✅ 포스트 초안이 생성되었습니다.${additionalInfo}</p>
                 <div class="generated-post-container">
                     <h3>${data.title}</h3>
                     <div class="generated-post-body-preview">${previewText}...</div>
@@ -687,7 +696,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addChatMessage('ai', aiResponseHtml, true);
         } else {
             // Post directly for ALL posting methods when preview is disabled
-            addChatMessage('ai', `✅ '발행 전 미리보기' 기능이 꺼져있습니다. "${data.title}" 포스트를 생성하여 즉시 발행합니다...`, true);
+            addChatMessage('ai', `✅ '발행 전 미리보기' 기능이 꺼져있습니다. "${data.title}" 포스트를 생성하여 즉시 발행합니다...${additionalInfo}`, true);
             await postToBloggerAndHandleResult(data.title, data.body, false);
         }
         return data; // Return data for loop processing

@@ -105,7 +105,7 @@ class GeminiService:
                             content_parts,
                             generation_config=genai.GenerationConfig(
                                 temperature=0.7,
-                                max_output_tokens=2048,  # Increased for longer content
+                                max_output_tokens=512,  # Restore stable limit to prevent crashes
                                 candidate_count=1
                             )
                         )
