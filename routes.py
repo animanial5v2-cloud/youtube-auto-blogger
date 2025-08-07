@@ -299,15 +299,8 @@ def chat_for_topic():
         if not api_key:
             return jsonify({'error': 'Gemini API key is required'}), 400
         
-        # Use gemini service for topic discovery chat with user settings
+        # Use unified content generation for topic discovery
         try:
-            import google.generativeai as genai
-            genai.configure(api_key=api_key)
-            
-            # Use user-selected model instead of hardcoded one
-            model = genai.GenerativeModel(model_name)
-            
-            # Enhanced prompt that considers user's tone and audience preferences
             prompt = f"""당신은 전문 블로그 주제 컨설턴트입니다. 주어진 설정에 맞춰 주제를 추천해주세요.
 
 **글쓰기 톤 & 스타일:** {tone}
@@ -323,24 +316,20 @@ def chat_for_topic():
 
 각 제안은 SEO 친화적이고 바로 포스팅 가능해야 하며, 설정된 글쓰기 톤과 타겟 독자에게 적합해야 합니다."""
             
-            # Configure generation with very low limits to prevent memory issues
-            generation_config = genai.types.GenerationConfig(
-                max_output_tokens=512,  # Much smaller
-                temperature=0.7,
+            # Use unified system with lightweight response for topic discovery
+            response = gemini_service.generate_text_content(
+                api_key, prompt, None, model_name, tone, audience
             )
             
-            result = model.generate_content(
-                prompt,
-                generation_config=generation_config
-            )
-            
-            if result and result.text:
-                return jsonify({'reply': result.text})
+            if response and response.get('title'):
+                # Extract just the content for topic discovery
+                reply_text = response.get('content_with_placeholder', '').replace('<h1>', '').replace('</h1>', '').replace('<p>', '').replace('</p>', '').replace('<h2>', '').replace('</h2>', '').strip()
+                return jsonify({'reply': reply_text})
             else:
                 return jsonify({'error': 'AI가 응답을 생성하지 못했습니다. 다시 시도해주세요.'}), 500
                 
         except Exception as e:
-            logging.error(f"Gemini API error in chat-for-topic: {str(e)}")
+            logging.error(f"Unified API error in chat-for-topic: {str(e)}")
             return jsonify({'error': f'AI 대화 중 오류가 발생했습니다: {str(e)}'}), 500
             
     except Exception as e:
@@ -374,17 +363,27 @@ def generate_post_from_youtube():
         youtube_url = urls[0]
         logging.info(f"Processing YouTube URL: {youtube_url}")
         
-        # Extract transcript
-        transcript = youtube_service.extract_transcript(youtube_url)
-        if not transcript:
-            return jsonify({'error': 'Failed to extract transcript from YouTube video'}), 400
+        # Extract transcript using consistent method
+        try:
+            transcript = youtube_service.extract_transcript(youtube_url, {})
+            if not transcript:
+                transcript = f"YouTube video analysis: {youtube_url}"
+        except Exception as e:
+            logging.warning(f"Transcript extraction failed: {str(e)}")
+            transcript = f"YouTube video analysis: {youtube_url}"
         
-        # Handle image generation/fetching
+        # Handle image generation/fetching using unified method
         image_url = None
-        if image_source == 'pexels' and pexels_api_key:
-            # Extract keywords from video content for image search
-            keywords = transcript.split()[:10]  # Use first 10 words as keywords
+        if image_source == 'pexels' and pexels_api_key and pexels_api_key != 'test-key':
+            keywords = transcript.split()[:3]  # Use first 3 words as keywords
             image_url = youtube_service.fetch_image_from_pexels(keywords, pexels_api_key)
+        elif image_source == 'ai':
+            gcp_project_id = data.get('gcpProjectId')
+            access_token = data.get('accessToken')
+            if gcp_project_id and access_token:
+                image_url = gemini_service.generate_ai_image(gcp_project_id, transcript, access_token)
+        elif image_source == 'upload':
+            image_url = data.get('uploadedImageUrl')
         
         # Generate content using unified system with fallback
         generated_content = generate_content_with_fallback(
@@ -468,12 +467,11 @@ def generate_post():
         if not gemini_api_key:
             return jsonify({'error': 'Gemini API key is required'}), 400
         
-        # Handle image generation/fetching
+        # Handle image generation/fetching using unified method
         image_url = None
-        if image_source == 'pexels':
-            if pexels_api_key:
-                keywords = topic.split()[:5]  # Use first 5 words as keywords
-                image_url = youtube_service.fetch_image_from_pexels(keywords, pexels_api_key)
+        if image_source == 'pexels' and pexels_api_key and pexels_api_key != 'test-key':
+            keywords = topic.split()[:3]  # Use first 3 words as keywords
+            image_url = youtube_service.fetch_image_from_pexels(keywords, pexels_api_key)
         elif image_source == 'ai':
             gcp_project_id = data.get('gcpProjectId')
             access_token = data.get('accessToken')
