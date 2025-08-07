@@ -377,11 +377,7 @@ def generate_post_from_youtube():
         if image_source == 'pexels' and pexels_api_key and pexels_api_key != 'test-key':
             keywords = transcript.split()[:3]  # Use first 3 words as keywords
             image_url = youtube_service.fetch_image_from_pexels(keywords, pexels_api_key)
-        elif image_source == 'ai':
-            gcp_project_id = data.get('gcpProjectId')
-            access_token = data.get('accessToken')
-            if gcp_project_id and access_token:
-                image_url = gemini_service.generate_ai_image(gcp_project_id, transcript, access_token)
+
         elif image_source == 'upload':
             image_url = data.get('uploadedImageUrl')
         
@@ -400,6 +396,7 @@ def generate_post_from_youtube():
         
         # Save to database with retry mechanism
         max_retries = 3
+        blog_post = None
         for attempt in range(max_retries):
             try:
                 blog_post = BlogPost()
@@ -472,11 +469,7 @@ def generate_post():
         if image_source == 'pexels' and pexels_api_key and pexels_api_key != 'test-key':
             keywords = topic.split()[:3]  # Use first 3 words as keywords
             image_url = youtube_service.fetch_image_from_pexels(keywords, pexels_api_key)
-        elif image_source == 'ai':
-            gcp_project_id = data.get('gcpProjectId')
-            access_token = data.get('accessToken')
-            if gcp_project_id and access_token:
-                image_url = gemini_service.generate_ai_image(gcp_project_id, topic, access_token)
+
         elif image_source == 'upload':
             image_url = data.get('uploadedImageUrl')
         
@@ -495,6 +488,7 @@ def generate_post():
         
         # Save to database with retry mechanism
         max_retries = 3
+        blog_post = None
         for attempt in range(max_retries):
             try:
                 blog_post = BlogPost()
@@ -664,6 +658,7 @@ def generate_post_from_video():
             
             # Save to database with retry mechanism
             max_retries = 3
+            blog_post = None
             for attempt in range(max_retries):
                 try:
                     blog_post = BlogPost()
