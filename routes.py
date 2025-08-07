@@ -7,6 +7,7 @@ from models import User, BlogPost, PostQueue
 from services.youtube_service import YouTubeService
 from services.gemini_service import GeminiService
 from services.openai_service import OpenAIService
+from services.gptoss_service import GPTOSSService
 from services.blogger_service import BloggerService
 from services.wordpress_service import WordPressService
 from services.tistory_service import TistoryService
@@ -18,6 +19,7 @@ import uuid
 youtube_service = YouTubeService()
 gemini_service = GeminiService()
 openai_service = OpenAIService()
+gptoss_service = GPTOSSService()
 blogger_service = BloggerService()
 wordpress_service = WordPressService()
 tistory_service = TistoryService()
@@ -70,28 +72,60 @@ def process_image_placement(content, image_url, alt_text="Blog post image"):
     # Fallback: insert at beginning
     return image_tag + '\n' + content
 
-def generate_content_with_fallback(api_key, content_input, image_url, model_name, tone, audience):
-    """Unified content generation with OpenAI fallback for consistent quality"""
-    try:
-        # Try Gemini first
-        generated_content = gemini_service.generate_text_content(
-            api_key, content_input, image_url, model_name, tone, audience
-        )
-        if generated_content:
-            return generated_content
-    except Exception as gemini_error:
-        logging.warning(f"Gemini failed, trying OpenAI fallback: {str(gemini_error)}")
-        
-        # Fallback to OpenAI
+def generate_content_with_fallback(api_key, content_input, image_url, model_name, tone, audience, ai_engine='gemini', gptoss_endpoint=None):
+    """Enhanced content generation with 3-tier fallback: Gemini -> OpenAI -> GPT-OSS"""
+    last_error = None
+    
+    # Determine which AI engine to try first
+    if ai_engine == 'gptoss' and gptoss_endpoint:
         try:
-            generated_content = openai_service.generate_text_content(
-                None, content_input, image_url, model_name, tone, audience
+            generated_content = gptoss_service.generate_text_content(
+                gptoss_endpoint, content_input, image_url, model_name, tone, audience
             )
-            if generated_content:
+            if generated_content and not generated_content.get('error'):
                 return generated_content
-        except Exception as openai_error:
-            logging.error(f"Both AI services failed: Gemini: {str(gemini_error)}, OpenAI: {str(openai_error)}")
-            raise ValueError("AI 콘텐츠 생성에 실패했습니다. 잠시 후 다시 시도해주세요.")
+        except Exception as gptoss_error:
+            last_error = gptoss_error
+            logging.warning(f"GPT-OSS failed, trying Gemini fallback: {str(gptoss_error)}")
+    
+    # Try Gemini (primary or fallback)
+    if ai_engine != 'openai':
+        try:
+            generated_content = gemini_service.generate_text_content(
+                api_key, content_input, image_url, model_name, tone, audience
+            )
+            if generated_content and not generated_content.get('error'):
+                return generated_content
+        except Exception as gemini_error:
+            last_error = gemini_error
+            logging.warning(f"Gemini failed, trying OpenAI fallback: {str(gemini_error)}")
+    
+    # Try OpenAI (primary or fallback)
+    try:
+        generated_content = openai_service.generate_text_content(
+            None, content_input, image_url, model_name, tone, audience
+        )
+        if generated_content and not generated_content.get('error'):
+            return generated_content
+    except Exception as openai_error:
+        last_error = openai_error
+        logging.warning(f"OpenAI failed, trying GPT-OSS fallback: {str(openai_error)}")
+    
+    # Final fallback to GPT-OSS (if not already tried)
+    if ai_engine != 'gptoss' and gptoss_endpoint:
+        try:
+            generated_content = gptoss_service.generate_text_content(
+                gptoss_endpoint, content_input, image_url, model_name, tone, audience
+            )
+            if generated_content and not generated_content.get('error'):
+                return generated_content
+        except Exception as final_error:
+            last_error = final_error
+    
+    # All services failed
+    error_msg = f"모든 AI 서비스 실패. 마지막 오류: {str(last_error) if last_error else '알 수 없음'}"
+    logging.error(error_msg)
+    raise ValueError("AI 콘텐츠 생성에 실패했습니다. 설정을 확인하고 다시 시도해주세요.")
 
 @app.route('/')
 def index():
@@ -169,6 +203,26 @@ def clear_history():
     db.session.commit()
     return jsonify({'status': 'success'})
 
+@app.route('/api/test-gptoss', methods=['POST'])
+def test_gptoss():
+    """Test GPT-OSS connection"""
+    try:
+        data = request.get_json()
+        endpoint = data.get('endpoint', '').strip()
+        api_key = data.get('apiKey', '').strip()
+        model = data.get('model', 'gpt-oss-20b')
+        
+        if not endpoint:
+            return jsonify({'available': False, 'error': 'Endpoint is required'}), 400
+        
+        # Test connection using GPT-OSS service
+        result = gptoss_service.check_model_availability(endpoint, api_key if api_key else None, model)
+        return jsonify(result)
+        
+    except Exception as e:
+        logging.error(f"GPT-OSS test error: {e}")
+        return jsonify({'available': False, 'error': str(e)}), 500
+
 @app.route('/api/generate', methods=['POST'])
 def generate_blog_post():
     """Generate blog post from topic or YouTube URL"""
@@ -188,9 +242,15 @@ def generate_blog_post():
         writing_tone = settings.get('writingTone', '친근한 (Friendly)')
         target_audience = settings.get('targetAudience', '')
         image_source = settings.get('imageSource', 'none')
+        ai_engine = settings.get('aiEngine', 'gemini')
+        gptoss_endpoint = settings.get('gptossEndpoint', '').strip()
+        gptoss_api_key = settings.get('gptossApiKey', '').strip()
         
-        if not gemini_api_key:
+        # Validate AI engine requirements
+        if ai_engine == 'gemini' and not gemini_api_key:
             return jsonify({'error': 'Gemini API key is required'}), 400
+        elif ai_engine == 'gptoss' and not gptoss_endpoint:
+            return jsonify({'error': 'GPT-OSS endpoint is required'}), 400
         
         # Determine content source
         content_text = ""
@@ -239,7 +299,7 @@ def generate_blog_post():
         
         # Generate content using unified system with fallback
         generated_content = generate_content_with_fallback(
-            gemini_api_key, content_text, image_url, gemini_model, writing_tone, target_audience
+            gemini_api_key, content_text, image_url, gemini_model, writing_tone, target_audience, ai_engine, gptoss_endpoint or gptoss_api_key
         )
         
         if not generated_content:
@@ -355,6 +415,9 @@ def generate_post_from_youtube():
         image_source = data.get('imageSource', 'none')
         pexels_api_key = data.get('pexelsApiKey', '').strip()
         youtube_source_type = data.get('youtubeSourceType', 'transcript')
+        ai_engine = data.get('aiEngine', 'gemini')
+        gptoss_endpoint = data.get('gptossEndpoint', '').strip()
+        gptoss_api_key = data.get('gptossApiKey', '').strip()
         
         if not gemini_api_key:
             return jsonify({'error': 'Gemini API key is required'}), 400
@@ -383,7 +446,7 @@ def generate_post_from_youtube():
         
         # Generate content using unified system with fallback
         generated_content = generate_content_with_fallback(
-            gemini_api_key, transcript, image_url, gemini_model, writing_tone, target_audience
+            gemini_api_key, transcript, image_url, gemini_model, writing_tone, target_audience, ai_engine, gptoss_endpoint or gptoss_api_key
         )
         
         if not generated_content:
@@ -463,9 +526,15 @@ def generate_post():
         target_audience = data.get('audience', '')
         image_source = data.get('imageSource', 'none')
         pexels_api_key = data.get('pexelsApiKey', '').strip()
+        ai_engine = data.get('aiEngine', 'gemini')
+        gptoss_endpoint = data.get('gptossEndpoint', '').strip()
+        gptoss_api_key = data.get('gptossApiKey', '').strip()
         
-        if not gemini_api_key:
+        # Validate AI engine requirements
+        if ai_engine == 'gemini' and not gemini_api_key:
             return jsonify({'error': 'Gemini API key is required'}), 400
+        elif ai_engine == 'gptoss' and not gptoss_endpoint:
+            return jsonify({'error': 'GPT-OSS endpoint is required'}), 400
         
         # Handle image generation/fetching using unified method
         image_url = None
@@ -478,7 +547,7 @@ def generate_post():
         
         # Generate content using unified system with fallback
         generated_content = generate_content_with_fallback(
-            gemini_api_key, topic, image_url, gemini_model, writing_tone, target_audience
+            gemini_api_key, topic, image_url, gemini_model, writing_tone, target_audience, ai_engine, gptoss_endpoint or gptoss_api_key
         )
         
         if not generated_content:
@@ -563,9 +632,15 @@ def generate_post_from_video():
         target_audience = request.form.get('audience', '')
         image_source = request.form.get('imageSource', 'none')
         pexels_api_key = request.form.get('pexelsApiKey', '').strip()
+        ai_engine = request.form.get('aiEngine', 'gemini')
+        gptoss_endpoint = request.form.get('gptossEndpoint', '').strip()
+        gptoss_api_key = request.form.get('gptossApiKey', '').strip()
         
-        if not gemini_api_key:
+        # Validate AI engine requirements
+        if ai_engine == 'gemini' and not gemini_api_key:
             return jsonify({'error': 'Gemini API key is required'}), 400
+        elif ai_engine == 'gptoss' and not gptoss_endpoint:
+            return jsonify({'error': 'GPT-OSS endpoint is required'}), 400
         
         if not topic:
             topic = f"동영상 파일에서 추출된 콘텐츠 ({video_file.filename})"
@@ -636,7 +711,7 @@ def generate_post_from_video():
             try:
                 # Generate content using unified system with fallback
                 generated_content = generate_content_with_fallback(
-                    gemini_api_key, video_content, image_url, gemini_model, writing_tone, target_audience
+                    gemini_api_key, video_content, image_url, gemini_model, writing_tone, target_audience, ai_engine, gptoss_endpoint or gptoss_api_key
                 )
                 
                 if not generated_content:

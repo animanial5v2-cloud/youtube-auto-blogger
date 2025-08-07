@@ -38,6 +38,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const removeImageBtn = document.getElementById('removeImageBtn');
     const youtubeExtractEnabledCheckbox = document.getElementById('youtubeExtractEnabled');
     const previewBeforePostCheckbox = document.getElementById('previewBeforePost');
+    // GPT-OSS elements
+    const aiEngineSelect = document.getElementById('aiEngine');
+    const geminiSettings = document.getElementById('geminiSettings');
+    const gptossSettings = document.getElementById('gptossSettings');
+    const gptossEndpointInput = document.getElementById('gptossEndpoint');
+    const gptossApiKeyInput = document.getElementById('gptossApiKey');
+    const gptossModelSelect = document.getElementById('gptossModel');
+    const testGptossBtn = document.getElementById('testGptossBtn');
+    const gptossTestResult = document.getElementById('gptossTestResult');
     // postAsDraft checkbox removed
 
     // Automation
@@ -106,6 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
     imageSourceRadios.forEach(radio => radio.addEventListener('change', handleImageSourceChange));
     userImageUpload.addEventListener('change', handleImageUpload);
     removeImageBtn.addEventListener('click', handleRemoveImage);
+    
+    // GPT-OSS Settings
+    aiEngineSelect.addEventListener('change', handleAiEngineChange);
+    testGptossBtn.addEventListener('click', handleTestGptoss);
 
     // Automation
     addToQueueFromChatBtn.addEventListener('click', handleAddToQueueFromChat);
@@ -139,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- SETTINGS PERSISTENCE ---
+
     const settingsToPersist = {
         apiKey: apiKeyInput,
         clientId: clientIdInput,
@@ -148,6 +162,10 @@ document.addEventListener('DOMContentLoaded', () => {
         geminiModel: geminiModelSelect,
         writingTone: writingToneSelect,
         targetAudience: targetAudienceSelect,
+        aiEngine: aiEngineSelect,
+        gptossEndpoint: gptossEndpointInput,
+        gptossApiKey: gptossApiKeyInput,
+        gptossModel: gptossModelSelect,
         previewBeforePost: {
             get: () => previewBeforePostCheckbox.checked,
             set: (value) => { previewBeforePostCheckbox.checked = value; }
@@ -525,14 +543,18 @@ document.addEventListener('DOMContentLoaded', () => {
             requestBody = { topic: topicOrUrl };
         }
 
+        const aiEngine = aiEngineSelect.value;
         const commonData = {
             apiKey: apiKeyInput.value.trim(),
-            modelName: geminiModelSelect.value,
+            modelName: aiEngine === 'gptoss' ? gptossModelSelect.value : geminiModelSelect.value,
             imageSource: imageSource,
             pexelsApiKey: pexelsApiKeyInput.value.trim(),
             accessToken: accessToken,
             tone: writingToneSelect.value,
             audience: targetAudienceSelect.value.trim(),
+            aiEngine: aiEngine,
+            gptossEndpoint: aiEngine === 'gptoss' ? gptossEndpointInput.value.trim() : null,
+            gptossApiKey: aiEngine === 'gptoss' ? gptossApiKeyInput.value.trim() : null,
             uploadedImageUrl: (imageSource === 'upload' && userImageUpload.files[0]) ? imagePreview.src : null
         };
 
@@ -1002,14 +1024,18 @@ document.addEventListener('DOMContentLoaded', () => {
             requestBody = { topic: topicOrUrl };
         }
 
+        const aiEngine = aiEngineSelect.value;
         const commonData = {
             apiKey: apiKeyInput.value.trim(),
-            modelName: geminiModelSelect.value,
+            modelName: aiEngine === 'gptoss' ? gptossModelSelect.value : geminiModelSelect.value,
             imageSource: imageSource,
             pexelsApiKey: pexelsApiKeyInput.value.trim(),
             accessToken: accessToken,
             tone: writingToneSelect.value,
             audience: targetAudienceSelect.value.trim(),
+            aiEngine: aiEngine,
+            gptossEndpoint: aiEngine === 'gptoss' ? gptossEndpointInput.value.trim() : null,
+            gptossApiKey: aiEngine === 'gptoss' ? gptossApiKeyInput.value.trim() : null,
             uploadedImageUrl: null // Image upload is not supported in queue mode
         };
         
@@ -1168,6 +1194,75 @@ document.addEventListener('DOMContentLoaded', () => {
         return unsafe.replace(/&/g, "&amp;").replace(/</g, "<").replace(/>/g, ">").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
+    // --- GPT-OSS HANDLERS ---
+    function handleAiEngineChange() {
+        const selectedEngine = aiEngineSelect.value;
+        
+        // Show/hide appropriate settings panels
+        if (selectedEngine === 'gptoss') {
+            geminiSettings.classList.add('hidden');
+            gptossSettings.classList.remove('hidden');
+        } else {
+            geminiSettings.classList.remove('hidden');
+            gptossSettings.classList.add('hidden');
+        }
+        
+        saveSettings();
+    }
+
+    function handleTestGptoss() {
+        const endpoint = gptossEndpointInput.value.trim();
+        const apiKey = gptossApiKeyInput.value.trim();
+        const model = gptossModelSelect.value;
+        
+        if (!endpoint) {
+            showGptossTestResult('오류: 엔드포인트를 입력해주세요.', 'error');
+            return;
+        }
+        
+        testGptossBtn.disabled = true;
+        testGptossBtn.textContent = '테스트 중...';
+        showGptossTestResult('GPT-OSS 연결을 테스트하는 중...', 'info');
+        
+        fetch('/api/test-gptoss', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                endpoint: endpoint,
+                apiKey: apiKey || null,
+                model: model
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.available) {
+                showGptossTestResult(`✅ 연결 성공! (${data.method} 방식, 모델: ${data.model})`, 'success');
+            } else {
+                showGptossTestResult(`❌ 연결 실패: ${data.error}`, 'error');
+            }
+        })
+        .catch(error => {
+            showGptossTestResult(`❌ 테스트 오류: ${error.message}`, 'error');
+        })
+        .finally(() => {
+            testGptossBtn.disabled = false;
+            testGptossBtn.textContent = '연결 테스트';
+        });
+    }
+
+    function showGptossTestResult(message, type) {
+        gptossTestResult.textContent = message;
+        gptossTestResult.className = `info-text ${type}`;
+        gptossTestResult.classList.remove('hidden');
+        
+        // Auto-hide after 10 seconds for success/info messages
+        if (type !== 'error') {
+            setTimeout(() => {
+                gptossTestResult.classList.add('hidden');
+            }, 10000);
+        }
+    }
+
     // --- KICKSTART ---
     setInitialTheme();
     loadGisScript();
@@ -1175,6 +1270,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadHistory();
     loadSettings();
     handleImageSourceChange();
+    handleAiEngineChange(); // Initialize AI engine settings display
 
     setChatInputEnabled(false);
     checkModelCompatibility();
