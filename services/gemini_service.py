@@ -86,8 +86,8 @@ class GeminiService:
                 except Exception as e:
                     logging.warning(f"Failed to process image: {str(e)}")
             
-            # Maximum stability content generation with comprehensive error prevention
-            max_retries = 1  # Single attempt with maximum resources
+            # Stable content generation with error handling
+            max_retries = 2  # Allow one retry for stability
             for attempt in range(max_retries):
                 try:
                     # Aggressive memory cleanup before each attempt
@@ -99,9 +99,11 @@ class GeminiService:
                     memory_percent = process.memory_percent()
                     logging.info(f"Memory usage before Gemini call: {memory_percent:.1f}%")
                     
-                    # No retries needed with maximum resource allocation
                     if attempt > 0:
-                        logging.error("Backup attempt should not be needed with maximum settings")
+                        delay = 2
+                        time.sleep(delay)
+                        gc.collect()
+                        logging.info(f"Retrying Gemini API call (attempt {attempt + 1})")
                     
                     # Use very minimal configuration to prevent memory issues
                     if HAS_GENAI:
@@ -109,7 +111,7 @@ class GeminiService:
                             content_parts,
                             generation_config=genai.GenerationConfig(
                                 temperature=0.7,
-                                max_output_tokens=4096,  # Maximum quality with error prevention
+                                max_output_tokens=2048,  # Stable quality for reliability
                                 candidate_count=1
                             )
                         )
