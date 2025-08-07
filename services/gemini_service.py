@@ -90,13 +90,14 @@ class GeminiService:
             max_retries = 3
             for attempt in range(max_retries):
                 try:
-                    # Force garbage collection before each attempt
+                    # Enhanced memory management
                     gc.collect()
                     
-                    # Add progressive delay between attempts  
+                    # Progressive delay with memory cleanup between attempts
                     if attempt > 0:
                         delay = min(2 ** attempt, 8)  # Cap at 8 seconds
                         time.sleep(delay)
+                        gc.collect()  # Additional cleanup before retry
                         logging.info(f"Retrying Gemini API call (attempt {attempt + 1}) after {delay}s delay")
                     
                     # Use very minimal configuration to prevent memory issues
@@ -105,7 +106,7 @@ class GeminiService:
                             content_parts,
                             generation_config=genai.GenerationConfig(
                                 temperature=0.7,
-                                max_output_tokens=512,  # Restore stable limit to prevent crashes
+                                max_output_tokens=1024,  # Balanced for quality and stability
                                 candidate_count=1
                             )
                         )
@@ -125,17 +126,23 @@ class GeminiService:
                     
                     logging.info(f"Gemini text generation completed successfully ({len(generated_text)} characters)")
                     
-                    # Clear result from memory
+                    # Enhanced memory cleanup
+                    response_text = generated_text
                     result = None
+                    generated_text = None
                     gc.collect()
                     
-                    return self._parse_gemini_json_response(generated_text)
+                    return self._parse_gemini_json_response(response_text)
                     
                 except (TimeoutError, Exception) as retry_error:
                     error_type = "Timeout" if isinstance(retry_error, TimeoutError) else "API Error"
                     logging.warning(f"Gemini {error_type} attempt {attempt + 1} failed: {str(retry_error)}")
                     
-                    # Force cleanup on timeout/error
+                    # Enhanced cleanup on error with explicit variable clearing
+                    if 'result' in locals():
+                        result = None
+                    if 'generated_text' in locals():
+                        generated_text = None
                     gc.collect()
                     
                     if attempt == max_retries - 1:
