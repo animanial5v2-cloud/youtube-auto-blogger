@@ -668,10 +668,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         thinkingMessage.remove(); // Remove "thinking" message
 
-        if (!previewBeforePostCheckbox.checked && !loopIntervalId) {
-            addChatMessage('ai', `✅ '발행 전 미리보기' 기능이 꺼져있습니다. "${data.title}" 포스트를 생성하여 즉시 발행합니다...`, true);
-            await postToBloggerAndHandleResult(data.title, data.body, false);
-        } else {
+        // Check preview setting consistently for all posting methods
+        if (previewBeforePostCheckbox.checked) {
+            // Show preview for ALL posting methods when enabled
             const contentId = `content-${Date.now()}`;
             generatedContentStore[contentId] = { title: data.title, body: data.body };
             const previewText = data.body.replace(/<[^>]+>/g, '').substring(0, 200);
@@ -686,6 +685,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             addChatMessage('ai', aiResponseHtml, true);
+        } else {
+            // Post directly for ALL posting methods when preview is disabled
+            addChatMessage('ai', `✅ '발행 전 미리보기' 기능이 꺼져있습니다. "${data.title}" 포스트를 생성하여 즉시 발행합니다...`, true);
+            await postToBloggerAndHandleResult(data.title, data.body, false);
         }
         return data; // Return data for loop processing
     }
@@ -1000,8 +1003,9 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const generatedData = await generatePostFromQueueItem(itemToProcess);
             if (generatedData) {
-                // Check preview setting for queue items too
+                // Apply preview setting consistently for queue items
                 if (previewBeforePostCheckbox.checked) {
+                    // Show preview for queue items when enabled
                     const contentId = `queue-content-${Date.now()}`;
                     generatedContentStore[contentId] = { title: generatedData.title, body: generatedData.body };
                     const previewText = generatedData.body.replace(/<[^>]+>/g, '').substring(0, 200);
@@ -1016,9 +1020,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
                     addChatMessage('ai', aiResponseHtml, true);
-                    // Don't post automatically in queue mode when preview is enabled
-                    // Continue to next item only after manual approval
+                    addChatMessage('ai', `⚠️ 미리보기가 활성화되어 일괄 포스팅이 일시정지됩니다. 승인 후 다음 항목으로 진행됩니다.`, true);
                 } else {
+                    // Post directly for queue items when preview is disabled
+                    addChatMessage('ai', `✅ 미리보기 OFF: 큐 아이템 ${currentQueueIndex + 1} "${generatedData.title}" 즉시 발행합니다.`, true);
                     await postToBloggerAndHandleResult(generatedData.title, generatedData.body, false);
                 }
             }
