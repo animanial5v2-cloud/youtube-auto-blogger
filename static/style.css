@@ -4,26 +4,26 @@
     --spacing-unit: 8px;
     --transition-speed: 0.2s;
 
-    /* New Color Palette - Inspired by modern IDEs */
-    --bg-color-dark: #0D1117;
-    --surface-color-dark: #161B22;
-    --primary-color-dark: #58A6FF;
-    --secondary-color-dark: #3FB950;
-    --text-color-dark: #C9D1D9;
-    --text-secondary-dark: #8B949E;
-    --error-color-dark: #F85149;
-    --border-color-dark: #30363D;
-    --input-bg-dark: #0D1117;
+    /* Professional Color Palette - Enhanced for commercial use */
+    --bg-color-dark: #0A0E16;
+    --surface-color-dark: #1C2128;
+    --primary-color-dark: #4A9EFF;
+    --secondary-color-dark: #00C851;
+    --text-color-dark: #E1E8F0;
+    --text-secondary-dark: #9CA3B0;
+    --error-color-dark: #FF4444;
+    --border-color-dark: #2D3748;
+    --input-bg-dark: #0A0E16;
 
-    --bg-color-light: #F6F8FA;
+    --bg-color-light: #FAFBFC;
     --surface-color-light: #FFFFFF;
-    --primary-color-light: #0969DA;
-    --secondary-color-light: #1F883D;
-    --text-color-light: #1F2328;
-    --text-secondary-light: #57606A;
-    --error-color-light: #CF222E;
-    --border-color-light: #D0D7DE;
-    --input-bg-light: #F6F8FA;
+    --primary-color-light: #2563EB;
+    --secondary-color-light: #059669;
+    --text-color-light: #1F2937;
+    --text-secondary-light: #6B7280;
+    --error-color-light: #DC2626;
+    --border-color-light: #E5E7EB;
+    --input-bg-light: #F9FAFB;
 }
 
 [data-theme="dark"] {

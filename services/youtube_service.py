@@ -36,15 +36,20 @@ class YouTubeService:
                 if video_id:
                     logging.info(f"Attempting transcript extraction for video ID: {video_id}")
                     
-                    # Try to get transcript - method works as designed
-                    for lang in ['ko', 'en']:
+                    # Try to get transcript with multiple language fallbacks
+                    for lang in ['ko', 'en', 'auto']:
                         try:
-                            transcript_data = YouTubeTranscriptApi.get_transcript(video_id, languages=[lang])
+                            if lang == 'auto':
+                                transcript_data = YouTubeTranscriptApi.get_transcript(video_id)
+                            else:
+                                transcript_data = YouTubeTranscriptApi.get_transcript(video_id, languages=[lang])
+                            
                             transcript_text = ' '.join([item['text'] for item in transcript_data])
                             if transcript_text and len(transcript_text.strip()) > 50:
                                 logging.info(f"Successfully extracted {lang} transcript, length: {len(transcript_text)}")
                                 break
-                        except:
+                        except Exception as lang_error:
+                            logging.debug(f"Failed to get {lang} transcript: {str(lang_error)}")
                             continue
                             
             except ImportError:

@@ -9,11 +9,12 @@ import base64
 
 try:
     import google.generativeai as genai
-    from google.generativeai import types
+    from google.generativeai.types import HarmCategory, HarmBlockThreshold
     HAS_GENAI = True
 except ImportError:
     genai = None
-    types = None
+    HarmCategory = None
+    HarmBlockThreshold = None
     HAS_GENAI = False
 
 class GeminiService:
@@ -39,20 +40,21 @@ class GeminiService:
             # Initialize model
             model = genai.GenerativeModel(model_name)
             
-            # JSON format prompt for consistent output
+            # Enhanced JSON format prompt for premium content generation
             prompt = f"""주제: {topic}
 톤: {tone}
 독자: {audience}
 
-반드시 아래 JSON 형식으로만 응답하세요. 
-- 최소 2500자 이상의 풍부하고 상세한 내용 작성
-- 구조: 제목 → 소개 → [IMAGE_HERE] → 본문(여러 섹션)
-- 실용적 정보와 구체적 예시 포함
+고품질 블로그 포스트를 JSON 형식으로 작성하세요:
+- 최소 3000자 이상의 전문적이고 상세한 내용
+- SEO 최적화된 제목과 구조
+- 실용적 가치와 구체적 예시 풍부하게 포함
+- 독자 참여를 유도하는 매력적인 문체
 
 {{
-  "title": "매력적인 블로그 제목",
-  "content_with_placeholder": "<h1>제목</h1><p>매력적인 소개 문단입니다. 독자의 관심을 끌고 본문에서 다룰 내용을 간략히 소개합니다.</p><p>두 번째 소개 문단으로 주제에 대한 배경과 중요성을 설명합니다.</p>[IMAGE_HERE]<h2>첫 번째 주요 섹션</h2><p>상세한 설명과 실용적 정보를 제공합니다...</p><h3>하위 섹션</h3><p>구체적인 예시와 팁을 제공합니다...</p><h2>두 번째 주요 섹션</h2><p>추가적인 상세 정보와 실무 활용법...</p><h2>결론</h2><p>핵심 내용 요약과 실행 방안...</p>",
-  "summary": "1-2문장으로 핵심 내용 요약",
+  "title": "클릭하고 싶게 만드는 매력적인 제목 (60자 이내)",
+  "content_with_placeholder": "<h1>제목</h1><p>독자의 관심을 즉시 끄는 매력적인 오프닝 문단입니다. 주제의 핵심 가치와 독자가 얻을 수 있는 구체적인 혜택을 명확히 제시합니다.</p><p>주제에 대한 배경 설명과 왜 지금 이 내용이 중요한지에 대한 맥락을 제공합니다.</p>[IMAGE_HERE]<h2>첫 번째 핵심 섹션 (실용적 정보)</h2><p>상세하고 실행 가능한 정보를 체계적으로 제공합니다. 구체적인 단계별 방법론과 실제 적용 사례를 포함합니다...</p><h3>세부 실행 방법</h3><p>독자가 바로 활용할 수 있는 구체적인 팁과 노하우를 제공합니다...</p><h2>두 번째 핵심 섹션 (심화 내용)</h2><p>보다 전문적이고 심화된 내용으로 독자의 이해도를 한 단계 더 끌어올립니다...</p><h2>실제 활용 사례와 결과</h2><p>실제 성공 사례와 구체적인 결과를 통해 신뢰성을 높입니다...</p><h2>마무리 및 실행 계획</h2><p>핵심 내용을 요약하고 독자가 취할 수 있는 구체적인 다음 단계를 제시합니다...</p>",
+  "summary": "핵심 가치와 주요 내용을 2-3문장으로 명확히 요약",
   "image_search_keywords": "영어 키워드 3개, 쉼표로 구분",
   "hashtags": "#키워드1 #키워드2 #키워드3"
 }}"""
@@ -60,26 +62,21 @@ class GeminiService:
             # Prepare content for generation
             content_parts = [prompt]
             
-            # Add image if provided
-            if image_url and HAS_GENAI and types:
+            # Add image if provided (simplified approach)
+            if image_url and HAS_GENAI:
                 try:
                     if image_url.startswith('data:'):
-                        # Handle data URI
-                        header, data = image_url.split(',', 1)
-                        mime_type = header.split(';')[0].split(':')[1]
-                        image_data = base64.b64decode(data)
-                        image_part = types.BlobDict(
-                            mime_type=mime_type,
-                            data=image_data
-                        )
+                        # Handle data URI - simplified
+                        logging.info("Processing data URI image")
+                        image_part = self._data_uri_to_generative_part(image_url)
                     else:
                         # Handle regular URL
-                        image_response = requests.get(image_url)
+                        image_response = requests.get(image_url, timeout=10)
                         if image_response.status_code == 200:
-                            image_part = types.BlobDict(
-                                mime_type='image/jpeg',
-                                data=image_response.content
-                            )
+                            image_part = {
+                                'mime_type': 'image/jpeg',
+                                'data': image_response.content
+                            }
                         else:
                             raise ValueError(f"Failed to fetch image: {image_response.status_code}")
                     content_parts.append(image_part)
@@ -182,11 +179,17 @@ class GeminiService:
         image_data = base64.b64decode(base64_data)
         
         # Return proper Part object for Gemini
-        if genai and hasattr(genai, 'types'):
-            return genai.types.BlobDict({
-                'mime_type': mime_type,
-                'data': image_data
-            })
+        if HAS_GENAI and genai:
+            try:
+                return {
+                    'mime_type': mime_type,
+                    'data': image_data
+                }
+            except Exception:
+                return {
+                    'mime_type': mime_type,
+                    'data': image_data
+                }
         else:
             return {
                 'mime_type': mime_type,

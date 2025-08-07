@@ -215,7 +215,10 @@ def test_gptoss():
         if not endpoint:
             return jsonify({'available': False, 'error': 'Endpoint is required'}), 400
         
-        # Test connection using GPT-OSS service
+        # Test connection using GPT-OSS service with enhanced validation
+        if not endpoint.startswith(('http://', 'https://')):
+            return jsonify({'available': False, 'error': 'Endpoint must start with http:// or https://'}), 400
+            
         result = gptoss_service.check_model_availability(endpoint, api_key or '', model)
         return jsonify(result)
         
