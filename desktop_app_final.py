@@ -15,8 +15,9 @@ class AIBloggingStudioFinal:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("AI 블로깅 스튜디오 Pro")
-        self.root.geometry("550x450")
-        self.root.resizable(False, False)
+        self.root.geometry("800x600")  # 더 큰 기본 크기
+        self.root.resizable(True, True)  # 크기 조절 가능
+        self.root.minsize(600, 500)  # 최소 크기 설정
         
         # 창을 화면 중앙에 배치
         self.center_window()
@@ -30,9 +31,9 @@ class AIBloggingStudioFinal:
     def center_window(self):
         """창을 화면 중앙에 배치"""
         self.root.update_idletasks()
-        x = (self.root.winfo_screenwidth() // 2) - (550 // 2)
-        y = (self.root.winfo_screenheight() // 2) - (450 // 2)
-        self.root.geometry(f"550x450+{x}+{y}")
+        x = (self.root.winfo_screenwidth() // 2) - (800 // 2)
+        y = (self.root.winfo_screenheight() // 2) - (600 // 2)
+        self.root.geometry(f"800x600+{x}+{y}")
     
     def setup_ui(self):
         """UI 구성"""

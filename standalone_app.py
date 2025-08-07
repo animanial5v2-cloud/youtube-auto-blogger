@@ -10,16 +10,17 @@ class AIBloggingStudioDark:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("AI 블로깅 스튜디오 Pro")
-        self.root.geometry("500x380")
-        self.root.resizable(False, False)
+        self.root.geometry("800x600")
+        self.root.resizable(True, True)
+        self.root.minsize(600, 500)
         self.root.configure(bg='#1a1a1a')
         self.center_window()
         self.setup_ui()
     
     def center_window(self):
-        x = (self.root.winfo_screenwidth() // 2) - 250
-        y = (self.root.winfo_screenheight() // 2) - 190
-        self.root.geometry(f"500x380+{x}+{y}")
+        x = (self.root.winfo_screenwidth() // 2) - 400
+        y = (self.root.winfo_screenheight() // 2) - 300
+        self.root.geometry(f"800x600+{x}+{y}")
     
     def setup_ui(self):
         # 메인 컨테이너 - 완전한 다크 테마

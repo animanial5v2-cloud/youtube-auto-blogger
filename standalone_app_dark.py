@@ -10,8 +10,9 @@ class AIBloggingStudioDark:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("AI 블로깅 스튜디오 Pro")
-        self.root.geometry("480x360")
-        self.root.resizable(False, False)
+        self.root.geometry("800x600")
+        self.root.resizable(True, True)
+        self.root.minsize(600, 500)
         
         # 강제 다크 테마 설정
         self.root.tk_setPalette(background='#1a1a1a', foreground='#ffffff',
@@ -22,9 +23,9 @@ class AIBloggingStudioDark:
         self.setup_ui()
     
     def center_window(self):
-        x = (self.root.winfo_screenwidth() // 2) - 240
-        y = (self.root.winfo_screenheight() // 2) - 180
-        self.root.geometry(f"480x360+{x}+{y}")
+        x = (self.root.winfo_screenwidth() // 2) - 400
+        y = (self.root.winfo_screenheight() // 2) - 300
+        self.root.geometry(f"800x600+{x}+{y}")
     
     def setup_ui(self):
         # 메인 프레임 - 강제 다크
