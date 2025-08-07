@@ -239,11 +239,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- IMAGE SOURCE & UPLOAD ---
+    // --- IMAGE & VIDEO SOURCE & UPLOAD ---
     function handleImageSourceChange() {
         const selectedSource = document.querySelector('input[name="imageSource"]:checked').value;
         pexelsConfig.classList.toggle('hidden', selectedSource !== 'pexels');
         uploadConfig.classList.toggle('hidden', selectedSource !== 'upload');
+    }
+        updateTopicDiscoveryModeUI();
     }
 
     function handleImageUpload(event) {
@@ -261,6 +263,26 @@ document.addEventListener('DOMContentLoaded', () => {
         userImageUpload.value = '';
         imagePreview.src = '#';
         imagePreviewContainer.classList.add('hidden');
+    }
+
+    function handleVideoUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        videoFileName.textContent = file.name;
+        videoFileInfo.classList.remove('hidden');
+        updateTopicDiscoveryModeUI();
+        
+        // Remove auto-trigger for video processing - respect preview settings
+        if (accessToken && !isTopicDiscoveryMode) {
+            addChatMessage('ai', '📹 동영상이 업로드되었습니다. 주제를 입력하고 전송 버튼을 눌러 포스팅을 생성해주세요.', true);
+        }
+    }
+
+    function handleRemoveVideo() {
+        userVideoUpload.value = '';
+        videoFileName.textContent = '';
+        videoFileInfo.classList.add('hidden');
+        updateTopicDiscoveryModeUI();
     }
 
     // --- AUTHENTICATION ---
@@ -1172,7 +1194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadHistory();
     loadSettings();
     handleImageSourceChange();
-
+    handleYoutubeSourceChange();
     setChatInputEnabled(false);
     checkModelCompatibility();
 });
