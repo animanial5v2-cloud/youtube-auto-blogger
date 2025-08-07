@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const imagePreviewContainer = document.getElementById('imagePreviewContainer');
     const imagePreview = document.getElementById('imagePreview');
     const removeImageBtn = document.getElementById('removeImageBtn');
+    const youtubeExtractEnabledCheckbox = document.getElementById('youtubeExtractEnabled');
     const previewBeforePostCheckbox = document.getElementById('previewBeforePost');
     // postAsDraft checkbox removed
 
@@ -151,7 +152,10 @@ document.addEventListener('DOMContentLoaded', () => {
             get: () => previewBeforePostCheckbox.checked,
             set: (value) => { previewBeforePostCheckbox.checked = value; }
         },
-
+        youtubeExtractEnabled: {
+            get: () => youtubeExtractEnabledCheckbox.checked,
+            set: (value) => { youtubeExtractEnabledCheckbox.checked = value; }
+        }
     };
 
     function saveSettings() {
@@ -191,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     Object.values(settingsToPersist).forEach(item => {
         if (!item) return;
-        const element = item.get ? previewBeforePostCheckbox : item;
+        const element = item.get ? (item === settingsToPersist.previewBeforePost ? previewBeforePostCheckbox : youtubeExtractEnabledCheckbox) : item;
         element.addEventListener('input', saveSettings);
         element.addEventListener('change', saveSettings);
     });
@@ -496,7 +500,6 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handlePostGeneration(topicOrUrl) {
         const thinkingMessage = addChatMessage('ai', `🤖 AI가 열심히 콘텐츠를 만들고 있어요: "${topicOrUrl.substring(0, 50)}..."`);
         
-        const youtubeSourceType = document.querySelector('input[name="youtubeSourceType"]:checked').value;
         const videoFile = userVideoUpload.files[0];
         const isYoutubeUrl = topicOrUrl.includes('youtube.com/') || topicOrUrl.includes('youtu.be/');
         const imageSource = document.querySelector('input[name="imageSource"]:checked').value;
@@ -505,15 +508,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const fetchOptions = { method: 'POST' };
         let requestBody;
 
-        if (youtubeSourceType === 'videoFile' && videoFile) {
-            endpoint = '/generate-post-from-video';
-            const formData = new FormData();
-            formData.append('video', videoFile);
-            formData.append('topic', topicOrUrl);
-            fetchOptions.body = formData;
-        } else if (isYoutubeUrl) {
+        if (isYoutubeUrl && youtubeExtractEnabledCheckbox.checked) {
             endpoint = '/generate-post-from-youtube';
-            requestBody = { urls: [topicOrUrl], youtubeSourceType };
+            requestBody = { urls: [topicOrUrl] };
         } else {
             endpoint = '/generate-post';
             requestBody = { topic: topicOrUrl };
@@ -523,8 +520,6 @@ document.addEventListener('DOMContentLoaded', () => {
             apiKey: apiKeyInput.value.trim(),
             modelName: geminiModelSelect.value,
             imageSource: imageSource,
-            aiImageModel: aiImageModelSelect.value,
-            gcpProjectId: gcpProjectIdInput.value.trim(),
             pexelsApiKey: pexelsApiKeyInput.value.trim(),
             accessToken: accessToken,
             tone: writingToneSelect.value,
@@ -663,7 +658,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const imageSource = document.querySelector('input[name="imageSource"]:checked').value;
             if (imageSource === 'pexels' && !pexelsApiKeyInput.value.trim()) { alert('Pexels API 키를 입력해주세요.'); return false; }
-            if (imageSource === 'ai' && aiImageModelSelect.value.startsWith('imagen') && !gcpProjectIdInput.value.trim()) { alert('Google Imagen 모델을 사용하려면 GCP Project ID를 입력해주세요.'); return false; }
+
             
             if (!skipFileValidation) {
                 if (imageSource === 'upload' && !userImageUpload.files[0]) { alert('업로드할 이미지를 선택해주세요.'); return false; }
@@ -989,9 +984,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let endpoint;
         let requestBody;
 
-        if (isYoutubeUrl) {
+        if (isYoutubeUrl && youtubeExtractEnabledCheckbox.checked) {
             endpoint = '/generate-post-from-youtube';
-            requestBody = { urls: [topicOrUrl], youtubeSourceType };
+            requestBody = { urls: [topicOrUrl] };
         } else {
             endpoint = '/generate-post';
             requestBody = { topic: topicOrUrl };
@@ -1001,8 +996,6 @@ document.addEventListener('DOMContentLoaded', () => {
             apiKey: apiKeyInput.value.trim(),
             modelName: geminiModelSelect.value,
             imageSource: imageSource,
-            aiImageModel: aiImageModelSelect.value,
-            gcpProjectId: gcpProjectIdInput.value.trim(),
             pexelsApiKey: pexelsApiKeyInput.value.trim(),
             accessToken: accessToken,
             tone: writingToneSelect.value,
