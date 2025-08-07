@@ -379,24 +379,17 @@ def chat_for_topic():
 
 각 제안은 SEO 친화적이고 바로 포스팅 가능해야 하며, 설정된 글쓰기 톤과 타겟 독자에게 적합해야 합니다."""
             
-            # Use lightweight Gemini call for topic discovery only
-            import google.generativeai as genai
-            genai.configure(api_key=api_key)
-            model = genai.GenerativeModel(model_name)
+            # Use lightweight Gemini service for topic discovery
+            gemini_service = GeminiService()
+            simple_result = gemini_service.generate_simple_response(api_key, prompt, model_name)
             
-            result = model.generate_content(
-                prompt,
-                generation_config=genai.GenerationConfig(
-                    temperature=0.7,
-                    max_output_tokens=512,  # Very light for topic discovery
-                    candidate_count=1
-                )
-            )
-            
-            if result and result.text:
-                return jsonify({'response': result.text.strip()})
+            if simple_result and isinstance(simple_result, str):
+                return jsonify({'response': simple_result})
+            elif simple_result and isinstance(simple_result, dict) and not simple_result.get('error'):
+                return jsonify({'response': simple_result})
             else:
-                return jsonify({'error': 'AI가 응답을 생성하지 못했습니다.'}), 500
+                error_msg = simple_result.get('error') if isinstance(simple_result, dict) else 'AI가 응답을 생성하지 못했습니다.'
+                return jsonify({'error': error_msg}), 500
                 
         except Exception as e:
             logging.error(f"Unified API error in chat-for-topic: {str(e)}")

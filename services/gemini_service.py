@@ -302,6 +302,37 @@ class GeminiService:
             'hashtags': "#블로그 #콘텐츠 #정보"
         }
     
+    def generate_simple_response(self, api_key, prompt, model_name='gemini-1.5-pro'):
+        """Generate simple text response for topic discovery"""
+        try:
+            if not HAS_GENAI:
+                raise ValueError("Google Generative AI library not available")
+                
+            effective_api_key = api_key or self.api_key
+            if not effective_api_key:
+                raise ValueError("Gemini API key is required")
+            
+            genai.configure(api_key=effective_api_key)
+            model = genai.GenerativeModel(model_name)
+            
+            result = model.generate_content(
+                prompt,
+                generation_config=genai.GenerationConfig(
+                    temperature=0.7,
+                    max_output_tokens=512,
+                    candidate_count=1
+                ) if HAS_GENAI else None
+            )
+            
+            if result and result.text:
+                return result.text.strip()
+            else:
+                return {'error': 'No response generated'}
+                
+        except Exception as e:
+            logging.error(f"Simple response generation failed: {str(e)}")
+            return {'error': str(e)}
+    
     def generate_ai_image(self, project_id, topic, access_token):
         """Generate AI image using Google Imagen 2"""
         try:
