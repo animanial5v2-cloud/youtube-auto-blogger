@@ -1170,7 +1170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             historyList.innerHTML = '<li class="history-placeholder">기록이 없습니다.</li>';
             clearHistoryBtn.style.display = 'none';
         } else {
-            postingHistory.slice(0, 50).forEach(item => {
+            postingHistory.slice(0, 5).forEach(item => {
                 const li = document.createElement('li');
                 li.className = 'history-item';
                 li.innerHTML = `
