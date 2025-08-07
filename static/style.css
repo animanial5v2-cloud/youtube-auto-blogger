@@ -61,16 +61,20 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     transition: background-color var(--transition-speed), color var(--transition-speed);
-    overflow: hidden;
+    overflow: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
 }
 
 .app-container {
     display: grid;
     grid-template-columns: 300px 1fr 350px;
-    height: 100vh;
+    min-height: 100vh;
+    height: auto;
     gap: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .sidebar-left, .main-content, .sidebar-right {
@@ -332,6 +336,7 @@ input:focus, select:focus, textarea:focus {
     display: flex;
     flex-direction: column;
     gap: calc(var(--spacing-unit) * 2);
+    max-height: calc(100vh - 200px);
 }
 
 .chat-message {
@@ -940,6 +945,37 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-secondary);
+}
+
+/* Console overlay protection for Replit preview */
+body.replit-preview {
+    padding-bottom: 60px !important;
+}
+
+iframe[src*="console"],
+iframe[src*="webview-console"] {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    max-height: 40vh !important;
+}
+
+/* Ensure main content doesn't get hidden behind console */
+.app-container {
+    margin-bottom: 60px;
+}
+
+/* Mobile responsive adjustments for console */
+@media (max-width: 768px) {
+    body.replit-preview {
+        padding-bottom: 80px !important;
+    }
+    
+    .app-container {
+        margin-bottom: 80px;
+    }
 }
 
 /* Collapsible Section Styles */

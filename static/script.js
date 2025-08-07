@@ -1271,7 +1271,44 @@ document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
     handleImageSourceChange();
     handleAiEngineChange(); // Initialize AI engine settings display
+    adjustForReplitConsole();
 
     setChatInputEnabled(false);
     checkModelCompatibility();
+
+    // --- REPLIT CONSOLE ADJUSTMENT ---
+    function adjustForReplitConsole() {
+        // Detect Replit environment and adjust UI accordingly
+        const isReplit = window.location.hostname.includes('replit.app') || 
+                        window.location.hostname.includes('replit.dev') ||
+                        window.parent !== window; // iframe detection
+        
+        if (isReplit) {
+            document.body.classList.add('replit-preview');
+            
+            // Monitor for console iframe injection
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeName === 'IFRAME' && 
+                            (node.src.includes('console') || node.src.includes('webview'))) {
+                            // Console iframe detected, ensure it doesn't overlap
+                            node.style.zIndex = '9999';
+                            node.style.position = 'fixed';
+                            node.style.bottom = '0';
+                            node.style.maxHeight = '40vh';
+                            
+                            // Add extra padding to body
+                            document.body.style.paddingBottom = '70px';
+                        }
+                    });
+                });
+            });
+            
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        }
+    }
 });
