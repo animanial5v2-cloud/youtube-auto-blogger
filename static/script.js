@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('loginBtn');
     const authStatus = document.getElementById('authStatus');
 
-    // Settings (Right Sidebar)
+    // Settings (Right Sidebar) - with null checks
     const apiKeyInput = document.getElementById('apiKey');
     const clientIdInput = document.getElementById('clientId');
     const blogIdInput = document.getElementById('blogId');
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const settings = {};
         for (const key in settingsToPersist) {
             if (settingsToPersist[key]) {
-                 settings[key] = typeof settingsToPersist[key].get === 'function' ? settingsToPersist[key].get() : settingsToPersist[key].value;
+                 settings[key] = typeof settingsToPersist[key].get === 'function' ? settingsToPersist[key].get() : settingsToPersist[key]?.value || '';
             }
         }
         localStorage.setItem('autoBloggerSettings', JSON.stringify(settings));
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (settingsToPersist[key] && settings[key] !== null && settings[key] !== undefined) {
                     if (typeof settingsToPersist[key].set === 'function') {
                         settingsToPersist[key].set(settings[key]);
-                    } else {
+                    } else if (settingsToPersist[key]) {
                         settingsToPersist[key].value = settings[key];
                     }
                 }
@@ -196,8 +196,10 @@ document.addEventListener('DOMContentLoaded', () => {
     Object.values(settingsToPersist).forEach(item => {
         if (!item) return;
         const element = item.get ? (item === settingsToPersist.previewBeforePost ? previewBeforePostCheckbox : youtubeExtractEnabledCheckbox) : item;
-        element.addEventListener('input', saveSettings);
-        element.addEventListener('change', saveSettings);
+        if (element) {
+            element.addEventListener('input', saveSettings);
+            element.addEventListener('change', saveSettings);
+        }
     });
     
     imageSourceRadios.forEach(radio => {
@@ -209,6 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- MODEL COMPATIBILITY ---
     function checkModelCompatibility() {
+        if (!geminiModelSelect) return;
         const selectedModel = geminiModelSelect.value;
         // This set is now only for providing a non-blocking warning.
         const SPECIAL_PURPOSE_MODELS = new Set([
@@ -228,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setChatInputEnabled(true); // Always enable if logged in.
         }
 
-        if (isSpecialPurpose) {
+        if (isSpecialPurpose && modelCompatibilityWarning) {
             modelCompatibilityWarning.classList.remove('hidden');
             let warningText = '';
             if (selectedModel.includes('tts')) warningText = 'TTS 전용 모델입니다.';
@@ -236,18 +239,24 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (selectedModel.includes('image-generation')) warningText = '대화형 이미지 생성 전용 모델입니다.';
             else if (selectedModel.includes('audio')) warningText = '대화형 오디오 출력 전용 모델입니다.';
             else warningText = '특수 목적용 모델입니다.';
-            modelCompatibilityWarning.textContent = `ℹ️ 정보: ${warningText} 선택됨. 일반 포스팅 생성에 적합하지 않을 수 있습니다.`;
+            if (modelCompatibilityWarning) {
+                modelCompatibilityWarning.textContent = `ℹ️ 정보: ${warningText} 선택됨. 일반 포스팅 생성에 적합하지 않을 수 있습니다.`;
+            }
         } else {
-            modelCompatibilityWarning.classList.add('hidden');
-            modelCompatibilityWarning.textContent = '';
+            if (modelCompatibilityWarning) {
+                modelCompatibilityWarning.classList.add('hidden');
+                modelCompatibilityWarning.textContent = '';
+            }
         }
     }
 
     // --- IMAGE SOURCE & UPLOAD ---
     function handleImageSourceChange() {
-        const selectedSource = document.querySelector('input[name="imageSource"]:checked').value;
-        pexelsConfig.classList.toggle('hidden', selectedSource !== 'pexels');
-        uploadConfig.classList.toggle('hidden', selectedSource !== 'upload');
+        const selectedRadio = document.querySelector('input[name="imageSource"]:checked');
+        if (!selectedRadio) return;
+        const selectedSource = selectedRadio.value;
+        if (pexelsConfig) pexelsConfig.classList.toggle('hidden', selectedSource !== 'pexels');
+        if (uploadConfig) uploadConfig.classList.toggle('hidden', selectedSource !== 'upload');
     }
 
     function handleImageUpload(event) {
@@ -273,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateAuthStatus('error', 'Google 인증 라이브러리 로딩 중...');
             return;
         }
-        const clientIdVal = clientIdInput.value.trim();
+        const clientIdVal = clientIdInput?.value?.trim() || '';
         if (!clientIdVal) {
             updateAuthStatus('error', 'OAuth 클라이언트 ID를 입력하세요.');
             return;
@@ -650,14 +659,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function validateInputs(isDiscoveryMode = false, skipFileValidation = false) {
         if (!accessToken) { alert('Google 계정으로 먼저 로그인해주세요.'); return false; }
-        if (!apiKeyInput.value.trim()) { alert('Gemini API 키를 입력해주세요.'); return false; }
+        if (!apiKeyInput?.value?.trim()) { alert('Gemini API 키를 입력해주세요.'); return false; }
 
         if (!isDiscoveryMode) {
-            if (!blogIdInput.value.trim()) { alert('대상 블로그 ID를 입력해주세요.'); return false; }
-            if (!blogAddressInput.value.trim()) { alert('블로그 주소를 입력해주세요.'); return false; }
+            if (!blogIdInput?.value?.trim()) { alert('대상 블로그 ID를 입력해주세요.'); return false; }
+            if (!blogAddressInput?.value?.trim()) { alert('블로그 주소를 입력해주세요.'); return false; }
             
-            const imageSource = document.querySelector('input[name="imageSource"]:checked').value;
-            if (imageSource === 'pexels' && !pexelsApiKeyInput.value.trim()) { alert('Pexels API 키를 입력해주세요.'); return false; }
+            const imageSourceRadio = document.querySelector('input[name="imageSource"]:checked');
+            const imageSource = imageSourceRadio?.value || 'none';
+            if (imageSource === 'pexels' && !pexelsApiKeyInput?.value?.trim()) { alert('Pexels API 키를 입력해주세요.'); return false; }
 
             
             if (!skipFileValidation) {
