@@ -57,7 +57,9 @@ class GeminiService:
   "summary": "핵심 가치와 주요 내용을 2-3문장으로 명확히 요약",
   "image_search_keywords": "영어 키워드 3개, 쉼표로 구분",
   "hashtags": "#키워드1 #키워드2 #키워드3"
-}}"""
+}}
+
+반드시 위 JSON 형식으로만 응답하고, 다른 설명은 포함하지 마세요."""
             
             # Prepare content for generation
             content_parts = [prompt]
