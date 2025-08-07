@@ -379,17 +379,24 @@ def chat_for_topic():
 
 각 제안은 SEO 친화적이고 바로 포스팅 가능해야 하며, 설정된 글쓰기 톤과 타겟 독자에게 적합해야 합니다."""
             
-            # Use unified system with lightweight response for topic discovery
-            response = gemini_service.generate_text_content(
-                api_key, prompt, None, model_name, tone, audience
+            # Use lightweight Gemini call for topic discovery only
+            import google.generativeai as genai
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel(model_name)
+            
+            result = model.generate_content(
+                prompt,
+                generation_config=genai.GenerationConfig(
+                    temperature=0.7,
+                    max_output_tokens=512,  # Very light for topic discovery
+                    candidate_count=1
+                )
             )
             
-            if response and response.get('title'):
-                # Extract just the content for topic discovery
-                reply_text = response.get('content_with_placeholder', '').replace('<h1>', '').replace('</h1>', '').replace('<p>', '').replace('</p>', '').replace('<h2>', '').replace('</h2>', '').strip()
-                return jsonify({'reply': reply_text})
+            if result and result.text:
+                return jsonify({'response': result.text.strip()})
             else:
-                return jsonify({'error': 'AI가 응답을 생성하지 못했습니다. 다시 시도해주세요.'}), 500
+                return jsonify({'error': 'AI가 응답을 생성하지 못했습니다.'}), 500
                 
         except Exception as e:
             logging.error(f"Unified API error in chat-for-topic: {str(e)}")
@@ -1074,3 +1081,70 @@ def not_found(error):
 @app.errorhandler(500)
 def internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
+
+def generate_content_with_fallback(gemini_api_key, content_text, image_url, gemini_model, writing_tone, target_audience, ai_engine, gptoss_config):
+    """Generate content with automatic fallback between AI engines"""
+    import os
+    
+    openai_api_key = os.getenv('OPENAI_API_KEY')
+    result = None
+    
+    # Try primary AI engine first
+    if ai_engine == 'gemini' and gemini_api_key:
+        try:
+            gemini_service = GeminiService()
+            result = gemini_service.generate_text_content(
+                api_key=gemini_api_key,
+                topic=content_text,
+                image_url=image_url,
+                model_name=gemini_model,
+                tone=writing_tone,
+                audience=target_audience
+            )
+            if result and not result.get('error'):
+                result['ai_engine_used'] = 'gemini'
+                logging.info("Successfully generated content with Gemini")
+                return result
+        except Exception as e:
+            logging.error(f"Gemini failed: {str(e)}")
+    
+    # Fallback to OpenAI if Gemini fails or not available
+    if not result and openai_api_key:
+        try:
+            openai_service = OpenAIService()
+            result = openai_service.generate_text_content(
+                api_key=openai_api_key,
+                topic=content_text,
+                image_url=image_url,
+                model_name='gpt-4',
+                tone=writing_tone,
+                audience=target_audience
+            )
+            if result and not result.get('error'):
+                result['ai_engine_used'] = 'openai'
+                logging.info("Successfully used OpenAI as fallback")
+                return result
+        except Exception as e:
+            logging.error(f"OpenAI fallback failed: {str(e)}")
+    
+    # Final fallback to GPT-OSS
+    if not result and gptoss_config:
+        try:
+            gptoss_service = GPTOSSService()
+            result = gptoss_service.generate_text_content(
+                api_key=gptoss_config,
+                topic=content_text,
+                image_url=image_url,
+                model_name='gpt-oss',
+                tone=writing_tone,
+                audience=target_audience
+            )
+            if result and not result.get('error'):
+                result['ai_engine_used'] = 'gptoss'
+                logging.info("Successfully used GPT-OSS as final fallback")
+                return result
+        except Exception as e:
+            logging.error(f"GPT-OSS final fallback failed: {str(e)}")
+    
+    # If all fail, return error
+    return {'error': 'All AI services are currently unavailable. Please check your API keys and try again.'}

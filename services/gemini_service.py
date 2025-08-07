@@ -46,9 +46,9 @@ class GeminiService:
 독자: {audience}
 
 고품질 블로그 포스트를 JSON 형식으로 작성하세요:
-- 최소 3000자 이상의 전문적이고 상세한 내용
-- SEO 최적화된 제목과 구조
-- 실용적 가치와 구체적 예시 풍부하게 포함
+- 최소 2000자 이상의 전문적이고 상세한 내용
+- SEO 최적화된 구조와 실용적 정보
+- 구체적 예시와 실행 가능한 팁 풍부하게 포함
 - 독자 참여를 유도하는 매력적인 문체
 
 {{
@@ -110,9 +110,18 @@ class GeminiService:
                             content_parts,
                             generation_config=genai.GenerationConfig(
                                 temperature=0.7,
-                                max_output_tokens=2048,  # Stable quality for reliability
-                                candidate_count=1
-                            )
+                                max_output_tokens=3072,  # High quality content
+                                candidate_count=1,
+                                stop_sequences=None,
+                                top_k=None,
+                                top_p=None
+                            ),
+                            safety_settings={
+                                HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+                                HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+                                HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+                                HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+                            } if HarmCategory and HarmBlockThreshold else None
                         )
                     else:
                         raise ValueError("Google Generative AI library not available")
@@ -125,8 +134,8 @@ class GeminiService:
                         raise ValueError("Empty text response from Gemini API")
                     
                     generated_text = result.text.strip()
-                    if len(generated_text) < 500:  # Higher quality threshold
-                        raise ValueError(f"Response too short for quality standards: {len(generated_text)} characters")
+                    if len(generated_text) < 1000:  # Higher quality threshold
+                        raise ValueError(f"Response too short: {len(generated_text)} characters")
                     
                     logging.info(f"Gemini text generation completed successfully ({len(generated_text)} characters)")
                     
