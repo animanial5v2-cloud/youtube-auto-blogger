@@ -86,19 +86,24 @@ class GeminiService:
                 except Exception as e:
                     logging.warning(f"Failed to process image: {str(e)}")
             
-            # Generate content with enhanced retry and memory optimization
-            max_retries = 3
+            # Optimized content generation with aggressive memory management
+            max_retries = 2  # Reduce retries for faster response
             for attempt in range(max_retries):
                 try:
-                    # Enhanced memory management
+                    # Aggressive memory cleanup before each attempt
+                    import psutil
+                    process = psutil.Process()
                     gc.collect()
                     
-                    # Progressive delay with memory cleanup between attempts
+                    # Log memory usage for monitoring
+                    memory_percent = process.memory_percent()
+                    logging.info(f"Memory usage before Gemini call: {memory_percent:.1f}%")
+                    
                     if attempt > 0:
-                        delay = min(2 ** attempt, 8)  # Cap at 8 seconds
+                        delay = 2  # Fixed short delay
                         time.sleep(delay)
-                        gc.collect()  # Additional cleanup before retry
-                        logging.info(f"Retrying Gemini API call (attempt {attempt + 1}) after {delay}s delay")
+                        gc.collect()
+                        logging.info(f"Retrying Gemini API call (attempt {attempt + 1})")
                     
                     # Use very minimal configuration to prevent memory issues
                     if HAS_GENAI:
@@ -106,7 +111,7 @@ class GeminiService:
                             content_parts,
                             generation_config=genai.GenerationConfig(
                                 temperature=0.7,
-                                max_output_tokens=1024,  # Balanced for quality and stability
+                                max_output_tokens=2048,  # Optimized for high-quality long content
                                 candidate_count=1
                             )
                         )
@@ -138,12 +143,19 @@ class GeminiService:
                     error_type = "Timeout" if isinstance(retry_error, TimeoutError) else "API Error"
                     logging.warning(f"Gemini {error_type} attempt {attempt + 1} failed: {str(retry_error)}")
                     
-                    # Enhanced cleanup on error with explicit variable clearing
+                    # Comprehensive cleanup on error
                     if 'result' in locals():
                         result = None
                     if 'generated_text' in locals():
                         generated_text = None
+                    if 'content_parts' in locals():
+                        content_parts.clear()
                     gc.collect()
+                    
+                    # Force memory release
+                    import psutil
+                    process = psutil.Process()
+                    logging.info(f"Memory after cleanup: {process.memory_percent():.1f}%")
                     
                     if attempt == max_retries - 1:
                         # Last attempt, raise the error
