@@ -216,7 +216,7 @@ def test_gptoss():
             return jsonify({'available': False, 'error': 'Endpoint is required'}), 400
         
         # Test connection using GPT-OSS service
-        result = gptoss_service.check_model_availability(endpoint, api_key if api_key else None, model)
+        result = gptoss_service.check_model_availability(endpoint, api_key or '', model)
         return jsonify(result)
         
     except Exception as e:
@@ -237,7 +237,7 @@ def generate_blog_post():
             return jsonify({'error': 'Input is required'}), 400
         
         # Extract settings
-        gemini_api_key = settings.get('apiKey', '').strip() or os.getenv('GOOGLE_GEMINI_API_KEY') or os.getenv('GEMINI_API_KEY')
+        gemini_api_key = settings.get('apiKey', '').strip() or os.getenv('GOOGLE_API_KEY') or os.getenv('GEMINI_API_KEY')
         gemini_model = settings.get('geminiModel', 'gemini-1.5-pro')
         writing_tone = settings.get('writingTone', '친근한 (Friendly)')
         target_audience = settings.get('targetAudience', '')
@@ -348,7 +348,7 @@ def chat_for_topic():
     try:
         data = request.get_json()
         message = data.get('message', '').strip()
-        api_key = data.get('apiKey', '').strip() or os.getenv('GOOGLE_GEMINI_API_KEY') or os.getenv('GEMINI_API_KEY')
+        api_key = data.get('apiKey', '').strip() or os.getenv('GOOGLE_API_KEY') or os.getenv('GEMINI_API_KEY')
         model_name = data.get('modelName', 'gemini-1.5-pro')
         tone = data.get('tone', '친근한 (Friendly)')
         audience = data.get('audience', '')
@@ -408,7 +408,7 @@ def generate_post_from_youtube():
             return jsonify({'error': 'YouTube URLs are required'}), 400
         
         # Extract settings from request data
-        gemini_api_key = data.get('apiKey', '').strip() or os.getenv('GOOGLE_GEMINI_API_KEY') or os.getenv('GEMINI_API_KEY')
+        gemini_api_key = data.get('apiKey', '').strip() or os.getenv('GOOGLE_API_KEY') or os.getenv('GEMINI_API_KEY')
         gemini_model = data.get('modelName', 'gemini-1.5-pro')
         writing_tone = data.get('tone', '친근한 (Friendly)')
         target_audience = data.get('audience', '')
@@ -626,7 +626,7 @@ def generate_post_from_video():
         
         # Get form data
         topic = request.form.get('topic', '').strip()
-        gemini_api_key = request.form.get('apiKey', '').strip() or os.getenv('GOOGLE_GEMINI_API_KEY') or os.getenv('GEMINI_API_KEY')
+        gemini_api_key = request.form.get('apiKey', '').strip() or os.getenv('GOOGLE_API_KEY') or os.getenv('GEMINI_API_KEY')
         gemini_model = request.form.get('modelName', 'gemini-1.5-pro')
         writing_tone = request.form.get('tone', '친근한 (Friendly)')
         target_audience = request.form.get('audience', '')

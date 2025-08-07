@@ -430,6 +430,9 @@ input:focus, select:focus, textarea:focus {
     align-items: center;
     gap: var(--spacing-unit);
     margin: 0 calc(var(--spacing-unit) * -2.5) calc(var(--spacing-unit) * -2.5);
+    flex-wrap: wrap;
+    position: relative;
+    overflow: visible;
 }
 
 .chat-mode-toggle {
@@ -1012,6 +1015,38 @@ iframe[src*="webview-console"] {
         max-height: none;
         padding: calc(var(--spacing-unit) * 2);
     }
+    
+    .chat-input-area {
+        flex-direction: column;
+        align-items: stretch;
+        gap: calc(var(--spacing-unit) * 1.5);
+    }
+    
+    .chat-form {
+        order: 2;
+        display: flex;
+        gap: var(--spacing-unit);
+    }
+    
+    .chat-mode-toggle {
+        order: 1;
+        align-self: flex-start;
+    }
+    
+    #topicDiscoveryBtn {
+        width: auto;
+        padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2);
+        height: auto;
+        min-height: 44px;
+    }
+    
+    #topicDiscoveryBtn .ai-icon {
+        margin-right: calc(var(--spacing-unit) * 0.5);
+    }
+    
+    #topicDiscoveryBtn span:not(.ai-icon) {
+        display: inline;
+    }
 }
 
 /* Improved responsive design for prompt sections */
@@ -1073,6 +1108,24 @@ iframe[src*="webview-console"] {
     .modal-footer {
         flex-direction: column-reverse;
         gap: calc(var(--spacing-unit) * 1.5);
+    }
+    
+    /* Mobile-specific chat input improvements */
+    #chatInput {
+        font-size: 16px; /* Prevents zoom on iOS */
+        min-height: 44px;
+        padding: calc(var(--spacing-unit) * 1.5);
+    }
+    
+    #sendBtn, #addToQueueFromChatBtn {
+        min-width: 44px;
+        min-height: 44px;
+        flex-shrink: 0;
+    }
+    
+    .chat-input-area {
+        padding: calc(var(--spacing-unit) * 1.5);
+        margin: 0 calc(var(--spacing-unit) * -2) calc(var(--spacing-unit) * -2);
     }
 }
 
