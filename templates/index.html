@@ -174,14 +174,28 @@
                 </div>
                 
                 <div class="settings-group">
-                    <h3>YouTube 자막 추출</h3>
-                    <div class="form-group">
-                        <label class="toggle-switch">
+                    <h3>
+                        <span class="youtube-icon">📺</span>
+                        YouTube 자막 추출
+                    </h3>
+                    <div class="youtube-toggle-container">
+                        <div class="toggle-switch-modern">
                             <input type="checkbox" id="youtubeExtractEnabled" checked>
-                            <span class="toggle-slider"></span>
-                            <span class="toggle-label">YouTube URL 자막 추출 활성화</span>
-                        </label>
-                        <p class="form-group-description">YouTube URL 입력 시 자동으로 자막을 추출하여 블로그 포스팅을 생성합니다.</p>
+                            <label for="youtubeExtractEnabled">
+                                <span class="toggle-track">
+                                    <span class="toggle-thumb">
+                                        <span class="toggle-icon">▶</span>
+                                    </span>
+                                </span>
+                                <span class="toggle-text">
+                                    <span class="toggle-on">ON</span>
+                                    <span class="toggle-off">OFF</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="youtube-description">
+                            <p>YouTube URL 입력 시 자동으로 자막을 추출하여 고품질 블로그 포스팅을 생성합니다</p>
+                        </div>
                     </div>
                 </div>
 
