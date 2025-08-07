@@ -252,6 +252,8 @@ class GeminiService:
                     parsed['summary'] = parsed['title']
                 if not parsed.get('image_search_keywords'):
                     parsed['image_search_keywords'] = "blog, content, article"
+                if not parsed.get('hashtags'):
+                    parsed['hashtags'] = "#블로그 #콘텐츠 #정보"
             
             return parsed
         except json.JSONDecodeError as e:
@@ -270,7 +272,8 @@ class GeminiService:
             'title': title_line[:100],
             'content_with_placeholder': f"<h2>{title_line}</h2>\n<p>{content}</p>\n[IMAGE_HERE]",
             'summary': title_line,
-            'image_search_keywords': "blog, content, article"
+            'image_search_keywords': "blog, content, article",
+            'hashtags': "#블로그 #콘텐츠 #정보"
         }
     
     def generate_ai_image(self, project_id, topic, access_token):

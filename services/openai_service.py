@@ -46,7 +46,7 @@ class OpenAIService:
                 "messages": [
                     {"role": "user", "content": prompt}
                 ],
-                "max_tokens": 2000,
+                "max_tokens": 1024,
                 "temperature": 0.7
             }
             
