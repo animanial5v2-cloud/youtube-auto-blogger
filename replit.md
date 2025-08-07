@@ -39,6 +39,13 @@ The user plans to sell this AI Auto-Blogging Studio on Kmong (Korean freelance p
 - **Commercial Ready**: Complete validation confirms system ready for 크몽 marketplace sale
 - **Draft Mode Removal**: Successfully completed - all "초안으로 저장" functionality removed
 
+### Server Specifications (August 7, 2025)
+- **Memory**: 62GB total (43GB used, 19GB available)
+- **CPU**: AMD EPYC 7B13 (6 cores)
+- **Storage**: 50GB total (18GB available)
+- **Current AI Settings**: Gemini max_output_tokens=1024, OpenAI max_tokens=1024
+- **Performance Status**: Excellent - sufficient resources for all 11 posting methods with high-quality content generation
+
 ## System Architecture
 
 ### Backend Architecture
