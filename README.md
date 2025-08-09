@@ -87,6 +87,23 @@ docker run -d -p 8080:8080 \
   ghcr.io/<owner>/<repo>:latest
 ```
 
+## ⚡ 원클릭 배포(SSH VPS: Lightsail 등)
+
+GitHub Actions의 `Deploy to VPS (Lightsail/Any SSH host)` 워크플로우로 원격 서버에 배포할 수 있습니다.
+
+1) 저장소 Secrets 추가
+   - `VPS_HOST`: 서버 IP 또는 도메인
+   - `VPS_USER`: SSH 사용자명(예: ubuntu)
+   - `VPS_SSH_KEY`: 개인키(private key) 내용 전체
+   - (선택) `VPS_PORT`: SSH 포트(기본 22)
+   - (선택) `OPENAI_API_KEY`, `PEXELS_API_KEY`
+
+2) Actions → `Deploy to VPS (Lightsail/Any SSH host)` → Run workflow → 실행
+   - `image`를 비우면 기본 `ghcr.io/<owner>/<repo>:latest` 사용
+   - 기본 포트는 8080 → `http://서버IP:8080`
+
+서버 측에서는 자동으로 Docker 설치(없을 경우), 이미지 Pull, 컨테이너 재시작이 수행됩니다. 데이터는 `$HOME/pab-data`에 유지됩니다.
+
 
 ## 📖 사용법
 

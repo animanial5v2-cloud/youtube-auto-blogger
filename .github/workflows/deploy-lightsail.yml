@@ -1,0 +1,67 @@
+name: Deploy to VPS (Lightsail/Any SSH host)
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: "Docker image to deploy (default: ghcr.io/<owner>/<repo>:latest)"
+        required: false
+      port:
+        description: "Host port to bind (default: 8080)"
+        required: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve image/tag
+        id: vars
+        run: |
+          DEF_IMAGE=ghcr.io/${{ github.repository }}:latest
+          echo "image=${{ github.event.inputs.image || env.DEF_IMAGE }}" >> $GITHUB_OUTPUT
+        env:
+          DEF_IMAGE: ghcr.io/${{ github.repository }}:latest
+
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script_stop: true
+          envs: IMAGE,APP_PORT,OPENAI_API_KEY,PEXELS_API_KEY
+          script: |
+            set -euo pipefail
+            IMAGE="${IMAGE:-${{ steps.vars.outputs.image }}}"
+            APP_PORT="${APP_PORT:-${{ github.event.inputs.port || 8080 }}}"
+            OPENAI_API_KEY="${OPENAI_API_KEY:-${{ secrets.OPENAI_API_KEY || '' }}}"
+            PEXELS_API_KEY="${PEXELS_API_KEY:-${{ secrets.PEXELS_API_KEY || '' }}}"
+
+            echo "[+] Using image: $IMAGE"
+
+            # Install docker if missing
+            if ! command -v docker >/dev/null 2>&1; then
+              echo "[+] Installing Docker..."
+              curl -fsSL https://get.docker.com | sh
+            fi
+
+            # Create persistent data dir
+            DATA_DIR="$HOME/pab-data"
+            mkdir -p "$DATA_DIR"
+
+            # Pull image (GHCR may require public visibility; ensure image is public or login beforehand)
+            docker pull "$IMAGE"
+
+            # Restart container
+            CONTAINER=pab-app
+            docker rm -f "$CONTAINER" || true
+            docker run -d --name "$CONTAINER" \
+              -p "$APP_PORT:8080" \
+              -e OPENAI_API_KEY="$OPENAI_API_KEY" \
+              -e PEXELS_API_KEY="$PEXELS_API_KEY" \
+              -v "$DATA_DIR:/app/data" \
+              "$IMAGE"
+
+            echo "[+] Deployed. Visit http://<server-ip>:${APP_PORT}"
+
