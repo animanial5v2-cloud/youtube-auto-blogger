@@ -1383,6 +1383,9 @@
             if (el) el.value = String(Math.max(1, Math.min(30, n)));
         }
 
+        // 추가 확장 옵션: 주중만/주말만 발행(클라이언트 힌트)
+        // 서버 로직 확장 전 임시로 유지. 향후 서버에서도 요일 필터를 반영할 수 있습니다.
+
         // 상단 진행 상태 표시 함수
         function showTopStatus(text, totalSteps, currentStep, done=false) {
             const bar = document.getElementById('topProgressBar');
