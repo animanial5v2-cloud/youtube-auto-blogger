@@ -18,29 +18,39 @@
 pip install -r requirements.txt
 ```
 
-### 2. 구글 클라우드 콘솔 설정
+### 2. Google Cloud Console 설정(클라이언트 ID/Secret 발급)
+
+아래 순서대로 진행하면 웹 애플리케이션용 OAuth 클라이언트를 생성하고 `credentials.json`을 받을 수 있습니다.
 
 #### 2.1 프로젝트 생성
-1. https://console.cloud.google.com 접속
-2. 새 프로젝트 생성
-3. 프로젝트 이름 입력 (예: "YouTube to Blogger")
+1. 브라우저로 [Google Cloud Console](https://console.cloud.google.com) 접속
+2. 상단 프로젝트 드롭다운 → "새 프로젝트" → 이름 입력(예: "YouTube Auto Blogger") → 만들기
 
-#### 2.2 Blogger API 활성화
-1. "API 및 서비스" → "라이브러리" 클릭
-2. "Blogger API v3" 검색
-3. API 활성화
+#### 2.2 Blogger API v3 활성화
+1. 좌측 메뉴 "API 및 서비스" → "라이브러리"
+2. "Blogger API v3" 검색 후 선택 → "사용 설정" 클릭
 
-#### 2.3 OAuth 2.0 클라이언트 ID 생성
-1. "API 및 서비스" → "사용자 인증 정보" 클릭
-2. "사용자 인증 정보 만들기" → "OAuth 클라이언트 ID" 클릭
-3. 애플리케이션 유형: "데스크톱 앱" 선택
-4. 이름 입력 (예: "YouTube to Blogger")
-5. "만들기" 클릭
-6. JSON 파일 다운로드
+#### 2.3 OAuth 동의화면 구성
+1. "API 및 서비스" → "OAuth 동의화면"
+2. 사용자 유형: "외부(External)" 선택 → 만들기
+3. 앱 이름/지원 이메일 입력
+4. 범위는 기본 프로필/이메일 정도로 시작 가능(필요 시 추후 확장)
+5. 테스트 사용자에 본인 Gmail 추가 → 저장
 
-#### 2.4 인증 파일 설정
-1. 다운로드한 JSON 파일을 `client_secrets.json`으로 이름 변경
-2. 프로젝트 루트 폴더에 저장
+#### 2.4 OAuth 2.0 클라이언트 ID 생성(웹 애플리케이션)
+1. "API 및 서비스" → "사용자 인증 정보"
+2. "사용자 인증 정보 만들기" → "OAuth 클라이언트 ID"
+3. 애플리케이션 유형: "웹 애플리케이션"
+4. 승인된 리디렉션 URI 추가(필수)
+   - 로컬 개발(Flask 기본): `http://localhost:5000/oauth2callback`
+   - Docker 8080: `http://localhost:8080/oauth2callback`
+   - 서버 배포: `http://서버IP:8080/oauth2callback` 또는 `https://도메인/oauth2callback`
+5. (선택) 승인된 자바스크립트 원본: `http://localhost:5000`
+6. 생성 후 JSON 다운로드 → 파일명은 `credentials.json`으로 유지 권장
+
+#### 2.5 프로그램에 적용
+- UI에서 `credentials.json 업로드` 버튼으로 업로드 또는 Client ID/Secret 직접 입력 후 "Google 로그인 및 설정" 클릭
+- 승인 완료 시 `token.pickle`이 생성되며 이후 자동 로그인 동작
 
 ### 3. OpenAI API 키 설정
 ```bash
@@ -62,6 +72,47 @@ python run_google_blogger.py
 
 ### 2. 웹 인터페이스 접속
 브라우저에서 `http://localhost:5000` 접속
+
+---
+
+## 🔍 문제 해결(FAQ)
+- 400 redirect_uri_mismatch: 리디렉션 URI가 정확히 일치해야 합니다(슬래시 포함). 콘솔에서 URI를 추가 후 저장하세요.
+- 403 access_denied: 테스트 사용자 목록에 본인 Gmail이 포함되어야 합니다(동의화면이 게시 전일 때).
+- 로컬 HTTP 오류: 환경변수 `OAUTHLIB_INSECURE_TRANSPORT=1` 설정으로 HTTP 리디렉션 허용(앱에 기본 적용됨).
+- 토큰 재설정: UI의 "로그아웃"을 눌러 `token.pickle`을 삭제하고 다시 로그인하세요.
+
+---
+
+## 📷 스크린샷 가이드(자리표시자)
+아래 파일명으로 스크린샷을 저장하면, 이 문서에서 자동으로 미리보기가 연결됩니다. 경로: `docs/screenshots/`
+
+1) 프로젝트 선택/생성
+![01 Project Select](docs/screenshots/01-project-select.png)
+
+2) Blogger API v3 활성화
+![02 Enable Blogger API](docs/screenshots/02-enable-blogger-api.png)
+
+3) OAuth 동의화면 설정(외부 → 테스트 사용자 추가)
+![03 OAuth Consent Screen](docs/screenshots/03-oauth-consent.png)
+
+4) OAuth 클라이언트 만들기(웹 애플리케이션)
+![04 Create OAuth Client](docs/screenshots/04-create-oauth-client.png)
+
+5) 승인된 리디렉션 URI 입력
+![05 Redirect URI](docs/screenshots/05-redirect-uri.png)
+
+6) credentials.json 다운로드
+![06 Download Credentials](docs/screenshots/06-download-credentials.png)
+
+7) 프로그램에서 credentials.json 업로드
+![07 Upload in App](docs/screenshots/07-upload-credentials-ui.png)
+
+8) 로그인 승인 완료
+![08 Login Success](docs/screenshots/08-login-success.png)
+
+팁
+- 이미지는 1280px 이상 권장, 민감 정보(Client Secret)는 마스킹 후 캡처하세요.
+- 파일명은 그대로 두면 링크가 자동으로 연결됩니다.
 
 ### 3. 블로그 선택
 - "블로그 목록 새로고침" 버튼 클릭

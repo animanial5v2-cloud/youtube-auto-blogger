@@ -31,6 +31,12 @@ PEXELS_API_KEY = os.environ.get('PEXELS_API_KEY', 'S7a7shjluIEyZweFJ3WHV7T2I2hrU
 # YouTubeAutoBlogger 인스턴스 생성
 auto_blogger = YouTubeAutoBlogger(pexels_api_key=PEXELS_API_KEY)
 
+# Ensure docs/screenshots exists for documentation uploads
+try:
+    os.makedirs(os.path.join('docs', 'screenshots'), exist_ok=True)
+except Exception:
+    pass
+
 # --- Simple in-process log streaming (SSE) ---
 _log_clients: list[queue.Queue] = []
 
@@ -404,6 +410,37 @@ def download_package():
             'success': False,
             'error': f'다운로드 중 오류가 발생했습니다: {str(e)}'
         }), 500
+
+@app.route('/api/upload-doc-screenshot', methods=['POST'])
+def upload_doc_screenshot():
+    """문서용 스크린샷 업로드: README_GOOGLE_BLOGGER.md에서 참조하는 이미지 파일 저장.
+
+    form fields:
+      - name: 저장 파일명 (예: 01-project-select.png)
+      - file: 이미지 파일 (png/jpg)
+    """
+    try:
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': '파일이 없습니다.'}), 400
+        name = (request.form.get('name') or '').strip()
+        if not name:
+            return jsonify({'success': False, 'error': '파일명을 지정해주세요.'}), 400
+        # sanitize filename (영문/숫자/하이픈/언더스코어/점만 허용)
+        import re as _re
+        safe = ''.join(_re.findall(r"[A-Za-z0-9_.-]", name))
+        if not safe:
+            return jsonify({'success': False, 'error': '유효한 파일명이 아닙니다.'}), 400
+        # enforce .png default if 확장자 없음
+        if '.' not in safe:
+            safe += '.png'
+        f = request.files['file']
+        base = os.path.join('docs', 'screenshots')
+        os.makedirs(base, exist_ok=True)
+        path = os.path.join(base, safe)
+        f.save(path)
+        return jsonify({'success': True, 'path': path.replace('\\', '/')})
+    except Exception as e:
+        return jsonify({'success': False, 'error': f'업로드 실패: {str(e)}'}), 500
 
 def _run_batch(urls, interval_minutes, blog_id, target_audience, auto_shutdown, schedule_isos=None):
     try:
