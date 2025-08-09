@@ -521,6 +521,10 @@ def batch_convert():
         auto_shutdown = bool(data.get('auto_shutdown', False))
         schedule_base_iso = (data.get('schedule_base_iso') or '').strip()
         repeat_days = int(data.get('repeat_days', 1))
+        time_of_day = (data.get('time_of_day') or '').strip()  # "HH:MM"
+        interval_days = int(data.get('interval_days', 1))
+        weekdays_only = bool(data.get('weekdays_only', False))
+        weekends_only = bool(data.get('weekends_only', False))
 
         if not isinstance(urls, list) or not urls:
             return jsonify({'success': False, 'error': 'YouTube URL 목록이 비어 있습니다.'}), 400
@@ -546,7 +550,7 @@ def batch_convert():
 
         interval_minutes = max(1, min(10, interval_minutes))
 
-        # 예약 반복 스케줄 확장
+        # 예약 반복 스케줄 확장(간격/요일 필터/특정 시간 적용)
         schedule_isos = None
         expanded_urls = cleaned
         if schedule_base_iso:
@@ -555,12 +559,31 @@ def batch_convert():
                 # parse ISO (including Z)
                 base = datetime.fromisoformat(schedule_base_iso.replace('Z', '+00:00'))
                 repeat_days = max(1, min(30, repeat_days))
+                interval_days = max(1, min(30, interval_days))
+                # time_of_day 적용: HH:MM 형식이면 base의 시:분으로 치환
+                if time_of_day and len(time_of_day.split(':')) == 2:
+                    try:
+                        hh, mm = [int(x) for x in time_of_day.split(':')]
+                        base = base.replace(hour=hh, minute=mm, second=0, microsecond=0)
+                    except Exception:
+                        pass
                 schedule_isos = []
                 expanded = []
-                for d in range(repeat_days):
+                day_count = 0
+                cur = base
+                while day_count < repeat_days:
+                    # 요일 필터
+                    if weekdays_only and cur.weekday() >= 5:  # 토(5), 일(6)
+                        cur = cur + timedelta(days=1)
+                        continue
+                    if weekends_only and cur.weekday() < 5:
+                        cur = cur + timedelta(days=1)
+                        continue
                     for u in cleaned:
                         expanded.append(u)
-                        schedule_isos.append((base + timedelta(days=d)).isoformat())
+                        schedule_isos.append(cur.isoformat())
+                    day_count += 1
+                    cur = cur + timedelta(days=interval_days)
                 expanded_urls = expanded
             except Exception:
                 schedule_isos = None
