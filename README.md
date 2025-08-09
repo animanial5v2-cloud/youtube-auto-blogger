@@ -73,6 +73,20 @@ docker run -d --name auto-blogger -p 8080:8080 \
 
 2) main/master 브랜치 푸시 시 자동으로 이미지가 빌드되어 푸시됩니다.
 
+### GHCR로 이미지 푸시(선택)
+이 저장소에는 GHCR(GitHub Container Registry) 푸시용 워크플로우도 포함되어 있습니다.
+
+- 푸시 태그: `ghcr.io/<owner>/<repo>:latest`
+- 사용 예시:
+```bash
+docker pull ghcr.io/<owner>/<repo>:latest
+docker run -d -p 8080:8080 \
+  -e OPENAI_API_KEY="your-openai-api-key" \
+  -e PEXELS_API_KEY="your-pexels-api-key" \
+  -v $(pwd)/data:/app/data \
+  ghcr.io/<owner>/<repo>:latest
+```
+
 
 ## 📖 사용법
 
