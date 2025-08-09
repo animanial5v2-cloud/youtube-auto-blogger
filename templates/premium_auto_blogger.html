@@ -272,6 +272,13 @@
             border-left: none;
         }
 
+        /* 예약 UI 가독성 향상 */
+        .schedule-section .form-label { margin-bottom: 6px; }
+        .schedule-section .chip-row { gap: 10px; flex-wrap: wrap; }
+        .schedule-section .chip-row .btn { min-width: 96px; }
+        .schedule-section .inline-row { gap: 10px; flex-wrap: wrap; }
+        .schedule-section small.text-muted { display: block; margin-top: 6px; }
+
         /* 모델 입력-버튼 경계 자연스럽게 연결 */
         .model-input-group .form-control {
             border-right: 0;
@@ -770,24 +777,26 @@
                         <button class="btn btn-success w-100 mt-3" onclick="startBatchPosting()">
                             <i class="fas fa-play"></i> 배치 시작
                         </button>
-                        <div class="mt-3 p-2" style="background: rgba(0,0,0,0.03); border-radius: 12px;">
+                        <div class="mt-3 p-2 schedule-section" style="background: rgba(0,0,0,0.03); border-radius: 12px;">
                             <label class="form-label"><i class="fas fa-calendar-alt"></i> 반복 예약 (선택)</label>
-                            <div class="d-flex gap-2 align-items-center mb-2 flex-wrap">
+                            <div class="d-flex align-items-center mb-2 inline-row">
                                 <input id="batchScheduleBase" type="datetime-local" class="form-control" style="max-width: 280px;" />
-                                <button type="button" class="btn btn-sm btn-outline" onclick="presetBatchBase('tonight21')">오늘 21:00</button>
-                                <button type="button" class="btn btn-sm btn-outline" onclick="presetBatchBase('tomorrow09')">내일 09:00</button>
-                                <button type="button" class="btn btn-sm btn-outline" onclick="clearBatchBase()">해제</button>
+                                <div class="d-flex chip-row">
+                                    <button type="button" class="btn btn-sm btn-outline" onclick="presetBatchBase('tonight21')">오늘 21:00</button>
+                                    <button type="button" class="btn btn-sm btn-outline" onclick="presetBatchBase('tomorrow09')">내일 09:00</button>
+                                    <button type="button" class="btn btn-sm btn-outline" onclick="clearBatchBase()">해제</button>
+                                </div>
                             </div>
-                            <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center inline-row">
                                 <label class="form-label mb-0">일수</label>
                                 <input id="batchRepeatDays" type="number" min="1" max="30" value="1" class="form-control" style="max-width:120px;" />
-                                <div class="d-flex gap-2 flex-wrap">
+                                <div class="d-flex chip-row">
                                     <button type="button" class="btn btn-sm btn-outline" onclick="presetBatchDays(7)">7일</button>
                                     <button type="button" class="btn btn-sm btn-outline" onclick="presetBatchDays(14)">14일</button>
                                     <button type="button" class="btn btn-sm btn-outline" onclick="presetBatchDays(30)">30일</button>
                                 </div>
                             </div>
-                            <div class="d-flex align-items-center gap-2 mt-2 flex-wrap">
+                            <div class="d-flex align-items-center inline-row mt-2">
                                 <label class="form-label mb-0"><i class="fas fa-clock"></i> 시간</label>
                                 <input id="batchTimeOfDay" type="time" class="form-control" value="09:00" style="max-width:140px;" />
                                 <label class="form-label mb-0"><i class="fas fa-arrows-alt-h"></i> 간격(일)</label>
@@ -801,7 +810,7 @@
                                     <label class="form-check-label" for="batchWeekendsOnly">주말만</label>
                                 </div>
                             </div>
-                            <small class="text-muted">시작 시각부터 지정한 일수 동안 하루 간격으로 예약 발행합니다.</small>
+                            <small class="text-muted">시작 시각부터 지정한 일수 동안 지정 간격으로 예약 발행합니다.</small>
                         </div>
                     </div>
                 </div>
