@@ -436,16 +436,25 @@ class YouTubeAutoBlogger:
             return {}
     
     def translate_keywords_to_english(self, keywords: List[str]) -> List[str]:
-        """비용 최소화를 위해 LLM 호출 없이 키워드를 그대로 반환합니다.
-        Pexels 검색은 한글 키워드도 동작하므로 굳이 번역하지 않습니다.
+        """키워드를 영어로 번역"""
+        prompt = f"""
+        다음 한글 키워드들을 영어로 번역해주세요. 
+        이미지 검색에 적합한 영어 단어로 변환해주세요.
+        
+        키워드: {', '.join(keywords[:5])}
+        
+        영어 키워드만 쉼표로 구분해서 응답해주세요.
         """
+        
         try:
-            if not isinstance(keywords, list):
-                return []
-            # 상위 5개만 사용하여 과도한 요청을 방지
-            return [str(k).strip() for k in keywords if str(k).strip()][:5]
-        except Exception:
-            return []
+            text = self._llm_generate_text(prompt)
+            if text:
+                english_keywords = text.strip().split(',')
+                return [kw.strip() for kw in english_keywords]
+            return keywords[:5]
+        except Exception as e:
+            print(f"❌ 키워드 번역 실패: {e}")
+            return keywords[:5]
     
     def search_pexels_image(self, keyword: str) -> Optional[str]:
         """Pexels에서 이미지 검색"""
@@ -475,95 +484,7 @@ class YouTubeAutoBlogger:
         
         return None
 
-    def search_pexels_best_image(self, query: str, per_page: int = 5) -> Optional[str]:
-        """한 번의 호출로 per_page개 이미지를 받아 로컬 점수로 최적 1장을 선택.
-        점수 기준(간단 가중치): alt 포함 일치(3), photographer 일치(1), 해상도 가점.
-        """
-        try:
-            headers = {}
-            if self.pexels_api_key:
-                headers['Authorization'] = self.pexels_api_key
-            url = f"{self.pexels_base_url}/search"
-            params = {
-                'query': query,
-                'per_page': max(1, min(10, int(per_page or 5))),
-                'orientation': 'landscape'
-            }
-            resp = requests.get(url, headers=headers, params=params, timeout=30)
-            if resp.status_code != 200:
-                print(f"Pexels API 오류: {resp.status_code}")
-                return None
-            data = resp.json() or {}
-            photos = data.get('photos') or []
-            if not photos:
-                return None
-            # 질의어를 토큰으로 분해하여 간단한 부분 일치 스코어 산출
-            tokens = [t.lower() for t in (query or '').split() if t.strip()]
-            best = None
-            best_score = -1.0
-            for p in photos:
-                alt = (p.get('alt') or '').lower()
-                photographer = (p.get('photographer') or '').lower()
-                width = float(p.get('width') or 0)
-                height = float(p.get('height') or 0)
-                size_score = (width * height) / 1_000_000.0  # 대략적인 가점
-                text_score = 0.0
-                for tk in tokens:
-                    if tk and tk in alt:
-                        text_score += 3.0
-                    if tk and tk in photographer:
-                        text_score += 1.0
-                score = text_score + min(5.0, size_score)  # 해상도 가점 상한
-                if score > best_score:
-                    best_score = score
-                    best = p
-            return (best or photos[0]).get('src', {}).get('large')
-        except Exception as e:
-            print(f"이미지 선택 실패: {e}")
-            return None
-
-    def _extract_candidate_terms(self, analysis: Dict) -> List[str]:
-        """제목/첫 소제목에서 명사성 토큰을 추출(로컬 전처리, 비용 0원)."""
-        try:
-            import re as _re
-            title = str(analysis.get('title') or '')
-            subs = analysis.get('subheadings') or []
-            first_sub = str(subs[0]) if subs else ''
-            base = f"{title} {first_sub}".strip()
-            raw_tokens = _re.findall(r"[A-Za-z0-9가-힣]+", base)
-            # 간단 스톱워드
-            stop = {"소개","방법","정리","가이드","리뷰","뉴스","영상","유튜브","블로그","포스트","자동","생성","콘텐츠","최적화"}
-            terms: List[str] = []
-            for t in raw_tokens:
-                if any(ch.isdigit() for ch in t):
-                    continue
-                if t in stop:
-                    continue
-                # 한글 2자 이상 또는 영문 3자 이상
-                if any('\uac00' <= ch <= '\ud7a3' for ch in t):
-                    if len(t) < 2:
-                        continue
-                else:
-                    if len(t) < 3:
-                        continue
-                if t not in terms:
-                    terms.append(t)
-            return terms[:5]
-        except Exception:
-            return []
-
-    def _build_image_query(self, analysis: Dict) -> str:
-        terms = self._extract_candidate_terms(analysis)
-        # 키워드도 보강(상위 2개)
-        kws = analysis.get('keywords') or []
-        for k in kws[:2]:
-            sk = str(k).strip()
-            if sk and sk not in terms:
-                terms.append(sk)
-        # 너무 비어있으면 제목 사용
-        if not terms:
-            return str(analysis.get('title') or '').strip()
-        return " ".join(terms[:3])
+    # (최적 이미지 선택/로컬 토큰화 보조 함수는 이전 상태로 복귀하므로 제거)
     
     def create_blog_post_content(self, analysis: Dict, image_url: Optional[str] = None) -> str:
         """블로그 포스트 HTML 생성"""
@@ -710,15 +631,17 @@ class YouTubeAutoBlogger:
         if not analysis:
             return {"error": "콘텐츠 분석 실패"}
         
-        # 3. 키워드 준비(LLM 무사용, 비용 최소화)
-        print("🌐 키워드 준비 중...")
-        english_keywords = analysis.get('keywords', []) or []
-        if not isinstance(english_keywords, list):
-            english_keywords = []
-        # 4. 이미지 검색: per_page=5로 1회 호출 후 최적 1장 선택
-        print("🖼️ 이미지 검색 중(1회 호출, 최적 1장 선택)...")
-        query = self._build_image_query(analysis)
-        image_url = self.search_pexels_best_image(query, per_page=5) if query else None
+        # 3. 키워드 번역
+        print("🌐 키워드 번역 중...")
+        english_keywords = self.translate_keywords_to_english(analysis.get('keywords', []))
+        
+        # 4. 이미지 검색
+        print("🖼️ 이미지 검색 중...")
+        image_url = None
+        for keyword in english_keywords:
+            image_url = self.search_pexels_image(keyword)
+            if image_url:
+                break
         
         # 5. 블로그 포스트 콘텐츠 생성
         print("✍️ 블로그 포스트 생성 중...")
