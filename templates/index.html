@@ -3,335 +3,413 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Auto-Blogging Studio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body class="replit-preview">
-    <div class="app-container">
-        <!-- Left Sidebar -->
-        <aside class="sidebar-left">
-            <div class="sidebar-header">
-                <h1>AI Blogging Studio</h1>
-            </div>
-            <div class="sidebar-section">
-                <details id="historySection" class="collapsible-section" open>
-                    <summary class="sidebar-section-header">
-                        <h2 class="sidebar-section-title">포스팅 기록</h2>
-                        <div class="header-actions">
-                            <button id="clearHistoryBtn" class="button-icon" title="기록 전체 삭제">🗑️</button>
-                            <span class="collapse-icon"></span>
-                        </div>
-                    </summary>
-                    <div class="collapsible-content-wrapper">
-                        <ul id="historyList" class="history-list">
-                            <li class="history-placeholder">기록이 없습니다.</li>
-                        </ul>
-                    </div>
-                </details>
-
-                <div class="settings-group">
-                    <h3>AI 엔진 선택</h3>
-                    <div class="form-group">
-                        <label for="aiEngine">AI 엔진</label>
-                        <select id="aiEngine">
-                            <option value="gemini" selected>Google Gemini (기본값)</option>
-                            <option value="openai">OpenAI GPT</option>
-                            <option value="gptoss">GPT-OSS (로컬/호스팅)</option>
-                        </select>
-                        <p class="form-group-description">AI 엔진을 선택하세요. 실패 시 자동으로 다른 엔진으로 전환됩니다.</p>
-                    </div>
-                </div>
-
-                <div class="settings-group" id="geminiSettings">
-                    <h3>Gemini 모델 설정</h3>
-                    <div class="form-group">
-                        <label for="geminiModel">Gemini 모델</label>
-                        <select id="geminiModel">
-                            <optgroup label="Gemini 2.5 Series (멀티모달 텍스트 출력)">
-                                <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-                                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-                                <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite</option>
-                            </optgroup>
-                            <optgroup label="Gemini 2.0 Series (멀티모달 텍스트 출력)">
-                                <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-                                <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash-Lite</option>
-                            </optgroup>
-                            <optgroup label="Gemini 1.5 Series (안정 버전)">
-                                <option value="gemini-1.5-pro-latest" selected>Gemini 1.5 Pro (기본값)</option>
-                                <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash</option>
-                            </optgroup>
-                            <optgroup label="Gemini 1.0 Series">
-                                <option value="gemini-pro">Gemini 1.0 Pro</option>
-                            </optgroup>
-                            <optgroup label="특수 목적 모델 (블로그 생성 불가)">
-                                <option value="gemini-live-2.5-flash-preview">Live: 2.5 Flash (실시간 음성/영상)</option>
-                                <option value="gemini-2.5-flash-preview-native-audio-dialog">Audio: 2.5 Flash Native (대화)</option>
-                                <option value="gemini-2.5-flash-exp-native-audio-thinking-dialog">Audio: 2.5 Flash Native+Thinking (대화)</option>
-                                <option value="gemini-2.5-flash-preview-tts">TTS: 2.5 Flash (텍스트→음성)</option>
-                                <option value="gemini-2.5-pro-preview-tts">TTS: 2.5 Pro (텍스트→음성)</option>
-                                <option value="gemini-2.0-flash-preview-image-generation">Image Gen: 2.0 Flash (이미지 생성)</option>
-                                <option value="gemini-2.0-flash-live-001">Live: 2.0 Flash (실시간 음성/영상)</option>
-                            </optgroup>
-                            <optgroup label="지원 중단된 모델">
-                                <option value="gemini-1.5-flash">Gemini 1.5 Flash (구)</option>
-                                <option value="gemini-1.5-flash-8b">Gemini 1.5 Flash-8B</option>
-                                <option value="gemini-1.5-pro">Gemini 1.5 Pro (구)</option>
-                            </optgroup>
-                        </select>
-                        <p id="modelCompatibilityWarning" class="info-text hidden" style="color: var(--warning-color); margin-top: 8px;"></p>
-                    </div>
-                </div>
-
-                <div class="settings-group hidden" id="gptossSettings">
-                    <h3>GPT-OSS 설정</h3>
-                    <div class="form-group">
-                        <label for="gptossEndpoint">GPT-OSS 엔드포인트</label>
-                        <input type="text" id="gptossEndpoint" placeholder="http://localhost:11434 (Ollama) 또는 호스팅 URL">
-                        <p class="form-group-description">로컬 Ollama 서버 또는 호스팅된 GPT-OSS API 엔드포인트</p>
-                    </div>
-                    <div class="form-group">
-                        <label for="gptossApiKey">GPT-OSS API 키 (선택사항)</label>
-                        <input type="password" id="gptossApiKey" placeholder="호스팅 서비스용 API 키 (로컬은 비워두세요)">
-                        <p class="form-group-description">호스팅된 GPT-OSS 서비스를 사용하는 경우에만 입력</p>
-                    </div>
-                    <div class="form-group">
-                        <label for="gptossModel">GPT-OSS 모델</label>
-                        <select id="gptossModel">
-                            <option value="gpt-oss-20b" selected>GPT-OSS 20B (추천)</option>
-                            <option value="gpt-oss-120b">GPT-OSS 120B (고성능 GPU 필요)</option>
-                        </select>
-                        <p class="form-group-description">20B 모델은 16GB+ VRAM, 120B 모델은 60GB+ VRAM 필요</p>
-                    </div>
-                    <div class="form-group">
-                        <button type="button" id="testGptossBtn" class="button-secondary">연결 테스트</button>
-                        <p id="gptossTestResult" class="info-text hidden"></p>
-                    </div>
-                    <div class="form-group">
-                        <label for="writingTone">글쓰기 톤 & 스타일</label>
-                        <select id="writingTone">
-                            <option value="전문적인 (Professional)">전문적인</option>
-                            <option value="친근한 (Friendly)" selected>친근한</option>
-                            <option value="유머러스한 (Humorous)">유머러스한</option>
-                            <option value="설득적인 (Persuasive)">설득적인</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="targetAudience">타겟 독자</label>
-                        <select id="targetAudience">
-                            <option value="일반인 (쉬운 설명과 친근한 톤)" selected>일반인 (쉬운 설명과 친근한 톤)</option>
-                            <option value="전문가 (기술적 용어와 심화 내용)">전문가 (기술적 용어와 심화 내용)</option>
-                            <option value="대학생 (논리적이고 체계적인 설명)">대학생 (논리적이고 체계적인 설명)</option>
-                            <option value="중고등학생 (쉽고 재미있는 설명)">중고등학생 (쉽고 재미있는 설명)</option>
-                            <option value="사업가 (실무적이고 실용적인 관점)">사업가 (실무적이고 실용적인 관점)</option>
-                            <option value="초보자 (기본부터 차근차근 설명)">초보자 (기본부터 차근차근 설명)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="settings-group policy-warning-group">
-                    <h3>⚠️ 책임감 있는 사용 가이드</h3>
-                    <p class="form-group-description">
-                        본 프로그램은 콘텐츠 제작을 돕는 <strong>'도구'</strong>이며, 생성된 콘텐츠의 저작권 및 각종 정책 준수에 대한 <strong>최종 책임은 사용자에게 있습니다.</strong>
-                    </p>
-                    <p class="form-group-description">
-                        AI 생성 및 YouTube 변환 콘텐츠를 그대로 사용할 경우, Google 검색 스팸 정책, 애드센스 정책, 저작권법 등에 위배되어 불이익을 받을 수 있습니다.
-                    </p>
-                    <p class="form-group-description">
-                        <strong>권장 사용법:</strong> 생성된 콘텐츠는 <strong>'초안'</strong>으로만 활용하세요. 자신의 지식, 경험, 의견을 충분히 추가하여 독창적인 게시물로 재창조하는 것이 중요합니다.
-                    </p>
-                </div>
-            </div>
-            <footer class="sidebar-footer">
-                <button id="loginBtn" class="button-google">
-                    <svg aria-hidden="true" class="google-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path><path d="M1 1h22v22H1z" fill="none"></path></svg>
-                    <span>Google 로그인</span>
-                </button>
-                <div id="authStatus" class="status-box hidden"></div>
-            </footer>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <div id="chatContainer" class="chat-container">
-                <div class="chat-message ai">
-                    <div class="chat-bubble">
-                        <p>안녕하세요! AI 자동 블로깅 스튜디오입니다.</p>
-                        <p><strong>아래 입력창에 포스팅할 주제 또는 YouTube URL을 입력한 후 전송 버튼(➤)을 누르세요.</strong></p>
-                        <p>아이디어가 필요하시면 '주제 탐색' 모드를 켜고 대화를 시작할 수 있습니다.</p>
-                    </div>
-                </div>
-            </div>
+    <title>YouTube to SEO Content Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
         
-            <div class="chat-input-area">
-                <div class="chat-mode-toggle">
-                    <button id="topicDiscoveryBtn" title="주제 탐색 모드 켜기/끄기">
-                        <span class="ai-icon">AI</span>
-                        <span>주제 탐색</span>
-                    </button>
-                </div>
-                <form id="chatForm" class="chat-form">
-                    <input type="text" id="chatInput" placeholder="여기에 포스팅 주제 또는 YouTube URL을 입력하세요..." autocomplete="off" disabled>
-                    <button type="button" id="addToQueueFromChatBtn" title="큐에 추가" disabled>
-                        <span class="plus-icon">+</span>
-                    </button>
-                    <button type="submit" id="sendBtn" title="전송" disabled>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                    </button>
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 2rem auto;
+            max-width: 1200px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+        }
+        
+        .form-section {
+            padding: 2rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result-section {
+            display: none;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .preview-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .keyword-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin: 2px;
+            display: inline-block;
+            font-size: 0.8rem;
+        }
+        
+        .social-media-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .platform-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+            background: #e9ecef;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="main-container">
+            <!-- Header -->
+            <div class="header">
+                <h1><i class="fas fa-youtube"></i> YouTube to SEO Content Generator</h1>
+                <p class="mb-0">유튜브 스크립트를 SEO 최적화된 블로그 포스트로 변환하세요</p>
+            </div>
+            
+            <!-- Form Section -->
+            <div class="form-section">
+                <form id="conversionForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="youtubeUrl" class="form-label">
+                                    <i class="fas fa-link"></i> YouTube URL
+                                </label>
+                                <input type="url" class="form-control" id="youtubeUrl" 
+                                       placeholder="https://www.youtube.com/watch?v=..." required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="contentType" class="form-label">
+                                    <i class="fas fa-tags"></i> 콘텐츠 유형
+                                </label>
+                                <select class="form-select" id="contentType">
+                                    <option value="blog">블로그 포스트</option>
+                                    <option value="article">기사</option>
+                                    <option value="review">리뷰</option>
+                                    <option value="tutorial">튜토리얼</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="scriptText" class="form-label">
+                            <i class="fas fa-file-text"></i> YouTube 스크립트
+                        </label>
+                        <textarea class="form-control" id="scriptText" rows="10" 
+                                  placeholder="유튜브 영상의 스크립트를 여기에 붙여넣으세요..." required></textarea>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> 
+                            스크립트는 YouTube Studio에서 자동 생성된 자막을 사용하거나 수동으로 입력할 수 있습니다.
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-magic"></i> SEO 콘텐츠 생성하기
+                        </button>
+                    </div>
                 </form>
             </div>
-        </main>
-
-        <!-- Right Sidebar -->
-        <aside class="sidebar-right">
-            <div class="sidebar-header">
-                <h2>Run Settings</h2>
-                <button id="themeToggleBtn" class="button-icon" title="테마 전환">☀️</button>
+            
+            <!-- Loading Section -->
+            <div class="loading" id="loadingSection">
+                <div class="spinner"></div>
+                <h4>AI가 콘텐츠를 생성하고 있습니다...</h4>
+                <div class="progress mt-3">
+                    <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                </div>
+                <p class="mt-2 text-muted">잠시만 기다려주세요. 최대 1-2분 정도 소요될 수 있습니다.</p>
             </div>
-            <div class="settings-panel">
-                <div class="settings-group">
-                    <h3>이미지 소스</h3>
-                    <div class="form-group image-source-selector">
-                        <label><input type="radio" name="imageSource" value="none" checked> 없음</label>
-                        <label><input type="radio" name="imageSource" value="pexels"> Pexels</label>
-                        <label><input type="radio" name="imageSource" value="upload"> 업로드</label>
+            
+            <!-- Result Section -->
+            <div class="result-section" id="resultSection">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="preview-card">
+                            <h4><i class="fas fa-eye"></i> 미리보기</h4>
+                            <div id="contentPreview"></div>
+                        </div>
                     </div>
-                    <div id="pexelsConfig" class="form-group hidden">
-                        <label for="pexelsApiKey">Pexels API 키</label>
-                        <input type="password" id="pexelsApiKey" placeholder="Pexels API 키">
-                        <p class="form-group-description"><a href="https://www.pexels.com/api/" target="_blank">여기서 무료 API 키를 발급받으세요.</a></p>
-                    </div>
-                    <div id="uploadConfig" class="form-group hidden">
-                        <label for="userImageUpload">이미지 파일</label>
-                        <input type="file" id="userImageUpload" accept="image/jpeg, image/png, image/webp" class="file-input">
-                        <div id="imagePreviewContainer" class="image-preview-container hidden">
-                            <img id="imagePreview" src="#" alt="Preview"><button id="removeImageBtn">&times;</button>
+                    <div class="col-md-4">
+                        <div class="preview-card">
+                            <h4><i class="fas fa-chart-line"></i> SEO 분석</h4>
+                            <div id="seoAnalysis"></div>
+                        </div>
+                        
+                        <div class="preview-card">
+                            <h4><i class="fas fa-share-alt"></i> 소셜미디어</h4>
+                            <div id="socialMedia"></div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button class="btn btn-success btn-lg w-100 mb-2" onclick="downloadPackage()">
+                                <i class="fas fa-download"></i> 패키지 다운로드
+                            </button>
+                            <button class="btn btn-outline-primary w-100" onclick="resetForm()">
+                                <i class="fas fa-redo"></i> 새로 만들기
+                            </button>
                         </div>
                     </div>
                 </div>
-                
-                <div class="settings-group">
-                    <h3>
-                        <span class="youtube-icon">📺</span>
-                        YouTube 자막 추출
-                    </h3>
-                    <div class="youtube-toggle-container">
-                        <div class="toggle-switch-modern">
-                            <input type="checkbox" id="youtubeExtractEnabled" checked>
-                            <label for="youtubeExtractEnabled">
-                                <span class="toggle-track">
-                                    <span class="toggle-thumb">
-                                        <span class="toggle-icon">▶</span>
-                                    </span>
-                                </span>
-                                <span class="toggle-text">
-                                    <span class="toggle-on">ON</span>
-                                    <span class="toggle-off">OFF</span>
-                                </span>
-                            </label>
-                        </div>
-                        <div class="youtube-description">
-                            <p>YouTube URL 입력 시 자동으로 자막을 추출하여 고품질 블로그 포스팅을 생성합니다</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="settings-group">
-                    <details id="apiKeysSection" class="collapsible-section" open>
-                        <summary class="settings-group-header">
-                            <h3>API 키 및 연동 정보</h3>
-                            <span class="collapse-icon"></span>
-                        </summary>
-                        <div class="collapsible-content-wrapper">
-                            <div class="form-group">
-                                <label for="apiKey">Google Gemini API 키</label>
-                                <input type="password" id="apiKey" placeholder="AIzaSy... 키 (콘텐츠 생성 및 주제 탐색용)">
-                                <p class="form-group-description">콘텐츠 생성 및 '주제 탐색'에 모두 사용됩니다. <a href="https://aistudio.google.com/app/apikey" target="_blank">여기서 발급받으세요.</a></p>
-                            </div>
-                            <div class="form-group">
-                                <label for="clientId">Google OAuth 클라이언트 ID</label>
-                                <input type="password" id="clientId" placeholder="...apps.googleusercontent.com">
-                                <p class="form-group-description">Blogger 포스팅 연동에 필요합니다. <a href="https://console.cloud.google.com/apis/credentials" target="_blank">여기서 생성하세요.</a> (웹 애플리케이션 타입)</p>
-                            </div>
-                            <div class="form-group">
-                                <label for="blogId">대상 블로그 ID</label>
-                                <input type="text" id="blogId" placeholder="Blogger URL의 blogID= 뒤 숫자">
-                                <p class="form-group-description">Blogger 대시보드 URL의 'blogID=' 뒤 숫자입니다.</p>
-                            </div>
-                             <div class="form-group">
-                                <label for="blogAddress">블로그 주소</label>
-                                <input type="text" id="blogAddress" placeholder="https://your-blog.blogspot.com">
-                                <p class="form-group-description">포스팅 후 바로가기 링크에 사용됩니다.</p>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-
-                <div class="settings-group">
-                    <h3>포스팅 옵션</h3>
-                    <div class="form-group toggle-group">
-                        <label for="previewBeforePost">발행 전 미리보기</label>
-                        <label class="switch"><input type="checkbox" id="previewBeforePost" checked><span class="slider"></span></label>
-                    </div>
-
-                </div>
-
-                <div class="settings-group">
-                    <h3>자동화 (일괄 포스팅)</h3>
-                    <div id="postQueueContainer">
-                        <!-- JS will add queue items here -->
-                    </div>
-                    <div class="form-group">
-                        <label for="loopInterval">포스팅 간격</label>
-                        <select id="loopInterval">
-                            <option value="60000">1분</option>
-                            <option value="300000">5분</option>
-                            <option value="600000">10분</option>
-                            <option value="1800000">30분</option>
-                            <option value="3600000" selected>1시간</option>
-                        </select>
-                    </div>
-                    <div class="button-group">
-                        <button id="startLoopBtn" class="button-primary">일괄 시작</button>
-                        <button id="stopLoopBtn" class="button-secondary" disabled>일괄 중지</button>
-                    </div>
-                    <p class="form-group-description">주제/URL을 큐에 추가하고 '일괄 시작'을 누르면 설정된 간격으로 순차적으로 포스팅합니다. (최대 5개)<br><strong>참고:</strong> 일괄 포스팅은 주제/URL만 지원하며, 동영상 파일 업로드는 지원하지 않습니다.</p>
-                </div>
-
-
-            </div>
-        </aside>
-    </div>
-
-    <!-- Preview & Edit Modal -->
-    <div id="previewModal" class="modal-backdrop hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>콘텐츠 미리보기 및 수정</h2>
-                <button id="closeModalBtn" class="modal-close-btn">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="modal-guidance-text">
-                    <p>💡 <strong>이 내용은 AI 초안입니다.</strong> Google 정책 및 저작권 준수를 위해, 발행 전 반드시 자신의 생각과 경험을 담아 내용을 수정하고 보완해주세요.</p>
-                </div>
-                <div class="form-group">
-                    <label for="previewTitle">제목</label>
-                    <input type="text" id="previewTitle">
-                </div>
-                <div class="form-group">
-                    <label for="previewBody">본문 (HTML)</label>
-                    <textarea id="previewBody" rows="15"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button id="cancelPostBtn" class="button-secondary">취소</button>
-                <button id="approvePostBtn" class="button-primary">승인 및 포스팅</button>
             </div>
         </div>
     </div>
 
-    <script type="module" src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentPackage = null;
+        
+        document.getElementById('conversionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const youtubeUrl = document.getElementById('youtubeUrl').value;
+            const scriptText = document.getElementById('scriptText').value;
+            const contentType = document.getElementById('contentType').value;
+            
+            if (!youtubeUrl || !scriptText) {
+                alert('YouTube URL과 스크립트를 모두 입력해주세요.');
+                return;
+            }
+            
+            // 로딩 시작
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/convert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        youtube_url: youtubeUrl,
+                        script_text: scriptText,
+                        content_type: contentType
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentPackage = result.package;
+                    showResults(result.package);
+                } else {
+                    alert('오류: ' + result.error);
+                }
+            } catch (error) {
+                alert('네트워크 오류가 발생했습니다: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        });
+        
+        function showLoading() {
+            document.getElementById('loadingSection').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+            
+            // 프로그레스 바 애니메이션
+            const progressBar = document.querySelector('.progress-bar');
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 90) {
+                    clearInterval(interval);
+                } else {
+                    width += Math.random() * 10;
+                    progressBar.style.width = width + '%';
+                }
+            }, 500);
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingSection').style.display = 'none';
+        }
+        
+        function showResults(package) {
+            document.getElementById('resultSection').style.display = 'block';
+            
+            // 콘텐츠 미리보기
+            const contentPreview = document.getElementById('contentPreview');
+            if (package.seo_content && package.seo_content.html_content) {
+                contentPreview.innerHTML = package.seo_content.html_content;
+            }
+            
+            // SEO 분석
+            const seoAnalysis = document.getElementById('seoAnalysis');
+            if (package.analysis) {
+                let analysisHtml = '';
+                
+                if (package.analysis.main_keywords) {
+                    analysisHtml += '<h6>주요 키워드:</h6>';
+                    package.analysis.main_keywords.forEach(keyword => {
+                        analysisHtml += `<span class="keyword-badge">${keyword}</span>`;
+                    });
+                    analysisHtml += '<br><br>';
+                }
+                
+                if (package.analysis.main_topic) {
+                    analysisHtml += `<h6>주요 주제:</h6><p>${package.analysis.main_topic}</p>`;
+                }
+                
+                if (package.analysis.target_audience) {
+                    analysisHtml += `<h6>타겟 독자:</h6><p>${package.analysis.target_audience}</p>`;
+                }
+                
+                seoAnalysis.innerHTML = analysisHtml;
+            }
+            
+            // 소셜미디어
+            const socialMedia = document.getElementById('socialMedia');
+            if (package.social_media) {
+                let socialHtml = '';
+                
+                const platforms = {
+                    instagram: { name: 'Instagram', icon: 'fab fa-instagram', color: '#E4405F' },
+                    twitter: { name: 'Twitter', icon: 'fab fa-twitter', color: '#1DA1F2' },
+                    linkedin: { name: 'LinkedIn', icon: 'fab fa-linkedin', color: '#0077B5' },
+                    facebook: { name: 'Facebook', icon: 'fab fa-facebook', color: '#1877F2' }
+                };
+                
+                Object.entries(package.social_media).forEach(([platform, content]) => {
+                    if (platforms[platform]) {
+                        const platformInfo = platforms[platform];
+                        socialHtml += `
+                            <div class="social-media-card">
+                                <div class="d-flex align-items-center">
+                                    <i class="${platformInfo.icon}" style="color: ${platformInfo.color}; font-size: 1.2rem;"></i>
+                                    <strong>${platformInfo.name}</strong>
+                                </div>
+                                <p class="mt-2 mb-0">${content}</p>
+                            </div>
+                        `;
+                    }
+                });
+                
+                socialMedia.innerHTML = socialHtml;
+            }
+        }
+        
+        async function downloadPackage() {
+            if (!currentPackage) {
+                alert('다운로드할 패키지가 없습니다.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/download', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        package: currentPackage
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `seo_package_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.zip`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('다운로드 중 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                alert('다운로드 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+        
+        function resetForm() {
+            document.getElementById('conversionForm').reset();
+            document.getElementById('resultSection').style.display = 'none';
+            currentPackage = null;
+        }
+    </script>
 </body>
 </html>

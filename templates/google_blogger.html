@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube to Google Blogger Automation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 2rem auto;
+            max-width: 1200px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+        }
+        
+        .form-section {
+            padding: 2rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #4285f4;
+            box-shadow: 0 0 0 0.2rem rgba(66, 133, 244, 0.25);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4285f4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result-section {
+            display: none;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .preview-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .blog-selector {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .blog-item {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .blog-item:hover {
+            border-color: #4285f4;
+            background: #f8f9fa;
+        }
+        
+        .blog-item.selected {
+            border-color: #4285f4;
+            background: #e3f2fd;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+            background: #e9ecef;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            border-radius: 10px;
+        }
+        
+        .publish-mode-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .publish-mode-btn {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .publish-mode-btn:hover {
+            border-color: #4285f4;
+        }
+        
+        .publish-mode-btn.selected {
+            border-color: #4285f4;
+            background: #e3f2fd;
+            color: #4285f4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="main-container">
+            <!-- Header -->
+            <div class="header">
+                <h1><i class="fab fa-google"></i> YouTube to Google Blogger Automation</h1>
+                <p class="mb-0">유튜브 스크립트를 구글 블로그 포스트로 자동 변환하세요</p>
+            </div>
+            
+            <!-- Form Section -->
+            <div class="form-section">
+                <form id="conversionForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="youtubeUrl" class="form-label">
+                                    <i class="fab fa-youtube"></i> YouTube URL
+                                </label>
+                                <input type="url" class="form-control" id="youtubeUrl" 
+                                       placeholder="https://www.youtube.com/watch?v=..." required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="blogSelector" class="form-label">
+                                    <i class="fas fa-blog"></i> 블로그 선택
+                                </label>
+                                <select class="form-select" id="blogSelector">
+                                    <option value="">블로그를 선택하세요...</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="loadBlogs()">
+                                    <i class="fas fa-sync"></i> 블로그 목록 새로고침
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-upload"></i> 발행 모드
+                        </label>
+                        <div class="publish-mode-selector">
+                            <div class="publish-mode-btn selected" data-mode="draft">
+                                <i class="fas fa-edit"></i>
+                                <div><strong>초안</strong></div>
+                                <small>검토 후 발행</small>
+                            </div>
+                            <div class="publish-mode-btn" data-mode="publish">
+                                <i class="fas fa-paper-plane"></i>
+                                <div><strong>바로 발행</strong></div>
+                                <small>즉시 공개</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="scriptText" class="form-label">
+                            <i class="fas fa-file-text"></i> YouTube 스크립트
+                        </label>
+                        <textarea class="form-control" id="scriptText" rows="10" 
+                                  placeholder="유튜브 영상의 스크립트를 여기에 붙여넣으세요..." required></textarea>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> 
+                            스크립트는 YouTube Studio에서 자동 생성된 자막을 사용하거나 수동으로 입력할 수 있습니다.
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="button" class="btn btn-outline-primary me-2" onclick="previewContent()">
+                            <i class="fas fa-eye"></i> 미리보기
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-magic"></i> 블로그 포스트 생성하기
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Loading Section -->
+            <div class="loading" id="loadingSection">
+                <div class="spinner"></div>
+                <h4>AI가 블로그 포스트를 생성하고 있습니다...</h4>
+                <div class="progress mt-3">
+                    <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                </div>
+                <p class="mt-2 text-muted">잠시만 기다려주세요. 최대 1-2분 정도 소요될 수 있습니다.</p>
+            </div>
+            
+            <!-- Result Section -->
+            <div class="result-section" id="resultSection">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="preview-card">
+                            <h4><i class="fas fa-eye"></i> 생성된 포스트</h4>
+                            <div id="contentPreview"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="preview-card">
+                            <h4><i class="fas fa-info-circle"></i> 포스트 정보</h4>
+                            <div id="postInfo"></div>
+                        </div>
+                        
+                        <div class="preview-card">
+                            <h4><i class="fas fa-cogs"></i> 작업</h4>
+                            <div id="actions"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentResult = null;
+        let selectedBlog = null;
+        let selectedPublishMode = 'draft';
+        
+        // 페이지 로드 시 블로그 목록 가져오기
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBlogs();
+        });
+        
+        // 발행 모드 선택
+        document.querySelectorAll('.publish-mode-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.publish-mode-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPublishMode = this.dataset.mode;
+            });
+        });
+        
+        // 블로그 목록 가져오기
+        async function loadBlogs() {
+            try {
+                const response = await fetch('/api/blogs');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const blogSelector = document.getElementById('blogSelector');
+                    blogSelector.innerHTML = '<option value="">블로그를 선택하세요...</option>';
+                    
+                    result.blogs.forEach(blog => {
+                        const option = document.createElement('option');
+                        option.value = blog.id;
+                        option.textContent = blog.name;
+                        blogSelector.appendChild(option);
+                    });
+                    
+                    if (result.blogs.length > 0) {
+                        selectedBlog = result.blogs[0].id;
+                        blogSelector.value = selectedBlog;
+                    }
+                } else {
+                    alert('블로그 목록을 가져오는데 실패했습니다: ' + result.error);
+                }
+            } catch (error) {
+                alert('블로그 목록을 가져오는데 실패했습니다: ' + error.message);
+            }
+        }
+        
+        // 미리보기
+        async function previewContent() {
+            const scriptText = document.getElementById('scriptText').value;
+            
+            if (!scriptText) {
+                alert('스크립트를 입력해주세요.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/preview', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        script_text: scriptText
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showPreview(result.post_data);
+                } else {
+                    alert('미리보기 생성 실패: ' + result.error);
+                }
+            } catch (error) {
+                alert('미리보기 생성 실패: ' + error.message);
+            }
+        }
+        
+        // 미리보기 표시
+        function showPreview(postData) {
+            document.getElementById('resultSection').style.display = 'block';
+            
+            const contentPreview = document.getElementById('contentPreview');
+            contentPreview.innerHTML = `
+                <h2>${postData.title}</h2>
+                <div>${postData.content}</div>
+                <hr>
+                <p><strong>태그:</strong> ${postData.labels.join(', ')}</p>
+                <p><strong>카테고리:</strong> ${postData.category}</p>
+                <p><strong>읽기 시간:</strong> ${postData.reading_time}</p>
+            `;
+        }
+        
+        // 폼 제출
+        document.getElementById('conversionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const youtubeUrl = document.getElementById('youtubeUrl').value;
+            const scriptText = document.getElementById('scriptText').value;
+            const blogId = document.getElementById('blogSelector').value;
+            
+            if (!youtubeUrl || !scriptText) {
+                alert('YouTube URL과 스크립트를 모두 입력해주세요.');
+                return;
+            }
+            
+            if (!blogId) {
+                alert('블로그를 선택해주세요.');
+                return;
+            }
+            
+            // 로딩 시작
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/convert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        youtube_url: youtubeUrl,
+                        script_text: scriptText,
+                        publish_mode: selectedPublishMode,
+                        blog_id: blogId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentResult = result.result;
+                    showResults(result.result);
+                } else {
+                    alert('오류: ' + result.error);
+                }
+            } catch (error) {
+                alert('네트워크 오류가 발생했습니다: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        });
+        
+        function showLoading() {
+            document.getElementById('loadingSection').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+            
+            // 프로그레스 바 애니메이션
+            const progressBar = document.querySelector('.progress-bar');
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 90) {
+                    clearInterval(interval);
+                } else {
+                    width += Math.random() * 10;
+                    progressBar.style.width = width + '%';
+                }
+            }, 500);
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingSection').style.display = 'none';
+        }
+        
+        function showResults(result) {
+            document.getElementById('resultSection').style.display = 'block';
+            
+            // 콘텐츠 미리보기
+            const contentPreview = document.getElementById('contentPreview');
+            contentPreview.innerHTML = `
+                <h2>${result.post_data.title}</h2>
+                <div>${result.post_data.content}</div>
+            `;
+            
+            // 포스트 정보
+            const postInfo = document.getElementById('postInfo');
+            postInfo.innerHTML = `
+                <p><strong>블로그:</strong> ${result.blog_info.name}</p>
+                <p><strong>제목:</strong> ${result.post_data.title}</p>
+                <p><strong>태그:</strong> ${result.post_data.labels.join(', ')}</p>
+                <p><strong>카테고리:</strong> ${result.post_data.category}</p>
+                <p><strong>읽기 시간:</strong> ${result.post_data.reading_time}</p>
+                <p><strong>생성된 이미지:</strong> ${result.images.length}개</p>
+            `;
+            
+            // 작업 버튼
+            const actions = document.getElementById('actions');
+            let actionButtons = '';
+            
+            if (result.result.draft_url) {
+                actionButtons += `
+                    <a href="${result.result.draft_url}" target="_blank" class="btn btn-primary w-100 mb-2">
+                        <i class="fas fa-edit"></i> 초안 편집
+                    </a>
+                `;
+            }
+            
+            if (result.result.url) {
+                actionButtons += `
+                    <a href="${result.result.url}" target="_blank" class="btn btn-success w-100 mb-2">
+                        <i class="fas fa-external-link-alt"></i> 포스트 보기
+                    </a>
+                `;
+            }
+            
+            actionButtons += `
+                <button class="btn btn-outline-primary w-100" onclick="resetForm()">
+                    <i class="fas fa-redo"></i> 새로 만들기
+                </button>
+            `;
+            
+            actions.innerHTML = actionButtons;
+        }
+        
+        function resetForm() {
+            document.getElementById('conversionForm').reset();
+            document.getElementById('resultSection').style.display = 'none';
+            currentResult = null;
+        }
+    </script>
+</body>
+</html>
+
+
